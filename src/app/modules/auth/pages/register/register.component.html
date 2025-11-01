@@ -1,0 +1,113 @@
+<div class="page">
+  <section class="card">
+    <h1>Crear Cuenta</h1>
+
+    <!-- Email -->
+    <label class="field">
+      <span class="field-label">Email</span>
+      <div class="input-wrap">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+          </svg>
+        </span>
+        <input [(ngModel)]="form.email" name="email" type="email" placeholder="tu@email.com" required />
+      </div>
+    </label>
+
+    <!-- Contraseña -->
+    <label class="field">
+      <span class="field-label">Contraseña</span>
+      <div class="input-wrap">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M17 8h-1V6a4 4 0 00-8 0v2H7a1 1 0 00-1 1v11a1 1 0 001 1h10a1 1 0 001-1V9a1 1 0 00-1-1zm-7-2a2 2 0 114 0v2h-4V6z"/>
+          </svg>
+        </span>
+        <input [(ngModel)]="form.password" name="password" type="password" placeholder="••••••••" required minlength="6" />
+      </div>
+    </label>
+
+    <!-- Username -->
+    <label class="field">
+      <span class="field-label">Nombre de usuario</span>
+      <div class="input-wrap">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/>
+          </svg>
+        </span>
+        <input [(ngModel)]="form.username" name="username" type="text" placeholder="tu_usuario" required minlength="3" />
+      </div>
+    </label>
+
+    <!-- Género -->
+    <label class="field">
+      <span class="field-label">Género</span>
+      <div class="select-wrap">
+        <select [(ngModel)]="form.gender" name="gender" required>
+          <option [ngValue]="null" disabled>Selecciona tu género</option>
+          <option *ngFor="let g of genders" [ngValue]="g.value">{{ g.label }}</option>
+        </select>
+      </div>
+    </label>
+
+    <!-- Fecha de nacimiento -->
+    <label class="field">
+      <span class="field-label">Fecha de nacimiento</span>
+      <div class="input-wrap">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 00-2 2v13a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zm0 15H5V10h14v9z"/>
+          </svg>
+        </span>
+        <input [(ngModel)]="form.birthday" name="birthday" type="date" placeholder="dd/mm/aaaa" required />
+      </div>
+    </label>
+
+    <!-- Nivel -->
+    <label class="field">
+      <span class="field-label">Nivel de entrenamiento</span>
+      <div class="select-wrap">
+        <select [(ngModel)]="form.level" name="level" required>
+          <option [ngValue]="null" disabled>Selecciona tu nivel</option>
+          <option *ngFor="let l of levels" [ngValue]="l.value">{{ l.label }}</option>
+        </select>
+      </div>
+    </label>
+
+    <!-- Días de entrenamiento (Slider 1–7) -->
+    <div class="field">
+      <div class="field-header">
+        <span class="field-label">Días de entrenamiento: <strong>{{ form.trainDays }}</strong></span>
+      </div>
+
+      <input
+        class="slider"
+        type="range"
+        min="1"
+        max="7"
+        step="1"
+        [(ngModel)]="form.trainDays"
+        name="trainDays"
+        aria-label="Días de entrenamiento por semana"
+      />
+
+      <div class="ticks">
+        <span>1 día</span>
+        <span>7 días</span>
+      </div>
+    </div>
+
+    <button class="cta" (click)="submit()" [disabled]="loading()">
+      {{ loading() ? 'Creando...' : 'Crear cuenta' }}
+    </button>
+
+    <p class="acc">
+      ¿Ya tienes cuenta? <a routerLink="/login" class="link">Inicia sesión aquí</a>
+    </p>
+
+    <p class="error" *ngIf="error()">{{ error() }}</p>
+    <p class="ok" *ngIf="ok()">¡Registro exitoso!</p>
+  </section>
+</div>

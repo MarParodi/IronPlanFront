@@ -1,0 +1,30 @@
+@if (!isLoginPage) {
+  <header data-bs-theme="dark">
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-white">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img src="assets/images/HSBC-Logo.png" alt="" width="100px" />
+        </a>
+        <form class="d-flex" role="search">
+          @if (isPromotionsPage) {
+            <button
+              class="btn btn-outline-success btn-exit"
+              type="button"
+              (click)="goBack()"
+            >
+              Regresar
+            </button>
+          } @else {
+            <button
+              class="btn btn-outline-success btn-exit"
+              type="button"
+              (click)="logout()"
+            >
+              Salir
+            </button>
+          }
+        </form>
+      </div>
+    </nav>
+  </header>
+}
