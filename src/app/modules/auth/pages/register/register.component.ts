@@ -21,6 +21,13 @@ export class RegisterComponent {
     { label: 'Masculino', value: 'MASCULINO' },
     { label: 'Otro',      value: 'OTRO' },
   ];
+get trainDaysPercent(): string {
+  const min = 1;
+  const max = 7;
+  const value = this.form.trainDays ?? min;
+  const pct = ((value - min) / (max - min)) * 100;
+  return pct + '%';
+}
 
   levels: {label: string; value: Level}[] = [
     { label: 'Principiante', value: 'NOVATO' },

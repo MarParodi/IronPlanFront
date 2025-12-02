@@ -6,7 +6,7 @@ import {
   OnInit
 } from '@angular/core';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
-import { TokenService } from '../../services/token.service';
+import { AuthService } from '../../../modules/auth/services/auth.service';
 import { filter } from 'rxjs/operators';
 import { input } from '@angular/core';
 
@@ -18,29 +18,15 @@ import { input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent implements OnInit {
-  private _tokenSvc = inject(TokenService);
+  private _tokenSvc = inject(AuthService);
   private _router = inject(Router);
   private _cdr = inject(ChangeDetectorRef);
-  logged = input.required<boolean>();
+
   isLoginPage = false;
   isPromotionsPage = false;
 
   ngOnInit(): void {
-    this._router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
-        this.isLoginPage = event.urlAfterRedirects.includes('/auth/login') || event.urlAfterRedirects.includes('/auth/recovery-password');
-        this._cdr.markForCheck();
-      });
-    this.isLoginPage = this._router.url.includes('/auth/login') || this._router.url.includes('/auth/recovery-password');
-
-    this._router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
-        this.isPromotionsPage = event.urlAfterRedirects.includes('/promotions');
-        this._cdr.markForCheck();
-      });
-
+   
 
   }
 

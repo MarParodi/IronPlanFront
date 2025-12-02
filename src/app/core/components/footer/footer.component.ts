@@ -16,18 +16,7 @@ export class FooterComponent {
   private _router = inject(Router);
   private _cdr = inject(ChangeDetectorRef);
 
-  isLoginPage = false;
-  logged = input.required<boolean>();
-
   ngOnInit(): void {
-    this._router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
-        this.isLoginPage = event.urlAfterRedirects.includes('/auth/login') || event.urlAfterRedirects.includes('/auth/recovery-password');
-        this._cdr.markForCheck();
-      });
-
-    this.isLoginPage = this._router.url.includes('/auth/login') || this._router.url.includes('/auth/recovery-password');
 
   }
 }
