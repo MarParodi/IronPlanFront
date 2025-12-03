@@ -7,14 +7,16 @@ export interface CardsPage {
   size: number;
 }
 
-export type AccessType = 'FREE' | 'XP_UNLOCK';
-export type Goal = 'HYPERTROPHY' | 'STRENGTH' | 'ENDURANCE' | 'POWER' | 'FAT_LOSS' | 'MOBILITY';
+export type AccessType = 'FREE' | 'XP_UNLOCK' | 'USER_SHARED';
+export type Goal = 'HIPERTROFIA' | 'FUERZA' | 'RESISTENCIA';
 
 export interface Card {
   id: string;
   name: string;
-  img: string;        // ← usa 'image' (mapea desde 'img' del backend)
+  img: string;
   accessType: AccessType;
   goal: Goal;
   description: string;
+  usageCount?: number;        // Contador de veces que se ha usado la rutina
+  ownerUsername?: string;     // Username del usuario que compartió la rutina (cuando accessType es USER_SHARED)
 }

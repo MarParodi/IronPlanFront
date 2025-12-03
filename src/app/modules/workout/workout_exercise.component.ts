@@ -12,6 +12,7 @@ import {
   WorkoutSetRequest
 } from './models/workout.models';
 import { WorkoutService } from './services/workout.services';
+import { SafePipe } from './pipes/safe.pipe';
 import { Subscription, interval } from 'rxjs';
 
 @Component({
@@ -21,7 +22,8 @@ import { Subscription, interval } from 'rxjs';
   imports: [
     CommonModule,   // 👉 NgIf, NgFor, pipes como number, etc.
     FormsModule,    // 👉 [(ngModel)]
-    RouterModule
+    RouterModule,
+    SafePipe        // 👉 Para sanitizar URLs de videos
   ]
 })
 export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
@@ -45,6 +47,9 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   loading = false;
   saving = false;
   errorMessage: string | null = null;
+
+  // Video modal
+  showVideoModal = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -190,6 +195,21 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   // Guardar series y avanzar
   // ─────────────────────────────────────────────
 
+  /**
+   * Verifica si este es el último ejercicio de la sesión
+   */
+  get isLastExercise(): boolean {
+    if (!this.data) return false;
+    return this.data.nextExercises.length === 0;
+  }
+
+  /**
+   * Texto del botón según si es último o no
+   */
+  get submitButtonText(): string {
+    return this.isLastExercise ? '✓ Finalizar sesión' : 'Registrar y continuar →';
+  }
+
   onSaveAndNext(): void {
     if (!this.data) return;
 
@@ -205,9 +225,14 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
         next: () => {
           this.saving = false;
 
-          // Ir al siguiente ejercicio por order+1
-          const nextOrder = this.data!.exerciseOrder + 1;
-          this.router.navigate(['/workouts', this.sessionId, 'exercise', nextOrder]);
+          // Si es el último ejercicio, ir al resumen
+          if (this.isLastExercise) {
+            this.router.navigate(['/workouts', this.sessionId, 'summary']);
+          } else {
+            // Ir al siguiente ejercicio por order+1
+            const nextOrder = this.data!.exerciseOrder + 1;
+            this.router.navigate(['/workouts', this.sessionId, 'exercise', nextOrder]);
+          }
         },
         error: (err) => {
           console.error(err);
@@ -215,6 +240,66 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
           this.errorMessage = 'No se pudieron guardar las series.';
         }
       });
+  }
+
+  // ─────────────────────────────────────────────
+  // Video
+  // ─────────────────────────────────────────────
+
+  /**
+   * Verifica si hay video disponible
+   */
+  get hasVideo(): boolean {
+    return !!this.data?.exerciseVideoUrl;
+  }
+
+  /**
+   * Obtiene el ID del video de YouTube si es una URL de YouTube
+   */
+  get youtubeVideoId(): string | null {
+    if (!this.data?.exerciseVideoUrl) return null;
+    
+    const url = this.data.exerciseVideoUrl;
+    
+    // Patrones de YouTube
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+      /youtube\.com\/shorts\/([^&\n?#]+)/
+    ];
+    
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    
+    return null;
+  }
+
+  /**
+   * URL del embed de YouTube
+   */
+  get youtubeEmbedUrl(): string | null {
+    const id = this.youtubeVideoId;
+    if (!id) return null;
+    return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
+  }
+
+  /**
+   * Es un video directo (no YouTube)
+   */
+  get isDirectVideo(): boolean {
+    if (!this.data?.exerciseVideoUrl) return false;
+    return !this.youtubeVideoId;
+  }
+
+  openVideoModal(): void {
+    this.showVideoModal = true;
+  }
+
+  closeVideoModal(): void {
+    this.showVideoModal = false;
   }
   // ─────────────────────────────────────────────
   // Reordenar siguientes ejercicios en la UI

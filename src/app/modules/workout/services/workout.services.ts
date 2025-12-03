@@ -8,6 +8,7 @@ import {
   WorkoutSetRequest,
   ReorderNextExercisesRequest
 } from '../models/workout.models';
+import { WorkoutSessionSummaryResponse } from '../models/workout-summary.model';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -57,6 +58,15 @@ export class WorkoutService {
       `${this.baseUrl}/workouts/start`,
       body
     );
+  }
+
+  /**
+   * Obtener resumen de sesión completada
+   * GET /api/workouts/{sessionId}/summary
+   */
+  getSessionSummary(sessionId: number): Observable<WorkoutSessionSummaryResponse> {
+    const url = `${this.baseUrl}/workouts/${sessionId}/summary`;
+    return this.http.get<WorkoutSessionSummaryResponse>(url);
   }
 
 }

@@ -8,12 +8,12 @@ import {
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { AuthService } from '../../../modules/auth/services/auth.service';
 import { filter } from 'rxjs/operators';
-import { input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, CommonModule],
   templateUrl: './header.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -22,12 +22,18 @@ export class HeaderComponent implements OnInit {
   private _router = inject(Router);
   private _cdr = inject(ChangeDetectorRef);
 
+  mobileMenuOpen = false;
   isLoginPage = false;
   isPromotionsPage = false;
 
   ngOnInit(): void {
-   
-
+    // Cerrar menú móvil en cambio de ruta
+    this._router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.mobileMenuOpen = false;
+        this._cdr.markForCheck();
+      });
   }
 
   goBack(): void {

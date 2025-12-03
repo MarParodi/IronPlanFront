@@ -16,6 +16,12 @@ export const routes: Routes = [
     import('./modules/home/home.component').then(m => m.HomeComponent),
   canActivate: [authGuard]
 },
+{
+  path: 'mis-rutinas',
+  loadComponent: () =>
+    import('./modules/my-routine/my-routine.component').then(m => m.MyRoutineComponent),
+  canActivate: [authGuard]
+},
 
 {
     path: 'routines/:id',
@@ -38,6 +44,19 @@ export const routes: Routes = [
   canActivate: [authGuard]
 },
 
+{
+  path: 'workouts/:sessionId/summary',
+  loadComponent: () =>
+    import('./modules/workout/summary/workout-summary.component').then(m => m.WorkoutSummaryComponent),
+  canActivate: [authGuard]
+},
+
+{
+  path: 'perfil',
+  loadComponent: () =>
+    import('./modules/profile/profile.component').then(m => m.ProfileComponent),
+  canActivate: [authGuard]
+},
 
   { path: '**', redirectTo: '' }
 ];

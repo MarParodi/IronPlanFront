@@ -31,6 +31,8 @@ export class RoutineOverviewComponent implements OnInit {
   routine: RoutineOverviewResponse | null = null;
   loading = true;
   error: string | null = null;
+  startingRoutine = false;
+  routineStarted = false;
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -59,9 +61,23 @@ export class RoutineOverviewComponent implements OnInit {
   }
 
   onStartRoutine(): void {
-    if (!this.routine) return;
-    // Aquí luego conectaremos con la pantalla de "sesión de entrenamiento"
-    console.log('Empezar rutina', this.routine.id);
+    if (!this.routine || this.startingRoutine) return;
+    
+    this.startingRoutine = true;
+    this.homeService.startRoutine(this.routine.id).subscribe({
+      next: () => {
+        this.routineStarted = true;
+        this.startingRoutine = false;
+        this.cdr.markForCheck();
+        // Navegar a "Mis Rutinas" para ver la rutina activa
+        this.router.navigate(['/mis-rutinas']);
+      },
+      error: (err) => {
+        console.error('Error al empezar la rutina', err);
+        this.startingRoutine = false;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   onSessionClick(session: RoutineSessionOverview): void {

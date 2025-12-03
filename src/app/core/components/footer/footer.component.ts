@@ -1,9 +1,5 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { ChangeDetectorRef, inject, OnInit } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
-
 
 @Component({
   selector: 'app-footer',
@@ -13,10 +9,5 @@ import { filter } from 'rxjs/operators';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FooterComponent {
-  private _router = inject(Router);
-  private _cdr = inject(ChangeDetectorRef);
-
-  ngOnInit(): void {
-
-  }
+  currentYear = new Date().getFullYear();
 }

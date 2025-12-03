@@ -1,4 +1,3 @@
-
 export interface RoutineDetailResponse {
   id: string;
   name: string;
@@ -6,4 +5,6 @@ export interface RoutineDetailResponse {
   goal: string;
   description: string;
   suggestedLevel?: string;
+  img?: string;
+  usageCount?: number;
 }

@@ -77,12 +77,20 @@
       <div class="mt-8">
         <button
           (click)="onStartRoutine()"
+          [disabled]="startingRoutine"
           class="w-full md:w-auto md:min-w-[220px] inline-flex items-center justify-center gap-2 px-6 py-3
                  rounded-2xl bg-teal-400 text-slate-950 font-semibold text-sm md:text-base
                  hover:brightness-110 active:translate-y-[1px] transition
-                 shadow-[0_10px_25px_rgba(45,212,191,0.4)]"
+                 shadow-[0_10px_25px_rgba(45,212,191,0.4)]
+                 disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Empezar rutina
+          <!-- Spinner cuando está cargando -->
+          <svg *ngIf="startingRoutine" class="animate-spin w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span *ngIf="!startingRoutine">Empezar rutina</span>
+          <span *ngIf="startingRoutine">Asignando...</span>
         </button>
       </div>
 
@@ -99,23 +107,27 @@
             <div class="space-y-3">
               <div
                 *ngFor="let s of b.sessions; trackBy: trackBySession"
-                (click)="onSessionClick(s)"
                 class="bg-[#171a1d] rounded-2xl px-4 py-3 md:px-5 md:py-4
                        flex items-center justify-between gap-3 shadow-md
-                       cursor-pointer hover:border hover:border-teal-400/60 transition"
+                       border border-slate-800/60 opacity-75"
               >
                 <div class="flex-1">
-                  <p class="text-sm md:text-base font-semibold uppercase tracking-wide">
+                  <p class="text-sm md:text-base font-semibold uppercase tracking-wide text-slate-300">
                     {{ s.title }}
                   </p>
-                  <p class="text-xs md:text-sm text-amber-400">
+                  <p class="text-xs md:text-sm text-amber-400/70">
                     {{ s.totalSeries }} series
                   </p>
-                  <p class="text-xs md:text-sm text-slate-400">
+                  <p class="text-xs md:text-sm text-slate-500">
                     {{ s.mainMuscles }}
                   </p>
                 </div>
-                <span class="text-teal-300 text-xl md:text-2xl">›</span>
+                <!-- Icono de candado -->
+                <div class="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>

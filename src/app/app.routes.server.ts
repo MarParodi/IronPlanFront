@@ -14,6 +14,10 @@ export const serverRoutes: ServerRoute[] = [
     path: 'workouts/:sessionId/exercise/:order',
     renderMode: RenderMode.Server
   },
+  {
+    path: 'workouts/:sessionId/summary',
+    renderMode: RenderMode.Server
+  },
   // Resto de rutas - prerenderizar
   {
     path: '**',
