@@ -22,6 +22,12 @@ export const routes: Routes = [
     import('./modules/my-routine/my-routine.component').then(m => m.MyRoutineComponent),
   canActivate: [authGuard]
 },
+{
+  path: 'crear',
+  loadComponent: () =>
+    import('./modules/create-routine/create-routine.component').then(m => m.CreateRoutineComponent),
+  canActivate: [authGuard]
+},
 
 {
     path: 'routines/:id',
