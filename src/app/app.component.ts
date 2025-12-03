@@ -1,7 +1,7 @@
 // src/app/app.component.ts
 import { Component, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './modules/auth/services/auth.service';
 import { FooterComponent } from './core/components/footer/footer.component';
@@ -12,7 +12,7 @@ import { SpinnerComponent } from './features/components/spinner/spinner.componen
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, FooterComponent, HeaderComponent, SpinnerComponent],
+  imports: [CommonModule, RouterOutlet, FooterComponent, HeaderComponent, SpinnerComponent],
   template: `
      <app-header  />
     <router-outlet />

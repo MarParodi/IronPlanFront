@@ -17,5 +17,27 @@ export const routes: Routes = [
   canActivate: [authGuard]
 },
 
+{
+    path: 'routines/:id',
+    loadComponent: () =>
+      import('./modules/home/routine/routine.component')
+        .then(m => m.RoutineOverviewComponent),
+    canActivate: [authGuard],
+  },
+
+{
+  path: 'academia/routines/:routineId/sessions/:sessionId',
+  loadComponent: () =>
+    import('./modules/session/session.component').then(m => m.SessionComponent)
+},
+
+{
+  path: 'workouts/:sessionId/exercise/:order',
+  loadComponent: () =>
+    import('./modules/workout/workout_exercise.component').then(m => m.WorkoutExercisePageComponent),
+  canActivate: [authGuard]
+},
+
+
   { path: '**', redirectTo: '' }
 ];

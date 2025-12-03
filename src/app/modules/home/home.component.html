@@ -198,6 +198,7 @@
       <div class="mt-5">
         <button
           *ngIf="r.accessType === 'XP_UNLOCK'; else freeBtn"
+              (click)="onStartRoutine(r)"
           class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl
                  bg-slate-900 text-slate-50 font-semibold text-sm
                  border border-slate-600 hover:border-teal-300/70 hover:bg-slate-800
@@ -208,6 +209,7 @@
 
         <ng-template #freeBtn>
           <button
+              (click)="onStartRoutine(r)"
             class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl
                    bg-teal-400 text-slate-950 font-semibold text-sm
                    hover:brightness-110 transition

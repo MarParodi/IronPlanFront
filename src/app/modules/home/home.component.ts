@@ -139,6 +139,18 @@ onDetails(card: Card): void {
     },
   });
 }
+onStartRoutine(routine: { id: string | number; accessType: string }): void {
+  if (routine.accessType === 'XP_UNLOCK') {
+    console.log('Intentar desbloquear con XP');
+    // Aquí luego pondremos el modal de "¿Deseas usar XP?"
+    return;
+  }
+
+  // FREE → navegar automáticamente al overview
+  this._router.navigate(['/routines', routine.id]);
+}
+
+
 
 closeDetail(): void {
   this.detailOpen = false;

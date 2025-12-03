@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { CardsPage, Card } from '../models/response/card_response';
 import { RoutineDetailResponse } from '../models/response/detail_routine_response';
+import { RoutineOverviewResponse } from '../models/response/routine_overview_response';
 
 @Injectable({ providedIn: 'root' })
 export class HomeService {
@@ -39,7 +40,11 @@ export class HomeService {
   return this.http.get<RoutineDetailResponse>(url);
 }
 
-
+  getRoutineOverview(id: string | number): Observable<RoutineOverviewResponse> {
+    return this.http.get<RoutineOverviewResponse>(
+      `${this.baseUrl}/routines/${id}/overview`
+    );
+  }
 
 
 
