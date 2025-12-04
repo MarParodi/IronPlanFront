@@ -1,0 +1,168 @@
+<ng-container *ngIf="loading(); else loaded">
+  <div class="min-h-screen bg-[#111416] text-slate-100 flex items-center justify-center">
+    <p class="text-slate-400 text-sm">Cargando sesión...</p>
+  </div>
+</ng-container>
+
+<ng-template #loaded>
+  <div *ngIf="session() as s; else errorTpl" class="min-h-screen bg-[#111416] text-slate-100">
+    <div class="max-w-3xl mx-auto px-4 md:px-6 lg:px-8 pb-10">
+
+      <!-- Header: back + saltar -->
+      <header class="flex items-center justify-between py-4 text-sm md:text-base">
+        <button
+          (click)="onBack()"
+          class="inline-flex items-center gap-2 text-slate-300 hover:text-slate-100 transition"
+        >
+          ← Volver
+        </button>
+
+        <button
+          (click)="onSkip()"
+          class="text-xs md:text-sm text-rose-400 hover:text-rose-300 font-medium"
+        >
+          Saltar sesión
+        </button>
+      </header>
+
+      <!-- Card principal -->
+      <section
+        class="bg-[#171a1d] rounded-3xl shadow-[0_18px_60px_rgba(0,0,0,0.7)]
+               px-4 py-5 md:px-6 md:py-6 space-y-3 md:space-y-4"
+      >
+        <!-- Título + subtítulo -->
+        <div class="space-y-1">
+          <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide">
+            {{ s.title }} <span *ngIf="s.icon" class="align-middle">{{ s.icon }}</span>
+          </h1>
+
+          <p class="text-xs md:text-sm text-amber-300 font-semibold">
+            {{ s.totalSeries }} series – {{ s.muscles }}
+          </p>
+        </div>
+
+        <!-- Descripción -->
+        <p class="text-sm md:text-base text-slate-200 leading-relaxed">
+          {{ s.description }}
+        </p>
+
+        <!-- Duración estimada -->
+        <div class="mt-2">
+          <span
+            class="inline-flex items-center gap-2 text-xs md:text-sm px-3 py-1.5 rounded-full
+                   bg-[#0f1516] border border-teal-400/60 text-teal-300"
+          >
+            ⏱️ Duración estimada: {{ s.estimatedMinutes }} min
+          </span>
+        </div>
+      </section>
+
+      <!-- Lista de ejercicios -->
+      <section class="mt-5 space-y-3">
+        <div
+          *ngFor="let ex of s.exercises; trackBy: trackByExercise"
+          class="bg-[#171a1d] rounded-2xl px-4 py-3 md:px-5 md:py-4 shadow-[0_12px_30px_rgba(0,0,0,0.55)]
+                 flex flex-col gap-2"
+        >
+          <!-- Primera línea: sets + reps + RIR + Ver detalles -->
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <!-- Badge series -->
+              <span
+                class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] md:text-[11px]
+                       font-semibold uppercase tracking-wide bg-amber-500 text-slate-950"
+              >
+                {{ ex.sets }} series
+              </span>
+
+              <!-- Rango de reps -->
+              <div class="leading-tight">
+                <p class="text-xs md:text-sm font-bold text-amber-300">
+                  {{ ex.repsMin }}-{{ ex.repsMax }} reps
+                </p>
+                <p class="text-[10px] md:text-xs text-slate-400">
+                  RIR {{ ex.rir }} · Descanso {{ ex.restMinutes }}&nbsp;min
+                </p>
+              </div>
+            </div>
+
+            <!-- Ver detalles (placeholder por ahora) -->
+            <button
+              type="button"
+              class="text-[11px] md:text-xs text-teal-300 hover:text-teal-200 font-medium inline-flex items-center gap-1"
+            >
+              Ver detalles
+              <span class="text-xs">⌄</span>
+            </button>
+          </div>
+
+          <!-- Nombre del ejercicio -->
+          <p class="text-sm md:text-base font-semibold text-slate-100">
+            {{ ex.name }}
+          </p>
+        </div>
+      </section>
+
+      <!-- Footer stats + CTA -->
+      <section class="mt-6 border-t border-teal-500/60 pt-4 space-y-4">
+        <!-- Stats -->
+        <div class="flex items-center justify-between text-xs md:text-sm text-slate-300">
+          <div class="flex flex-col items-start">
+            <span class="font-semibold text-sm md:text-base text-slate-100">
+              {{ totalSeries() }}
+            </span>
+            <span class="text-[10px] md:text-xs uppercase tracking-wide text-slate-400">
+              Total series
+            </span>
+          </div>
+
+          <div class="flex flex-col items-start">
+            <span class="font-semibold text-sm md:text-base text-slate-100">
+              {{ estimatedMinutes() }}
+            </span>
+            <span class="text-[10px] md:text-xs uppercase tracking-wide text-slate-400">
+              Minutos
+            </span>
+          </div>
+
+          <div class="flex flex-col items-start">
+            <span class="font-semibold text-sm md:text-base text-teal-300">
+              +{{ estimatedXp() }}
+            </span>
+            <span class="text-[10px] md:text-xs uppercase tracking-wide text-slate-400">
+              XP estimada
+            </span>
+          </div>
+        </div>
+
+        <!-- Botón CTA -->
+        <button
+          (click)="onStartSession()"
+          class="w-full inline-flex items-center justify-center gap-2 px-6 py-3
+                 rounded-2xl bg-gradient-to-b from-teal-300 to-teal-500
+                 text-slate-950 font-semibold text-sm md:text-base
+                 shadow-[0_16px_40px_rgba(45,212,191,0.5)]
+                 hover:brightness-110 active:translate-y-[1px] transition"
+        >
+          📅 Empezar sesión
+        </button>
+
+        <!-- Link progreso -->
+        <button
+          type="button"
+          class="w-full text-[11px] md:text-xs text-center text-slate-400 hover:text-slate-200"
+        >
+          🏆 Ver progreso histórico
+        </button>
+      </section>
+    </div>
+  </div>
+
+  <ng-template #errorTpl>
+    <div class="min-h-screen bg-[#111416] text-slate-100 flex items-center justify-center">
+      <p class="text-red-400 text-sm">
+        {{ error() || 'Ocurrió un error al cargar la sesión.' }}
+      </p>
+    </div>
+  </ng-template>
+</ng-template>

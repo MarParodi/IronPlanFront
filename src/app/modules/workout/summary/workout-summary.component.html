@@ -1,0 +1,215 @@
+<!-- Loading -->
+<div *ngIf="loading" class="min-h-screen bg-[#111416] flex items-center justify-center text-slate-300">
+  <div class="text-center">
+    <div class="w-12 h-12 border-4 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+    <p>Cargando resumen...</p>
+  </div>
+</div>
+
+<!-- Error -->
+<div *ngIf="!loading && error" class="min-h-screen bg-[#111416] flex items-center justify-center text-red-400 px-4">
+  <div class="text-center">
+    <p class="text-lg mb-4">{{ error }}</p>
+    <button
+      (click)="onGoHome()"
+      class="px-6 py-2 bg-slate-700 hover:bg-slate-600 rounded-xl text-white transition"
+    >
+      Volver al inicio
+    </button>
+  </div>
+</div>
+
+<!-- Contenido principal -->
+<div
+  *ngIf="!loading && summary as s"
+  class="min-h-screen bg-[#111416] text-slate-50 flex justify-center relative overflow-hidden"
+>
+  <!-- Confetti animation -->
+  <div *ngIf="showConfetti" class="absolute inset-0 pointer-events-none overflow-hidden">
+    <div class="confetti-container">
+      <div *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" 
+           class="confetti"
+           [style.left.%]="i * 6.5"
+           [style.animation-delay.s]="i * 0.1">
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full max-w-md md:max-w-lg flex flex-col px-4 py-8 relative z-10">
+
+    <!-- Header con icono de éxito -->
+    <header class="text-center mb-6">
+      <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 
+                  flex items-center justify-center text-4xl shadow-[0_0_40px_rgba(16,185,129,0.5)]
+                  animate-bounce">
+        🎉
+      </div>
+      <h1 class="text-2xl md:text-3xl font-bold text-emerald-400">
+        ¡Sesión Completada!
+      </h1>
+      <p class="text-slate-400 mt-2">
+        {{ s.sessionTitle }}
+        <span *ngIf="s.sessionIcon">{{ s.sessionIcon }}</span>
+      </p>
+    </header>
+
+    <!-- Tarjeta principal de stats -->
+    <section class="bg-[#171a1d] rounded-3xl p-5 md:p-6 shadow-[0_18px_60px_rgba(0,0,0,0.7)] border border-slate-800">
+      
+      <!-- Tiempo total -->
+      <div class="text-center mb-6">
+        <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">Tiempo total</p>
+        <p class="text-4xl md:text-5xl font-bold tabular-nums text-emerald-400">
+          {{ s.durationFormatted }}
+        </p>
+      </div>
+
+      <!-- Grid de stats -->
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <!-- Ejercicios -->
+        <div class="bg-[#0f1214] rounded-2xl p-4 text-center">
+          <p class="text-2xl md:text-3xl font-bold text-white">
+            {{ s.completedExercises }}/{{ s.totalExercises }}
+          </p>
+          <p class="text-xs text-slate-400 mt-1">Ejercicios</p>
+        </div>
+
+        <!-- Series -->
+        <div class="bg-[#0f1214] rounded-2xl p-4 text-center">
+          <p class="text-2xl md:text-3xl font-bold text-white">
+            {{ s.completedSeries }}/{{ s.totalSeries }}
+          </p>
+          <p class="text-xs text-slate-400 mt-1">Series</p>
+        </div>
+      </div>
+
+      <!-- XP ganado -->
+      <div class="bg-gradient-to-r from-amber-500/20 to-amber-600/20 rounded-2xl p-4 border border-amber-500/30">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs text-amber-300 uppercase tracking-wide mb-1">XP Ganado</p>
+            <p class="text-3xl font-bold text-amber-400">+{{ s.xpEarned }} XP</p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-slate-400 mb-1">Total</p>
+            <p class="text-lg font-semibold text-white">{{ s.totalUserXp }} XP</p>
+            <p class="text-xs text-amber-300">{{ s.userRank.replace('_', ' ') }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparación con sesión anterior -->
+    <section *ngIf="s.previousComparison" class="mt-5 bg-[#171a1d] rounded-2xl p-4 border border-slate-800">
+      <h3 class="text-xs text-slate-400 uppercase tracking-wide mb-3">
+        Comparado con tu última sesión
+      </h3>
+      
+      <div class="flex items-center justify-between">
+        <!-- Tiempo -->
+        <div class="flex items-center gap-2">
+          <span class="text-lg" [class.text-emerald-400]="durationImproved" [class.text-rose-400]="!durationImproved">
+            {{ durationImproved ? '⚡' : '🐢' }}
+          </span>
+          <div>
+            <p class="text-sm font-semibold" 
+               [class.text-emerald-400]="durationImproved" 
+               [class.text-rose-400]="!durationImproved">
+              {{ formatDurationDiff(s.previousComparison.durationDifferenceSeconds) }}
+            </p>
+            <p class="text-xs text-slate-500">Tiempo</p>
+          </div>
+        </div>
+
+        <!-- XP -->
+        <div class="flex items-center gap-2">
+          <span class="text-lg" [class.text-emerald-400]="xpImproved" [class.text-slate-400]="!xpImproved">
+            {{ xpImproved ? '🔥' : '➖' }}
+          </span>
+          <div class="text-right">
+            <p class="text-sm font-semibold"
+               [class.text-emerald-400]="xpImproved"
+               [class.text-slate-400]="!xpImproved">
+              {{ s.previousComparison.xpDifference > 0 ? '+' : '' }}{{ s.previousComparison.xpDifference }} XP
+            </p>
+            <p class="text-xs text-slate-500">Diferencia</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Músculos trabajados -->
+    <section *ngIf="s.muscles" class="mt-5 text-center">
+      <p class="text-xs text-slate-400 uppercase tracking-wide mb-2">Músculos trabajados</p>
+      <p class="text-sm text-slate-200">{{ s.muscles }}</p>
+    </section>
+
+    <!-- Botones de acción -->
+    <section class="mt-8 space-y-3">
+      <button
+        (click)="onGoHome()"
+        class="w-full inline-flex items-center justify-center gap-2 px-6 py-4
+               rounded-2xl bg-gradient-to-b from-emerald-300 to-emerald-500
+               text-slate-950 font-semibold text-base
+               shadow-[0_16px_40px_rgba(16,185,129,0.5)]
+               hover:brightness-110 active:translate-y-[1px] transition"
+      >
+        🏠 Volver al inicio
+      </button>
+
+      <button
+        (click)="onViewHistory()"
+        class="w-full inline-flex items-center justify-center gap-2 px-6 py-3
+               rounded-2xl bg-slate-800 border border-slate-700
+               text-slate-200 font-medium text-sm
+               hover:bg-slate-700 transition"
+      >
+        📊 Ver mi progreso
+      </button>
+    </section>
+
+  </div>
+</div>
+
+<style>
+  .confetti-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    animation: confetti-fall 3s ease-out forwards;
+  }
+  
+  .confetti:nth-child(odd) {
+    background: linear-gradient(135deg, #10b981, #34d399);
+    border-radius: 50%;
+  }
+  
+  .confetti:nth-child(even) {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    transform: rotate(45deg);
+  }
+  
+  .confetti:nth-child(3n) {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    border-radius: 2px;
+  }
+  
+  @keyframes confetti-fall {
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+</style>
+

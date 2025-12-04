@@ -4,8 +4,65 @@ import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './modules/auth/pages/role.guard';
 
 export const routes: Routes = [
-  { path: '', loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent), canActivate: [authGuard] },
+  { path: '',   loadComponent: () =>
+    import('./modules/home/home.component').then(m => m.HomeComponent),
+  canActivate: [authGuard]
+},
   { path: 'login', loadComponent: () => import('./modules/auth/pages/login/login.component').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./modules/auth/pages/register/register.component').then(m => m.RegisterComponent) },
+  {
+  path: 'academia',
+  loadComponent: () =>
+    import('./modules/home/home.component').then(m => m.HomeComponent),
+  canActivate: [authGuard]
+},
+{
+  path: 'mis-rutinas',
+  loadComponent: () =>
+    import('./modules/my-routine/my-routine.component').then(m => m.MyRoutineComponent),
+  canActivate: [authGuard]
+},
+{
+  path: 'crear',
+  loadComponent: () =>
+    import('./modules/create-routine/create-routine.component').then(m => m.CreateRoutineComponent),
+  canActivate: [authGuard]
+},
+
+{
+    path: 'routines/:id',
+    loadComponent: () =>
+      import('./modules/home/routine/routine.component')
+        .then(m => m.RoutineOverviewComponent),
+    canActivate: [authGuard],
+  },
+
+{
+  path: 'academia/routines/:routineId/sessions/:sessionId',
+  loadComponent: () =>
+    import('./modules/session/session.component').then(m => m.SessionComponent)
+},
+
+{
+  path: 'workouts/:sessionId/exercise/:order',
+  loadComponent: () =>
+    import('./modules/workout/workout_exercise.component').then(m => m.WorkoutExercisePageComponent),
+  canActivate: [authGuard]
+},
+
+{
+  path: 'workouts/:sessionId/summary',
+  loadComponent: () =>
+    import('./modules/workout/summary/workout-summary.component').then(m => m.WorkoutSummaryComponent),
+  canActivate: [authGuard]
+},
+
+{
+  path: 'perfil',
+  loadComponent: () =>
+    import('./modules/profile/profile.component').then(m => m.ProfileComponent),
+  canActivate: [authGuard]
+},
+
   { path: '**', redirectTo: '' }
 ];

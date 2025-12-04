@@ -16,4 +16,8 @@ import { CommonModule } from '@angular/common';
 export class SpinnerComponent {
   private _spinnerService = inject(SpinnerService);
   isLoading$ = this._spinnerService.isLoading$;
+
+
+  //commit de prueba
+
 }

@@ -1,0 +1,475 @@
+<div class="min-h-screen bg-[#111416] text-slate-100">
+  <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- HEADER DE LA SECCIÓN -->
+    <div class="space-y-2">
+      <h1 class="text-2xl md:text-3xl font-bold text-slate-50">
+        Explorar Rutinas
+      </h1>
+      <p class="text-sm md:text-base text-slate-400">
+        Encuentra la rutina perfecta para alcanzar tus objetivos
+      </p>
+    </div>
+
+    <!-- BARRA DE BÚSQUEDA -->
+    <div class="relative">
+      <div class="relative flex items-center">
+        <!-- Icono de búsqueda -->
+        <svg xmlns="http://www.w3.org/2000/svg" 
+             class="absolute left-4 w-5 h-5 text-slate-500 pointer-events-none transition-colors"
+             [class.text-teal-400]="searchFocused"
+             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        
+        <!-- Input de búsqueda -->
+        <input 
+          type="text"
+          [value]="searchQuery"
+          (input)="onSearchInput($event)"
+          (focus)="searchFocused = true"
+          (blur)="searchFocused = false"
+          placeholder="Buscar rutinas por nombre o descripción..."
+          class="w-full pl-12 pr-12 py-3.5 bg-[#0d0f11] border border-slate-700/80 rounded-xl
+                 text-sm md:text-base text-slate-100 placeholder:text-slate-500
+                 focus:outline-none focus:border-teal-400/70 focus:ring-2 focus:ring-teal-400/20
+                 transition-all duration-200" />
+        
+        <!-- Botón limpiar búsqueda -->
+        <button 
+          *ngIf="searchQuery"
+          (click)="clearSearch()"
+          class="absolute right-4 p-1 text-slate-500 hover:text-slate-300 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Indicador de búsqueda activa -->
+      <div *ngIf="searchQuery" class="mt-2 flex items-center gap-2 text-xs text-slate-400">
+        <span class="w-2 h-2 bg-teal-400 rounded-full animate-pulse"></span>
+        Buscando: "{{ searchQuery }}"
+        <span *ngIf="!loading && filteredCards.length > 0">
+          · {{ filteredCards.length }} resultado{{ filteredCards.length !== 1 ? 's' : '' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- FILTROS POR OBJETIVO -->
+    <div class="space-y-3">
+      <div class="flex items-center gap-2 text-sm text-slate-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+        </svg>
+        <span>Filtrar por objetivo</span>
+      </div>
+      
+    <div class="flex flex-wrap items-center gap-2">
+        <!-- Botón "Todos" -->
+        <button 
+          (click)="onSelectGoal(null)" 
+          [ngClass]="goalFilter === null
+            ? 'bg-slate-100 text-slate-900 shadow-md border-transparent'
+            : 'bg-transparent text-slate-300 border-slate-600 hover:border-slate-400 hover:text-slate-100'"
+          class="px-4 py-2 rounded-full text-xs md:text-sm font-medium border transition-all duration-200">
+          Todos
+      </button>
+
+        <!-- Botón Fuerza -->
+        <button 
+          (click)="onSelectGoal('FUERZA')" 
+          [ngClass]="goalFilter === 'FUERZA'
+            ? 'bg-teal-400 text-slate-950 shadow-md shadow-teal-400/25 border-transparent'
+            : 'bg-[#0f1214] text-slate-200 border-slate-700 hover:border-teal-300/70 hover:text-teal-300'"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-medium border transition-all duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <span>Fuerza</span>
+      </button>
+
+        <!-- Botón Hipertrofia -->
+        <button 
+          (click)="onSelectGoal('HIPERTROFIA')" 
+          [ngClass]="goalFilter === 'HIPERTROFIA'
+            ? 'bg-teal-400 text-slate-950 shadow-md shadow-teal-400/25 border-transparent'
+            : 'bg-[#0f1214] text-slate-200 border-slate-700 hover:border-teal-300/70 hover:text-teal-300'"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-medium border transition-all duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          </svg>
+          <span>Hipertrofia</span>
+      </button>
+
+        <!-- Botón Resistencia -->
+        <button 
+          (click)="onSelectGoal('RESISTENCIA')" 
+          [ngClass]="goalFilter === 'RESISTENCIA'
+            ? 'bg-teal-400 text-slate-950 shadow-md shadow-teal-400/25 border-transparent'
+            : 'bg-[#0f1214] text-slate-200 border-slate-700 hover:border-teal-300/70 hover:text-teal-300'"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-medium border transition-all duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Resistencia</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- FILTROS POR DÍAS DE ENTRENAMIENTO -->
+    <div class="space-y-3">
+      <div class="flex items-center gap-2 text-sm text-slate-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <span>Días por semana</span>
+      </div>
+      
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Botón "Todos" -->
+        <button 
+          (click)="onSelectDays(null)" 
+          [ngClass]="daysFilter === null
+            ? 'bg-slate-100 text-slate-900 shadow-md border-transparent'
+            : 'bg-transparent text-slate-300 border-slate-600 hover:border-slate-400 hover:text-slate-100'"
+          class="px-4 py-2 rounded-full text-xs md:text-sm font-medium border transition-all duration-200">
+        Todos
+      </button>
+
+        <!-- Botones de días -->
+        <button 
+          *ngFor="let d of daysOptions"
+          (click)="onSelectDays(d)" 
+          [ngClass]="daysFilter === d
+            ? 'bg-violet-400 text-slate-950 shadow-md shadow-violet-400/25 border-transparent'
+            : 'bg-[#0f1214] text-slate-200 border-slate-700 hover:border-violet-300/70 hover:text-violet-300'"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-medium border transition-all duration-200">
+          <span class="font-bold">{{ d }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ORDENAR + CONTADOR -->
+    <div class="flex flex-wrap items-center justify-between gap-3 py-2 border-y border-slate-800/60">
+      <div class="flex items-center gap-2 text-sm text-slate-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+        </svg>
+        <span>Ordenar por:</span>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <select 
+          (change)="onSortChange($any($event.target).value)"
+          class="bg-[#0f1214] border border-slate-700 rounded-lg px-3 py-2 text-xs md:text-sm text-slate-100 
+                 focus:outline-none focus:ring-2 focus:ring-teal-400/60 focus:border-teal-300 cursor-pointer">
+          <option value="id,desc">Más recientes</option>
+          <option value="usageCount,desc">Más populares</option>
+        <option value="name,asc">Nombre A-Z</option>
+        <option value="name,desc">Nombre Z-A</option>
+      </select>
+
+        <!-- Contador de resultados -->
+        <span *ngIf="!loading" class="text-xs text-slate-500 hidden sm:inline">
+          {{ filteredCards.length }} rutina{{ filteredCards.length !== 1 ? 's' : '' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- ESTADO: CARGANDO -->
+    <div *ngIf="loading" class="py-12">
+      <div class="flex flex-col items-center gap-4">
+        <div class="w-10 h-10 border-3 border-teal-400 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-sm text-slate-400">Cargando rutinas...</p>
+      </div>
+    </div>
+
+    <!-- ESTADO: ERROR -->
+    <div *ngIf="errorMsg" class="text-sm text-rose-300 bg-rose-900/30 border border-rose-700/50 rounded-xl px-5 py-4 flex items-center gap-3">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      {{ errorMsg }}
+    </div>
+
+    <!-- ESTADO: SIN RESULTADOS -->
+    <div *ngIf="!loading && !errorMsg && filteredCards.length === 0" class="py-16">
+      <div class="flex flex-col items-center gap-4 text-center">
+        <div class="w-16 h-16 rounded-full bg-slate-800/50 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div class="space-y-1">
+          <p class="text-slate-300 font-medium">No se encontraron rutinas</p>
+          <p class="text-sm text-slate-500">Intenta con otros filtros o términos de búsqueda</p>
+        </div>
+        <button 
+          (click)="onSelectGoal(null); onSelectDays(null); clearSearch()"
+          class="mt-2 px-4 py-2 text-sm text-teal-400 hover:text-teal-300 transition-colors">
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+
+    <!-- LISTA DE RUTINAS -->
+    <div *ngIf="!loading && !errorMsg && filteredCards.length > 0">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+
+        <div 
+          *ngFor="let c of filteredCards; trackBy: trackByCard" 
+          class="group bg-[#171a1d] border border-slate-800 rounded-2xl overflow-hidden
+                 shadow-[0_8px_30px_rgba(0,0,0,0.4)]
+                 hover:border-teal-400/50 hover:shadow-[0_12px_40px_rgba(45,212,191,0.15)]
+                 transition-all duration-300">
+          
+          <!-- Imagen header de la card -->
+          <div class="relative h-32 bg-gradient-to-br from-slate-800 to-slate-900 overflow-hidden">
+            <img 
+              *ngIf="c.img"
+              [src]="backendBaseUrl + c.img" 
+              alt="{{ c.name }}"
+              class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" />
+            
+            <!-- Overlay gradient -->
+            <div class="absolute inset-0 bg-gradient-to-t from-[#171a1d] via-transparent to-transparent"></div>
+            
+            <!-- Badge de acceso -->
+            <div class="absolute top-3 left-3">
+              <!-- Rutina compartida por usuario de la comunidad -->
+              <span
+                *ngIf="c.accessType === 'USER_SHARED'"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold backdrop-blur-sm
+                       bg-violet-500/30 text-violet-300 border border-violet-400/40">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span class="normal-case">{{ c.ownerUsername || 'Usuario' }}</span>
+              </span>
+
+              <!-- Rutina gratuita -->
+              <span
+                *ngIf="c.accessType === 'FREE'"
+                class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold uppercase tracking-wide backdrop-blur-sm
+                       bg-emerald-500/30 text-emerald-300 border border-emerald-400/40">
+                ✓ Gratis
+              </span>
+
+              <!-- Rutina de XP -->
+              <span
+                *ngIf="c.accessType === 'XP_UNLOCK'"
+                class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold uppercase tracking-wide backdrop-blur-sm
+                       bg-amber-500/30 text-amber-300 border border-amber-400/40">
+                ⭐ XP
+              </span>
+            </div>
+
+            <!-- Contador de usos (corazón) -->
+            <div class="absolute top-3 right-3">
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/40 backdrop-blur-sm border border-white/10">
+                <svg xmlns="http://www.w3.org/2000/svg" 
+                     class="w-4 h-4 text-rose-400" 
+                     fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <span class="text-xs font-medium text-slate-200">{{ formatUsageCount(c.usageCount) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contenido -->
+          <div class="p-4 space-y-3">
+            <!-- Título y objetivo -->
+            <div class="space-y-1">
+              <h3 class="text-base md:text-lg font-semibold text-slate-50 group-hover:text-teal-300 transition-colors line-clamp-1">
+                {{ c.name }}
+              </h3>
+              
+              <!-- Badge del objetivo -->
+              <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-800/80 text-slate-300 border border-slate-700/80">
+                  {{ c.goal | titlecase }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Descripción -->
+            <p class="text-sm text-slate-400 line-clamp-2 leading-relaxed">
+              {{ c.description }}
+            </p>
+
+          <!-- Botón -->
+            <button 
+              (click)="onDetails(c)" 
+              class="w-full mt-2 px-4 py-2.5 rounded-xl bg-slate-800/80 text-slate-200 text-sm font-medium
+                     border border-slate-700/80
+                     hover:bg-teal-400 hover:text-slate-950 hover:border-teal-400
+                     active:scale-[0.98] transition-all duration-200
+                     flex items-center justify-center gap-2">
+              <span>Ver detalles</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <div *ngIf="totalPages > 1" class="flex items-center justify-center gap-2 md:gap-4 pt-6">
+      <button 
+        (click)="onPageChange(page - 1)" 
+        [disabled]="page === 0" 
+        class="inline-flex items-center gap-1 px-4 py-2 rounded-lg border border-slate-700 bg-[#0f1214] text-sm text-slate-300
+               disabled:opacity-40 disabled:cursor-not-allowed 
+               hover:border-teal-400/60 hover:text-teal-400 transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        <span class="hidden sm:inline">Anterior</span>
+      </button>
+
+      <!-- Números de página -->
+      <div class="flex items-center gap-1">
+        <button 
+          *ngFor="let p of getPageNumbers()"
+          (click)="onPageChange(p)"
+          [ngClass]="p === page 
+            ? 'bg-teal-400 text-slate-950 border-teal-400' 
+            : 'bg-[#0f1214] text-slate-400 border-slate-700 hover:border-slate-500'"
+          class="w-9 h-9 rounded-lg border text-sm font-medium transition-all">
+          {{ p + 1 }}
+        </button>
+      </div>
+
+      <button 
+        (click)="onPageChange(page + 1)" 
+        [disabled]="page + 1 >= totalPages" 
+        class="inline-flex items-center gap-1 px-4 py-2 rounded-lg border border-slate-700 bg-[#0f1214] text-sm text-slate-300
+               disabled:opacity-40 disabled:cursor-not-allowed 
+               hover:border-teal-400/60 hover:text-teal-400 transition-all">
+        <span class="hidden sm:inline">Siguiente</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- MODAL DETALLE DE RUTINA -->
+<div *ngIf="detailOpen"
+         class="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/80 backdrop-blur-sm px-4 pb-4 md:pb-0">
+
+  <!-- Cerrar al dar click en el fondo -->
+  <div class="absolute inset-0" (click)="closeDetail()"></div>
+
+  <!-- Contenedor del modal -->
+  <div
+        class="relative w-full max-w-lg bg-[#171a1d] text-slate-100 rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden
+               animate-[slideUp_0.3s_ease-out]">
+
+        <!-- Header con imagen -->
+        <div *ngIf="selectedRoutine" class="relative h-40 bg-gradient-to-br from-slate-800 to-slate-900">
+          <img 
+            *ngIf="selectedRoutine.img"
+            [src]="backendBaseUrl + selectedRoutine.img" 
+            alt="{{ selectedRoutine.name }}"
+            class="w-full h-full object-cover opacity-70" />
+          <div class="absolute inset-0 bg-gradient-to-t from-[#171a1d] via-[#171a1d]/50 to-transparent"></div>
+          
+          <!-- Botón Cerrar -->
+    <button
+      type="button"
+      (click)="closeDetail()"
+            class="absolute right-4 top-4 w-8 h-8 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-slate-300 hover:text-white hover:bg-black/60 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+    </button>
+        </div>
+
+        <div class="p-5 md:p-6">
+    <!-- ESTADO: CARGANDO -->
+          <div *ngIf="detailLoading" class="space-y-4">
+            <div class="h-6 w-48 bg-slate-700/60 rounded-lg animate-pulse"></div>
+            <div class="space-y-2">
+              <div class="h-4 w-full bg-slate-700/40 rounded animate-pulse"></div>
+              <div class="h-4 w-3/4 bg-slate-700/40 rounded animate-pulse"></div>
+            </div>
+            <div class="h-12 w-full bg-slate-700/60 rounded-xl mt-4 animate-pulse"></div>
+    </div>
+
+    <!-- ESTADO: ERROR -->
+          <div *ngIf="!detailLoading && detailError" class="text-sm text-rose-300 bg-rose-900/30 border border-rose-700/50 rounded-xl px-4 py-3 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+      {{ detailError }}
+    </div>
+
+    <!-- CONTENIDO DEL DETALLE -->
+    <ng-container *ngIf="!detailLoading && !detailError && selectedRoutine as r">
+
+      <!-- Título -->
+            <h2 class="text-xl md:text-2xl font-bold text-slate-50 mb-4">
+        {{ r.name }}
+      </h2>
+
+            <!-- Info grid -->
+            <div class="grid grid-cols-2 gap-3 mb-4">
+              <div class="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50">
+                <p class="text-xs text-slate-500 mb-1">Objetivo</p>
+                <p class="text-sm font-medium text-slate-200">{{ r.goal | titlecase }}</p>
+              </div>
+              <div class="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50">
+                <p class="text-xs text-slate-500 mb-1">Nivel</p>
+                <p class="text-sm font-medium text-slate-200">{{ r.suggestedLevel || 'Intermedio' }}</p>
+              </div>
+            </div>
+
+      <!-- Descripción -->
+            <div class="mb-5">
+              <p class="text-xs text-slate-500 mb-2">Descripción</p>
+              <p class="text-sm text-slate-300 leading-relaxed">
+            {{ r.description }}
+          </p>
+      </div>
+
+      <!-- BOTÓN PRINCIPAL -->
+        <button
+          *ngIf="r.accessType === 'XP_UNLOCK'; else freeBtn"
+              (click)="onStartRoutine(r)"
+              class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl
+                     bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 font-semibold text-sm
+                     border border-amber-500/40 hover:border-amber-400/60 hover:from-amber-500/30 hover:to-orange-500/30
+                     transition-all duration-200 shadow-lg shadow-amber-500/10">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+          Desbloquear con XP
+        </button>
+
+        <ng-template #freeBtn>
+          <button
+              (click)="onStartRoutine(r)"
+                class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl
+                   bg-teal-400 text-slate-950 font-semibold text-sm
+                       hover:bg-teal-300 active:scale-[0.98] transition-all duration-200
+                       shadow-lg shadow-teal-400/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            Empezar rutina
+          </button>
+        </ng-template>
+
+    </ng-container>
+        </div>
+  </div>
+</div>
+
+  </div>
+</div>

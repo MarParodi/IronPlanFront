@@ -6,42 +6,34 @@ import {
   OnInit
 } from '@angular/core';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
-import { TokenService } from '../../services/token.service';
+import { AuthService } from '../../../modules/auth/services/auth.service';
 import { filter } from 'rxjs/operators';
-import { input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, CommonModule],
   templateUrl: './header.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent implements OnInit {
-  private _tokenSvc = inject(TokenService);
+  private _tokenSvc = inject(AuthService);
   private _router = inject(Router);
   private _cdr = inject(ChangeDetectorRef);
-  logged = input.required<boolean>();
+
+  mobileMenuOpen = false;
   isLoginPage = false;
   isPromotionsPage = false;
 
   ngOnInit(): void {
+    // Cerrar menú móvil en cambio de ruta
     this._router.events
       .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
-        this.isLoginPage = event.urlAfterRedirects.includes('/auth/login') || event.urlAfterRedirects.includes('/auth/recovery-password');
+      .subscribe(() => {
+        this.mobileMenuOpen = false;
         this._cdr.markForCheck();
       });
-    this.isLoginPage = this._router.url.includes('/auth/login') || this._router.url.includes('/auth/recovery-password');
-
-    this._router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
-        this.isPromotionsPage = event.urlAfterRedirects.includes('/promotions');
-        this._cdr.markForCheck();
-      });
-
-
   }
 
   goBack(): void {

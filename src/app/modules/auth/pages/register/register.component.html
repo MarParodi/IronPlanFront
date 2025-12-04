@@ -1,51 +1,97 @@
-<div class="page">
-  <section class="card">
-    <h1>Crear Cuenta</h1>
+<div class="min-h-screen bg-[#111416] text-slate-100 flex items-center justify-center px-3">
+  <section
+    class="w-full max-w-lg md:max-w-md bg-[#1b1f22]/95 border border-white/5 rounded-2xl
+           shadow-[0_18px_50px_rgba(0,0,0,0.7)] backdrop-blur-sm
+           px-4 py-5 md:px-6 md:py-6 space-y-4"
+  >
+    <h1 class="text-center text-2xl font-semibold mb-1">Crear Cuenta</h1>
 
     <!-- Email -->
-    <label class="field">
-      <span class="field-label">Email</span>
-      <div class="input-wrap">
-        <span class="icon" aria-hidden="true">
+    <label class="block space-y-1">
+      <span class="text-sm font-medium text-slate-200">Email</span>
+      <div
+        class="flex items-center gap-2 bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 focus-within:border-teal-300 focus-within:ring-2 focus-within:ring-teal-300/40 transition"
+      >
+        <span class="text-slate-400" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-            <path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            <path
+              d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+            />
           </svg>
         </span>
-        <input [(ngModel)]="form.email" name="email" type="email" placeholder="tu@email.com" required />
+        <input
+          [(ngModel)]="form.email"
+          name="email"
+          type="email"
+          placeholder="tu@email.com"
+          required
+          class="w-full bg-transparent border-none outline-none text-sm text-slate-100 placeholder:text-slate-500"
+        />
       </div>
     </label>
 
     <!-- Contraseña -->
-    <label class="field">
-      <span class="field-label">Contraseña</span>
-      <div class="input-wrap">
-        <span class="icon" aria-hidden="true">
+    <label class="block space-y-1">
+      <span class="text-sm font-medium text-slate-200">Contraseña</span>
+      <div
+        class="flex items-center gap-2 bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 focus-within:border-teal-300 focus-within:ring-2 focus-within:ring-teal-300/40 transition"
+      >
+        <span class="text-slate-400" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-            <path d="M17 8h-1V6a4 4 0 00-8 0v2H7a1 1 0 00-1 1v11a1 1 0 001 1h10a1 1 0 001-1V9a1 1 0 00-1-1zm-7-2a2 2 0 114 0v2h-4V6z"/>
+            <path
+              d="M17 8h-1V6a4 4 0 00-8 0v2H7a1 1 0 00-1 1v11a1 1 0 001 1h10a1 1 0 001-1V9a1 1 0 00-1-1zm-7-2a2 2 0 114 0v2h-4V6z"
+            />
           </svg>
         </span>
-        <input [(ngModel)]="form.password" name="password" type="password" placeholder="••••••••" required minlength="6" />
+        <input
+          [(ngModel)]="form.password"
+          name="password"
+          type="password"
+          placeholder="••••••••"
+          required
+          minlength="6"
+          class="w-full bg-transparent border-none outline-none text-sm text-slate-100 placeholder:text-slate-500"
+        />
       </div>
     </label>
 
     <!-- Username -->
-    <label class="field">
-      <span class="field-label">Nombre de usuario</span>
-      <div class="input-wrap">
-        <span class="icon" aria-hidden="true">
+    <label class="block space-y-1">
+      <span class="text-sm font-medium text-slate-200">Nombre de usuario</span>
+      <div
+        class="flex items-center gap-2 bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 focus-within:border-teal-300 focus-within:ring-2 focus-within:ring-teal-300/40 transition"
+      >
+        <span class="text-slate-400" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-            <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/>
+            <path
+              d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"
+            />
           </svg>
         </span>
-        <input [(ngModel)]="form.username" name="username" type="text" placeholder="tu_usuario" required minlength="3" />
+        <input
+          [(ngModel)]="form.username"
+          name="username"
+          type="text"
+          placeholder="tu_usuario"
+          required
+          minlength="3"
+          class="w-full bg-transparent border-none outline-none text-sm text-slate-100 placeholder:text-slate-500"
+        />
       </div>
     </label>
 
     <!-- Género -->
-    <label class="field">
-      <span class="field-label">Género</span>
-      <div class="select-wrap">
-        <select [(ngModel)]="form.gender" name="gender" required>
+    <label class="block space-y-1">
+      <span class="text-sm font-medium text-slate-200">Género</span>
+      <div
+        class="flex items-center bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 focus-within:border-teal-300 focus-within:ring-2 focus-within:ring-teal-300/40 transition"
+      >
+        <select
+          [(ngModel)]="form.gender"
+          name="gender"
+          required
+          class="w-full bg-transparent border-none outline-none text-sm text-slate-100"
+        >
           <option [ngValue]="null" disabled>Selecciona tu género</option>
           <option *ngFor="let g of genders" [ngValue]="g.value">{{ g.label }}</option>
         </select>
@@ -53,23 +99,41 @@
     </label>
 
     <!-- Fecha de nacimiento -->
-    <label class="field">
-      <span class="field-label">Fecha de nacimiento</span>
-      <div class="input-wrap">
-        <span class="icon" aria-hidden="true">
+    <label class="block space-y-1">
+      <span class="text-sm font-medium text-slate-200">Fecha de nacimiento</span>
+      <div
+        class="flex items-center gap-2 bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 focus-within:border-teal-300 focus-within:ring-2 focus-within:ring-teal-300/40 transition"
+      >
+        <span class="text-slate-400" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-            <path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 00-2 2v13a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zm0 15H5V10h14v9z"/>
+            <path
+              d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 00-2 2v13a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zm0 15H5V10h14v9z"
+            />
           </svg>
         </span>
-        <input [(ngModel)]="form.birthday" name="birthday" type="date" placeholder="dd/mm/aaaa" required />
+        <input
+          [(ngModel)]="form.birthday"
+          name="birthday"
+          type="date"
+          placeholder="dd/mm/aaaa"
+          required
+          class="w-full bg-transparent border-none outline-none text-sm text-slate-100 placeholder:text-slate-500"
+        />
       </div>
     </label>
 
-    <!-- Nivel -->
-    <label class="field">
-      <span class="field-label">Nivel de entrenamiento</span>
-      <div class="select-wrap">
-        <select [(ngModel)]="form.level" name="level" required>
+    <!-- Nivel de entrenamiento -->
+    <label class="block space-y-1">
+      <span class="text-sm font-medium text-slate-200">Nivel de entrenamiento</span>
+      <div
+        class="flex items-center bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 focus-within:border-teal-300 focus-within:ring-2 focus-within:ring-teal-300/40 transition"
+      >
+        <select
+          [(ngModel)]="form.level"
+          name="level"
+          required
+          class="w-full bg-transparent border-none outline-none text-sm text-slate-100"
+        >
           <option [ngValue]="null" disabled>Selecciona tu nivel</option>
           <option *ngFor="let l of levels" [ngValue]="l.value">{{ l.label }}</option>
         </select>
@@ -77,37 +141,62 @@
     </label>
 
     <!-- Días de entrenamiento (Slider 1–7) -->
-    <div class="field">
-      <div class="field-header">
-        <span class="field-label">Días de entrenamiento: <strong>{{ form.trainDays }}</strong></span>
+    <div class="space-y-2">
+      <div class="flex items-baseline justify-between">
+        <span class="text-sm font-medium text-slate-200">
+          Días de entrenamiento: <strong>{{ form.trainDays }}</strong>
+        </span>
       </div>
 
-      <input
-        class="slider"
-        type="range"
-        min="1"
-        max="7"
-        step="1"
-        [(ngModel)]="form.trainDays"
-        name="trainDays"
-        aria-label="Días de entrenamiento por semana"
-      />
 
-      <div class="ticks">
+     <input
+  class="slider"
+  type="range"
+  min="1"
+  max="7"
+  step="1"
+  [(ngModel)]="form.trainDays"
+  name="trainDays"
+  aria-label="Días de entrenamiento por semana"
+  [style.--p]="trainDaysPercent"  
+/>
+
+
+      <div class="flex justify-between text-[11px] text-slate-400 mt-1">
         <span>1 día</span>
         <span>7 días</span>
       </div>
     </div>
 
-    <button class="cta" (click)="submit()" [disabled]="loading()">
+    <!-- Botón -->
+    <button
+      (click)="submit()"
+      [disabled]="loading()"
+      class="w-full mt-1 py-3 rounded-xl bg-gradient-to-b from-teal-300 to-teal-500 text-slate-950 font-semibold text-sm shadow-[0_10px_25px_rgba(45,212,191,0.45)] hover:brightness-110 active:translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed transition"
+    >
       {{ loading() ? 'Creando...' : 'Crear cuenta' }}
     </button>
 
-    <p class="acc">
-      ¿Ya tienes cuenta? <a routerLink="/login" class="link">Inicia sesión aquí</a>
+    <!-- Link a login -->
+    <p class="text-center text-xs text-slate-400 mt-2">
+      ¿Ya tienes cuenta?
+      <a routerLink="/login" class="text-teal-300 font-semibold hover:underline">
+        Inicia sesión aquí
+      </a>
     </p>
 
-    <p class="error" *ngIf="error()">{{ error() }}</p>
-    <p class="ok" *ngIf="ok()">¡Registro exitoso!</p>
+    <!-- Mensajes -->
+    <p
+      *ngIf="error()"
+      class="text-center text-xs text-rose-400 bg-rose-900/30 border border-rose-700/40 rounded-lg px-3 py-2"
+    >
+      {{ error() }}
+    </p>
+    <p
+      *ngIf="ok()"
+      class="text-center text-xs text-teal-300 bg-emerald-900/20 border border-emerald-500/40 rounded-lg px-3 py-2"
+    >
+      ¡Registro exitoso!
+    </p>
   </section>
 </div>
