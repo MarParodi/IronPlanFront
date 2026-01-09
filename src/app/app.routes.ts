@@ -64,5 +64,59 @@ export const routes: Routes = [
   canActivate: [authGuard]
 },
 
+{
+  path: 'user/settings',
+  loadComponent: () =>
+    import('./modules/user/user.component').then(m => m.SettingsComponent),
+  canActivate: [authGuard]
+},
+
+{
+  path: 'perfil/historial',
+  loadComponent: () =>
+    import('./modules/profile/workout-history/workout-history.component')
+      .then(m => m.WorkoutHistoryComponent),
+},
+
+{
+  path: 'perfil/mis-rutinas',
+  loadComponent: () =>
+    import('./modules/profile/my-created-routines/my-created-routines.component')
+      .then(m => m.MyCreatedRoutinesComponent),
+  canActivate: [authGuard]
+},
+
+{
+  path: 'perfil/hazanas',
+  loadComponent: () =>
+    import('./modules/profile/achievements/achievements.component')
+      .then(m => m.AchievementsComponent),
+  canActivate: [authGuard]
+},
+
+{
+  path: 'perfil/estadisticas',
+  loadComponent: () =>
+    import('./modules/profile/stats/stats.component')
+      .then(m => m.StatsComponent),
+  canActivate: [authGuard]
+},
+
+{
+  path: 'notificaciones',
+  loadComponent: () =>
+    import('./modules/notifications/notifications.component')
+      .then(m => m.NotificationsComponent),
+  canActivate: [authGuard]
+},
+
+{
+  path: 'workouts/:sessionId',
+  loadComponent: () =>
+    import('./modules/workout/workout-detail/workout-detail.component')
+      .then(m => m.WorkoutDetailComponent),
+},
+
+
   { path: '**', redirectTo: '' }
 ];

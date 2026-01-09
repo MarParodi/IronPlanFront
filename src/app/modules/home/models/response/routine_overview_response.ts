@@ -9,9 +9,13 @@ export interface RoutineOverviewResponse {
   blocks: RoutineBlock[];
 }
 
+// ACTUALIZADO: Nueva estructura de bloque con más campos
 export interface RoutineBlock {
-  blockNumber: number;
-  blockTitle: string;
+  id: number;
+  orderIndex: number;
+  name: string;
+  description: string | null;
+  durationWeeks: number;
   sessions: RoutineSessionOverview[];
 }
 

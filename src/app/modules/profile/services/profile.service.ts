@@ -2,7 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ProfileResponse, XP_RANKS } from '../models/profile.models';
+import { MyRoutinesPage } from '../models/my-routines.models';
+import { Achievement, UserAchievement, AchievementStats } from '../models/achievement.models';
 import { environment } from '../../../../environments/environment';
+import { RecentWorkoutDto } from '../models/profile.models';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -51,6 +55,21 @@ export class ProfileService {
     };
   }
 
+  getWorkoutHistory(): Observable<RecentWorkoutDto[]> {
+  return this.http.get<any[]>(`${this.baseUrl}/profile/workouts`).pipe(
+    map(list =>
+      (list ?? []).map(item => ({
+        sessionId: item.sessionId ?? item.id,
+        routineName: item.routineName,
+        date: item.date ?? item.startedAt,
+        totalSeries: item.totalSeries ?? 0,
+        totalWeightKg: item.totalWeightKg ?? 0,
+        durationMinutes: item.durationMinutes ?? item.minutes ?? 0,
+      }))
+    )
+  );
+}
+
   /**
    * Genera las iniciales del usuario
    */
@@ -62,6 +81,52 @@ export class ProfileService {
       return (parts[0][0] + parts[1][0]).toUpperCase();
     }
     return username.substring(0, 2).toUpperCase();
+  }
+
+  /**
+   * Obtiene las rutinas creadas por el usuario
+   */
+  getMyCreatedRoutines(page: number = 0, size: number = 20): Observable<MyRoutinesPage> {
+    return this.http.get<MyRoutinesPage>(`${this.baseUrl}/routines/mine`, {
+      params: { page: page.toString(), size: size.toString() }
+    });
+  }
+
+  /**
+   * Elimina una rutina creada por el usuario
+   */
+  deleteRoutine(routineId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/routines/${routineId}`);
+  }
+
+  // ============ ACHIEVEMENTS / HAZAÑAS ============
+
+  /**
+   * Obtiene todas las hazañas con estado de desbloqueo
+   */
+  getAchievements(): Observable<Achievement[]> {
+    return this.http.get<Achievement[]>(`${this.baseUrl}/achievements`);
+  }
+
+  /**
+   * Obtiene estadísticas de hazañas del usuario
+   */
+  getAchievementStats(): Observable<AchievementStats> {
+    return this.http.get<AchievementStats>(`${this.baseUrl}/achievements/stats`);
+  }
+
+  /**
+   * Obtiene hazañas recién desbloqueadas (no vistas)
+   */
+  getUnseenAchievements(): Observable<UserAchievement[]> {
+    return this.http.get<UserAchievement[]>(`${this.baseUrl}/achievements/unseen`);
+  }
+
+  /**
+   * Marca hazañas como vistas
+   */
+  markAchievementsAsSeen(codes: string[]): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/achievements/mark-seen`, { codes });
   }
 }
 

@@ -46,3 +46,84 @@ select option {
   color: white;
 }
 
+/* ===================== Cover uploader ===================== */
+.routine-cover {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 16 / 10;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(15, 21, 22, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.routine-cover__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.routine-cover__empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.routine-cover__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Buttons (match your dark + teal vibe) */
+.btn-upload {
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 14px;
+  background: rgba(15, 21, 22, 0.7);
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  color: rgb(226, 232, 240);
+  transition: 0.15s ease;
+}
+
+.btn-upload:hover {
+  border-color: rgba(45, 212, 191, 0.6);
+  transform: translateY(-1px);
+}
+
+.btn-upload:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-remove {
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: rgb(226, 232, 240);
+  transition: 0.15s ease;
+}
+
+.btn-remove:hover {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.btn-remove:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

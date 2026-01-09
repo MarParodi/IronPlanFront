@@ -7,7 +7,7 @@ import {
   inject,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HomeService } from '../services/home.services';
+import { HomeService, CurrentRoutineResponse } from '../services/home.services';
 import {
   RoutineOverviewResponse,
   RoutineBlock,
@@ -33,6 +33,11 @@ export class RoutineOverviewComponent implements OnInit {
   error: string | null = null;
   startingRoutine = false;
   routineStarted = false;
+
+  // Modal de confirmación de cambio de rutina
+  showChangeRoutineModal = false;
+  currentRoutine: CurrentRoutineResponse | null = null;
+  checkingCurrentRoutine = false;
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -61,9 +66,43 @@ export class RoutineOverviewComponent implements OnInit {
   }
 
   onStartRoutine(): void {
+    if (!this.routine || this.startingRoutine || this.checkingCurrentRoutine) return;
+    
+    // Primero verificar si ya tiene una rutina activa
+    this.checkingCurrentRoutine = true;
+    this.homeService.getCurrentRoutine().subscribe({
+      next: (current) => {
+        this.checkingCurrentRoutine = false;
+        
+        // Si tiene rutina activa y es diferente a la que quiere iniciar
+        if (current && current.id !== this.routine?.id) {
+          this.currentRoutine = current;
+          this.showChangeRoutineModal = true;
+          this.cdr.markForCheck();
+        } else {
+          // No tiene rutina o es la misma, proceder directamente
+          this.confirmStartRoutine();
+        }
+      },
+      error: () => {
+        this.checkingCurrentRoutine = false;
+        // Si hay error, intentar iniciar de todos modos
+        this.confirmStartRoutine();
+      }
+    });
+  }
+
+  closeChangeRoutineModal(): void {
+    this.showChangeRoutineModal = false;
+    this.currentRoutine = null;
+  }
+
+  confirmStartRoutine(): void {
     if (!this.routine || this.startingRoutine) return;
     
+    this.showChangeRoutineModal = false;
     this.startingRoutine = true;
+    
     this.homeService.startRoutine(this.routine.id).subscribe({
       next: () => {
         this.routineStarted = true;
@@ -85,12 +124,12 @@ export class RoutineOverviewComponent implements OnInit {
     this.router.navigate(['/academia/routines', this.routine.id, 'sessions', session.sessionId]);
   }
 
+  // ACTUALIZADO: trackBy usa id del bloque
   trackByBlock(index: number, block: RoutineBlock): number {
-  return block.blockNumber;
-}
+    return block.id;
+  }
 
-trackBySession(index: number, session: RoutineSessionOverview): number {
-  return session.sessionId;
-}
-
+  trackBySession(index: number, session: RoutineSessionOverview): number {
+    return session.sessionId;
+  }
 }

@@ -9,6 +9,7 @@ export interface SessionExercise {
   repsMax: number;
   rir: number;
   restMinutes: number;
+  instructions?: string;
 }
 
 export interface TrainingSessionDetail {

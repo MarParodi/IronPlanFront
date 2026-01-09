@@ -1,0 +1,196 @@
+<!-- IronPlan | Settings -->
+<div class="min-h-dvh text-white bg-gradient-to-b from-[#0F1113] to-[#2A2C2E]">
+  <!-- Contenido scroll -->
+  <main class="pb-28">
+    <!-- Título simple (sin header fijo) -->
+    <div class="mx-auto w-full max-w-[420px] px-4">
+      <h1 class="pt-6 pb-5 text-center text-[28px] sm:text-[32px] font-semibold tracking-tight text-white/95">
+        Configuración
+      </h1>
+    </div>
+
+    <div class="mx-auto w-full max-w-[420px] px-4">
+      <!-- Sección de perfil (foto) -->
+      <section class="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md shadow-xl shadow-black/30 p-5">
+        <div class="flex flex-col items-center">
+          <button type="button" class="relative group outline-none focus:ring-2 focus:ring-[#00B2B2]/70 rounded-full"
+            (click)="fileInput.click()" (keydown.enter)="fileInput.click()" (keydown.space)="fileInput.click()"
+            aria-label="Cambiar foto de perfil">
+            <img
+              [src]="imagePreview || user?.profilePictureUrl || user?.profile_picture_url || 'assets/default-user.png'"
+              alt="Foto de perfil" class="h-28 w-28 sm:h-32 sm:w-32 rounded-full object-cover ring-2 ring-[#00B2B2] shadow-lg shadow-black/40
+                     transition duration-200 group-hover:opacity-90" />
+
+            <!-- Botón editar (cámara) -->
+            <span class="absolute bottom-1 right-1 z-10 h-8 w-8 rounded-full bg-[#00B2B2] text-black
+                     flex items-center justify-center ring-4 ring-[#0F1113] shadow-lg shadow-black/50">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M9 7l1.2-2h3.6L15 7h2a3 3 0 013 3v7a3 3 0 01-3 3H7a3 3 0 01-3-3v-7a3 3 0 013-3h2z"
+                  stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+                <path d="M12 17a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="2" />
+              </svg>
+            </span>
+          </button>
+
+          <input type="file" #fileInput class="sr-only" accept="image/*" (change)="onFileSelected($event)" />
+          <p class="text-xs text-[#C0C4C9] mt-3 text-center">Toca la imagen para cambiar tu foto</p>
+
+          <!-- Subiendo -->
+          <div *ngIf="isUploading" class="mt-4 w-full">
+            <div class="h-2 w-full rounded-full bg-white/10 overflow-hidden">
+              <div class="h-full bg-[#00B2B2] animate-pulse" style="width: 70%"></div>
+            </div>
+            <p class="mt-2 text-xs text-[#C0C4C9] text-center">Guardando cambios…</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Card de configuración -->
+      <section class="mt-5 rounded-2xl bg-[#1F1F1F]/70 border border-white/10 shadow-2xl shadow-black/40">
+        <!-- 👇 FORM con los nuevos campos -->
+        <form [formGroup]="profileForm" class="p-5 space-y-5">
+          <!-- Username -->
+          <div>
+            <label class="block text-sm text-[#C0C4C9] mb-2">Nombre de usuario</label>
+            <input type="text" formControlName="username" class="w-full rounded-xl border border-white/10 bg-black/30
+                     px-4 py-3 text-white placeholder-[#C0C4C9]/50 outline-none
+                     focus:border-[#00B2B2]/90 focus:ring-2 focus:ring-[#00B2B2]/30 transition"
+              placeholder="atleta_pro" autocomplete="username" />
+            <p *ngIf="profileForm.get('username')?.invalid && profileForm.get('username')?.touched"
+              class="mt-1 text-xs text-red-400">
+              Usa 3–20 caracteres: minúsculas, números o _ .
+            </p>
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label class="block text-sm text-[#C0C4C9] mb-2">Email</label>
+            <input type="email" formControlName="email" class="w-full rounded-xl border border-white/10 bg-black/30
+                     px-4 py-3 text-white placeholder-[#C0C4C9]/50 outline-none
+                     focus:border-[#00B2B2]/90 focus:ring-2 focus:ring-[#00B2B2]/30 transition"
+              placeholder="correo@email.com" autocomplete="email" />
+          </div>
+
+          <!-- Cambiar contraseña -->
+<div class="space-y-3">
+  <p class="text-sm text-white/90 font-semibold">Cambiar contraseña</p>
+
+  <div>
+    <label class="block text-sm text-[#C0C4C9] mb-2">Contraseña actual</label>
+    <input type="password" formControlName="currentPassword"
+      class="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none
+             focus:border-[#00B2B2]/90 focus:ring-2 focus:ring-[#00B2B2]/30 transition"
+      placeholder="Tu contraseña actual" autocomplete="current-password" />
+  </div>
+
+  <div>
+    <label class="block text-sm text-[#C0C4C9] mb-2">Nueva contraseña</label>
+    <input type="password" formControlName="newPassword"
+      class="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none
+             focus:border-[#00B2B2]/90 focus:ring-2 focus:ring-[#00B2B2]/30 transition"
+      placeholder="Mínimo 8 caracteres" autocomplete="new-password" />
+  </div>
+
+  <div>
+    <label class="block text-sm text-[#C0C4C9] mb-2">Confirmar nueva contraseña</label>
+    <input type="password" formControlName="confirmPassword"
+      class="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none
+             focus:border-[#00B2B2]/90 focus:ring-2 focus:ring-[#00B2B2]/30 transition"
+      placeholder="Repite la nueva contraseña" autocomplete="new-password" />
+  </div>
+
+  <!-- Errores -->
+  <p *ngIf="profileForm.errors?.['passwordIncomplete']" class="text-xs text-red-400">
+  Para cambiar contraseña, llena los 3 campos.
+</p>
+
+<p *ngIf="profileForm.errors?.['passwordMismatch']" class="text-xs text-red-400">
+  La confirmación no coincide.
+</p>
+
+<p *ngIf="profileForm.errors?.['passwordWeak']" class="text-xs text-red-400">
+  La nueva contraseña debe tener mínimo 8 caracteres.
+</p>
+
+</div>
+
+
+          <!-- Nivel -->
+          <div>
+            <label class="block text-sm text-[#C0C4C9] mb-2">Nivel de entrenamiento</label>
+            <div class="relative rounded-xl border border-white/10 bg-black/30
+                     focus-within:border-[#00B2B2]/90 focus-within:ring-2 focus-within:ring-[#00B2B2]/30 transition">
+              <select formControlName="level"
+                class="w-full bg-transparent border-none outline-none py-3 pl-3 pr-10 text-white appearance-none">
+                <option *ngFor="let l of levels" [value]="l.value" class="bg-[#0F1113]">
+                  {{ l.label }}
+                </option>
+              </select>
+
+              <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-white/50">
+                <i class="fas fa-chevron-down"></i>
+              </span>
+            </div>
+          </div>
+
+          <!-- TrainDays (1–7) -->
+          <div>
+            <label class="block text-sm text-[#C0C4C9] mb-2">Días de entrenamiento por semana</label>
+
+            <input type="range" min="1" max="7" step="1" formControlName="trainDays" class="w-full accent-[#00B2B2]" />
+
+           
+
+            <p class="mt-1 text-xs text-[#C0C4C9] text-center">
+              {{ profileForm.get('trainDays')?.value }} días / semana
+            </p>
+          </div>
+
+          <!-- Peso -->
+          <div>
+            <label class="block text-sm text-[#C0C4C9] mb-2">Peso (kg)</label>
+            <input type="number" formControlName="weight" class="w-full rounded-xl border border-white/10 bg-black/30
+                     px-4 py-3 text-white placeholder-[#C0C4C9]/50 outline-none
+                     focus:border-[#00B2B2]/90 focus:ring-2 focus:ring-[#00B2B2]/30 transition" placeholder="Ej. 70" />
+          </div>
+
+          <!-- Altura -->
+          <div>
+            <label class="block text-sm text-[#C0C4C9] mb-2">Altura (cm)</label>
+            <input type="number" formControlName="height" class="w-full rounded-xl border border-white/10 bg-black/30
+                     px-4 py-3 text-white placeholder-[#C0C4C9]/50 outline-none
+                     focus:border-[#00B2B2]/90 focus:ring-2 focus:ring-[#00B2B2]/30 transition"
+              placeholder="Ej. 170" />
+          </div>
+
+          <p *ngIf="saveError" class="text-sm text-red-400" aria-live="polite">{{ saveError }}</p>
+        </form>
+
+        <!-- ✅ TU BOTÓN sticky NO SE QUITA -->
+        <div class="sticky bottom-0 p-5 pt-0 bg-gradient-to-t from-[#1F1F1F]/90 to-transparent rounded-b-2xl">
+          <button type="button" [disabled]="profileForm.invalid || isUploading || !hasChanges" (click)="saveChanges()"
+            class="w-full h-[52px] rounded-xl font-bold text-white bg-[#00B2B2]
+         shadow-lg shadow-[#00B2B2]/20 transition
+         active:scale-[0.99] active:brightness-95
+         disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none">
+            Guardar cambios
+          </button>
+
+          <p *ngIf="!hasChanges" class="mt-2 text-xs text-[#C0C4C9] text-center">
+            No hay cambios por guardar.
+          </p>
+
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Toast confirmación -->
+  <div *ngIf="saveOk" class="fixed left-1/2 bottom-6 -translate-x-1/2 z-50 px-4">
+    <div
+      class="rounded-2xl border border-white/10 bg-black/70 backdrop-blur-md shadow-xl shadow-black/40 px-4 py-3 flex items-center gap-3">
+      <span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+      <p class="text-sm text-white">Cambios guardados</p>
+    </div>
+  </div>
+</div>

@@ -12,13 +12,14 @@ export class HomeService {
 
   constructor(private http: HttpClient) {}
 
-  getCardsPage(params: { page?: number; size?: number; sort?: string; goal?: string; search?: string; daysPerWeek?: number }): Observable<CardsPage> {
-    const { page = 0, size = 12, sort = 'name,asc', goal, search, daysPerWeek } = params ?? {};
+  getCardsPage(params: { page?: number; size?: number; sort?: string; goal?: string; search?: string; daysPerWeek?: number; routineGender?: string }): Observable<CardsPage> {
+    const { page = 0, size = 12, sort = 'name,asc', goal, search, daysPerWeek, routineGender } = params ?? {};
     const url = `${this.baseUrl}/routines`;
     const query = new URLSearchParams({ page: String(page), size: String(size), sort });
     if (goal) query.set('goal', goal);
     if (search) query.set('search', search);
     if (daysPerWeek) query.set('daysPerWeek', String(daysPerWeek));
+    if (routineGender) query.set('routineGender', routineGender);
 
     return this.http.get<any>(`${url}?${query.toString()}`).pipe(
       map(p => ({
@@ -31,7 +32,10 @@ export class HomeService {
           goal: r.goal,
           description: r.description,
           usageCount: r.usageCount ?? 0,
-          ownerUsername: r.ownerUsername   // Username del creador (cuando es USER_SHARED)
+          ownerUsername: r.ownerUsername,   // Username del creador (cuando es USER_SHARED)
+          routineGender: r.routineGender,   // Género de la rutina
+          xpCost: r.xpCost ?? 0,            // Costo en XP
+          unlockedByUser: r.unlockedByUser ?? false // Si ya está desbloqueada
         }))
       }))
     );
@@ -39,15 +43,28 @@ export class HomeService {
 
 
   getRoutineDetail(id: string): Observable<RoutineDetailResponse> {
-  const url = `${this.baseUrl}/routines/${id}`;
-  return this.http.get<RoutineDetailResponse>(url);
-}
+    const url = `${this.baseUrl}/routines/${id}`;
+    return this.http.get<RoutineDetailResponse>(url).pipe(
+      map(r => ({
+        ...r,
+        accessType: r.access,           // Mapear access -> accessType
+        xpCost: r.xp_cost ?? 0          // Mapear xp_cost -> xpCost
+      }))
+    );
+  }
 
   getRoutineOverview(id: string | number): Observable<RoutineOverviewResponse> {
     return this.http.get<RoutineOverviewResponse>(
       `${this.baseUrl}/routines/${id}/overview`
     );
   }
+
+  
+//unlock xp
+unlockRoutine(routineId: string | number) {
+  return this.http.post<void>(`${this.baseUrl}/routines/${routineId}/unlock`, {});
+}
+
 
   // -------- RUTINA DEL USUARIO --------
 
@@ -83,11 +100,12 @@ export class HomeService {
 
   /**
    * Reordenar sesiones dentro de un bloque
+   * ACTUALIZADO: Ahora usa blockId en lugar de blockNumber
    */
-  reorderSessions(routineId: number, blockNumber: number, sessionIds: number[]): Observable<void> {
+  reorderSessions(routineId: number, blockId: number, sessionIds: number[]): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/profile/my-routine/reorder`, {
       routineId,
-      blockNumber,
+      blockId,
       sessionIds
     });
   }
@@ -106,18 +124,23 @@ export interface ActiveRoutineResponse {
   blocks: ActiveRoutineBlock[];
 }
 
+// ACTUALIZADO: Nueva estructura de bloque activo
 export interface ActiveRoutineBlock {
-  blockNumber: number;
-  blockTitle: string;
+  blockId: number;
+  orderIndex: number;
+  name: string;
+  description: string | null;
+  durationWeeks: number;
   sessions: ActiveRoutineSession[];
 }
 
+// ACTUALIZADO: sessionOrder en lugar de orderInBlock
 export interface ActiveRoutineSession {
   sessionId: number;
   title: string;
   totalSeries: number;
   mainMuscles: string;
-  orderInBlock: number;
+  sessionOrder: number;
   completed: boolean;
   completedAt?: string;
 }
