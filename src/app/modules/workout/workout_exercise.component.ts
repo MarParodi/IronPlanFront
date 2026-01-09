@@ -12,6 +12,8 @@ import {
   WorkoutSetRequest
 } from './models/workout.models';
 import { WorkoutService } from './services/workout.services';
+import { ProgressService } from './services/progress.service';
+import { ProgressionRecommendation } from './models/progress.models';
 import { SafePipe } from './pipes/safe.pipe';
 import { Subscription, interval } from 'rxjs';
 
@@ -51,10 +53,21 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   // Video modal
   showVideoModal = false;
 
+  // Recomendación de progresión
+  recommendation: ProgressionRecommendation | null = null;
+  loadingRecommendation = false;
+  showRecommendationModal = false;
+
+  // Modal de salida
+  showExitModal = false;
+  exitAction: 'discard' | 'finish' | null = null;
+  processingExit = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private workoutService: WorkoutService
+    private workoutService: WorkoutService,
+    private progressService: ProgressService
   ) {}
 
   // ─────────────────────────────────────────────
@@ -94,6 +107,9 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
           this.setupSets(resp);
           this.setupTimer(resp);
           this.loading = false;
+          
+          // Cargar recomendación de progresión
+          this.loadRecommendation(resp);
         },
         error: (err) => {
           console.error(err);
@@ -101,6 +117,73 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
           this.loading = false;
         }
       });
+  }
+
+  private loadRecommendation(resp: WorkoutExerciseDetailResponse): void {
+    // Necesitamos el exerciseId - lo obtenemos del routineExerciseId o directamente
+    // Asumimos que el backend expone exerciseId en la respuesta
+    if (!resp.exerciseId) return;
+
+    this.loadingRecommendation = true;
+    this.progressService.getProgressionRecommendation(
+      resp.exerciseId,
+      resp.plannedSets,
+      resp.plannedRepsMin,
+      resp.plannedRepsMax
+    ).subscribe({
+      next: (rec) => {
+        this.recommendation = rec;
+        this.loadingRecommendation = false;
+        
+        // Pre-llenar peso sugerido si hay recomendación
+        if (rec.suggestedWeightKg && this.currentSets.length > 0) {
+          this.applySuggestedWeight(rec.suggestedWeightKg);
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando recomendación:', err);
+        this.loadingRecommendation = false;
+      }
+    });
+  }
+
+  applySuggestedWeight(weight: number): void {
+    // Aplicar peso sugerido a todas las series que no tienen peso
+    this.currentSets.forEach(set => {
+      if (set.weightKg === null || set.weightKg === undefined) {
+        set.weightKg = weight;
+      }
+    });
+  }
+
+  openRecommendationModal(): void {
+    this.showRecommendationModal = true;
+  }
+
+  closeRecommendationModal(): void {
+    this.showRecommendationModal = false;
+  }
+
+  getRecommendationColor(): string {
+    if (!this.recommendation) return 'text-slate-400';
+    return this.progressService.getRecommendationColor(this.recommendation.type);
+  }
+
+  getRecommendationIcon(): string {
+    if (!this.recommendation) return '•';
+    return this.progressService.getRecommendationIcon(this.recommendation.type);
+  }
+
+  getRecommendationBgColor(): string {
+    if (!this.recommendation) return 'bg-slate-700/20';
+    switch (this.recommendation.type) {
+      case 'INCREASE_WEIGHT': return 'bg-emerald-500/20 border-emerald-500/30';
+      case 'DECREASE_WEIGHT': return 'bg-rose-500/20 border-rose-500/30';
+      case 'INCREASE_REPS': return 'bg-teal-500/20 border-teal-500/30';
+      case 'MAINTAIN': return 'bg-amber-500/20 border-amber-500/30';
+      case 'FIRST_TIME': return 'bg-violet-500/20 border-violet-500/30';
+      default: return 'bg-slate-700/20';
+    }
   }
 
   /**
@@ -169,10 +252,56 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Volver a la pantalla anterior
+   * Mostrar modal de confirmación de salida
    */
   onBack(): void {
-    this.router.navigate(['/']);
+    this.showExitModal = true;
+  }
+
+  /**
+   * Cerrar modal de salida
+   */
+  closeExitModal(): void {
+    this.showExitModal = false;
+    this.exitAction = null;
+  }
+
+  /**
+   * Descartar la sesión y salir
+   */
+  onDiscardSession(): void {
+    this.processingExit = true;
+    this.workoutService.discardSession(this.sessionId).subscribe({
+      next: () => {
+        this.processingExit = false;
+        this.showExitModal = false;
+        this.router.navigate(['/mis-rutinas']);
+      },
+      error: (err) => {
+        console.error('Error al descartar sesión:', err);
+        this.processingExit = false;
+        this.errorMessage = 'No se pudo descartar la sesión.';
+      }
+    });
+  }
+
+  /**
+   * Finalizar la sesión guardando el progreso y salir
+   */
+  onFinishSession(): void {
+    this.processingExit = true;
+    this.workoutService.finishSession(this.sessionId).subscribe({
+      next: () => {
+        this.processingExit = false;
+        this.showExitModal = false;
+        this.router.navigate(['/workouts', this.sessionId, 'summary']);
+      },
+      error: (err) => {
+        console.error('Error al finalizar sesión:', err);
+        this.processingExit = false;
+        this.errorMessage = 'No se pudo finalizar la sesión.';
+      }
+    });
   }
 
   /**

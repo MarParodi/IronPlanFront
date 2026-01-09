@@ -9,6 +9,7 @@ export interface CardsPage {
 
 export type AccessType = 'FREE' | 'XP_UNLOCK' | 'USER_SHARED';
 export type Goal = 'HIPERTROFIA' | 'FUERZA' | 'RESISTENCIA';
+export type RoutineGender = 'MUJER' | 'HOMBRE' | 'UNISEX';
 
 export interface Card {
   id: string;
@@ -19,4 +20,7 @@ export interface Card {
   description: string;
   usageCount?: number;        // Contador de veces que se ha usado la rutina
   ownerUsername?: string;     // Username del usuario que compartió la rutina (cuando accessType es USER_SHARED)
+  routineGender?: RoutineGender; // Género para el que está diseñada la rutina
+  xpCost?: number;            // Costo en XP para desbloquear
+  unlockedByUser?: boolean;   // true si el usuario actual ya desbloqueó esta rutina
 }

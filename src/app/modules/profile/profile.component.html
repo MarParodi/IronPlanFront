@@ -52,8 +52,17 @@
       <div class="flex items-center gap-4">
         <!-- Avatar -->
         <div class="relative">
-          <div class="w-20 h-20 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center ring-4 ring-teal-400/20">
-            <span class="text-2xl font-bold text-white">{{ getInitials() }}</span>
+          <img *ngIf="profile.header.profilePictureUrl" [src]="profile.header.profilePictureUrl" alt="Foto de perfil"
+            class="w-20 h-20 rounded-full object-cover ring-4 ring-teal-400/20 shadow-lg">
+
+          <div *ngIf="!profile.header.profilePictureUrl"
+            class="w-20 h-20 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center ring-4 ring-teal-400/20 shadow-lg">
+            <span class="text-2xl font-bold text-white uppercase">{{ getInitials() }}</span>
+          </div>
+
+          <div
+            class="absolute -bottom-1 -right-1 w-7 h-7 bg-orange-500 rounded-full border-2 border-[#161b22] flex items-center justify-center shadow-md">
+            <i class="fas fa-star text-[10px] text-white"></i>
           </div>
           <!-- Level indicator -->
           <div class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center ring-2 ring-[#111318]">
@@ -90,7 +99,7 @@
 
         <!-- XP Display -->
         <div class="text-right">
-          <span class="text-2xl font-bold text-teal-400">{{ profile.header.lifetimeXp | number }}</span>
+          <span class="text-2xl font-bold text-teal-400">{{ profile.header.xpPoints | number }}</span>
           <p class="text-xs text-slate-500 uppercase tracking-wider">XP</p>
         </div>
       </div>
@@ -141,6 +150,19 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
         </svg>
       </button>
+
+      <button (click)="goToStats()" 
+              class="w-full flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 hover:border-amber-500/50 transition-all group">
+        <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center group-hover:bg-amber-500/30 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+          </svg>
+        </div>
+        <span class="flex-1 text-left text-sm font-medium text-amber-300 group-hover:text-amber-200 transition-colors">Ver mis estadísticas</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-500/50 group-hover:text-amber-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+        </svg>
+      </button>
     </div>
 
     <!-- Achievements Section -->
@@ -158,29 +180,53 @@
              [ngClass]="{'opacity-40': !achievement.unlocked, 'border-amber-500/30': achievement.unlocked}">
           <div class="w-12 h-12 rounded-full flex items-center justify-center"
                [ngClass]="achievement.unlocked ? 'bg-amber-500/20' : 'bg-slate-700/40'">
-            <!-- Trophy icon for first routine -->
+            <!-- Trophy icon -->
             <svg *ngIf="achievement.icon === 'trophy'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" 
                  [ngClass]="achievement.unlocked ? 'text-amber-400' : 'text-slate-500'"
                  fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
             </svg>
-            <!-- Medal icon for 10 workouts -->
+            <!-- Medal icon -->
             <svg *ngIf="achievement.icon === 'medal'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
                  [ngClass]="achievement.unlocked ? 'text-amber-400' : 'text-slate-500'"
                  fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M12 12.75a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
             </svg>
-            <!-- Target icon for weekly goal -->
-            <svg *ngIf="achievement.icon === 'target'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
-                 [ngClass]="achievement.unlocked ? 'text-amber-400' : 'text-slate-500'"
-                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            <!-- Star icon -->
+            <svg *ngIf="achievement.icon === 'star'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
+                 [ngClass]="achievement.unlocked ? 'text-yellow-400' : 'text-slate-500'"
+                 fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
             </svg>
-            <!-- Fire icon for streak -->
+            <!-- Crown icon -->
+            <svg *ngIf="achievement.icon === 'crown'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
+                 [ngClass]="achievement.unlocked ? 'text-yellow-500' : 'text-slate-500'"
+                 fill="currentColor" viewBox="0 0 24 24">
+              <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5ZM19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V18H19V19Z"/>
+            </svg>
+            <!-- Fire icon -->
             <svg *ngIf="achievement.icon === 'fire'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
                  [ngClass]="achievement.unlocked ? 'text-orange-400' : 'text-slate-500'"
                  fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 23C16.1421 23 19.5 19.6421 19.5 15.5C19.5 14.6345 19.2697 13.8032 19 13C19 13 18.5 14.5 17 14.5C17 14.5 18.151 11.4621 16 8C14.5 9.5 13.5 10 12 10C12 10 12.5 7.5 11 5C9.5 6.5 8 8.75 8 12C8 12 7 12 6 11C6 11 5 13 5 15.5C5 19.6421 7.85786 23 12 23ZM12 21C10.3431 21 9 19.6569 9 18C9 16.3431 10.3431 15 12 15C13.6569 15 15 16.3431 15 18C15 19.6569 13.6569 21 12 21Z"/>
+            </svg>
+            <!-- Bolt icon -->
+            <svg *ngIf="achievement.icon === 'bolt'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
+                 [ngClass]="achievement.unlocked ? 'text-teal-400' : 'text-slate-500'"
+                 fill="currentColor" viewBox="0 0 24 24">
+              <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z"/>
+            </svg>
+            <!-- Pencil icon -->
+            <svg *ngIf="achievement.icon === 'pencil'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
+                 [ngClass]="achievement.unlocked ? 'text-violet-400' : 'text-slate-500'"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+            </svg>
+            <!-- Target icon -->
+            <svg *ngIf="achievement.icon === 'target'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
+                 [ngClass]="achievement.unlocked ? 'text-emerald-400' : 'text-slate-500'"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
           </div>
           <span class="mt-2 text-[10px] text-center text-slate-400 leading-tight">{{ achievement.name }}</span>
@@ -197,7 +243,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mx-auto text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
         </svg>
-        <p class="text-slate-500 text-sm">Aún no tienes entrenamientos registrados</p>
+        <p class="text-slate-500 text-sm">Aún no tienes entrenamientoss registrados</p>
       </div>
 
       <div *ngIf="profile.recentWorkouts.length > 0" class="space-y-2">
@@ -229,6 +275,98 @@
       <p class="text-xs text-slate-600">
         Miembro desde {{ formatDate(profile.header.joinedAt) }}
       </p>
+    </div>
+  </div>
+
+  <!-- Modal de Nueva Hazaña Desbloqueada -->
+  <div *ngIf="newAchievementModal && newAchievement" 
+       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+       (click)="closeAchievementModal()">
+    
+    <div class="w-full max-w-sm bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl border border-amber-500/30 shadow-2xl overflow-hidden animate-bounce-in"
+         (click)="$event.stopPropagation()">
+      
+      <!-- Header con efecto celebración -->
+      <div class="relative pt-8 pb-6 text-center bg-gradient-to-b from-amber-500/30 to-transparent">
+        
+        <!-- Confetti effect -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+          <div class="absolute top-2 left-1/4 w-2 h-2 bg-amber-400 rounded-full animate-ping"></div>
+          <div class="absolute top-4 right-1/4 w-2 h-2 bg-orange-400 rounded-full animate-ping" style="animation-delay: 0.2s"></div>
+          <div class="absolute top-6 left-1/3 w-1.5 h-1.5 bg-yellow-400 rounded-full animate-ping" style="animation-delay: 0.4s"></div>
+        </div>
+        
+        <!-- Glow effect -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-40 bg-amber-500/40 rounded-full blur-3xl"></div>
+        
+        <!-- Badge -->
+        <div class="relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/30 border border-amber-400/50 mb-4">
+          <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">🎉 Nueva Hazaña</span>
+        </div>
+        
+        <!-- Icon -->
+        <div class="relative w-28 h-28 mx-auto rounded-full bg-amber-500/30 flex items-center justify-center ring-4 ring-amber-400/30">
+          <!-- Trophy -->
+          <svg *ngIf="newAchievement.icon === 'trophy'" xmlns="http://www.w3.org/2000/svg" class="w-14 h-14 text-amber-400"
+               fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+          </svg>
+          <!-- Medal -->
+          <svg *ngIf="newAchievement.icon === 'medal'" xmlns="http://www.w3.org/2000/svg" class="w-14 h-14 text-amber-400"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M12 12.75a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+          </svg>
+          <!-- Star -->
+          <svg *ngIf="newAchievement.icon === 'star'" xmlns="http://www.w3.org/2000/svg" class="w-14 h-14 text-yellow-400"
+               fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+          </svg>
+          <!-- Crown -->
+          <svg *ngIf="newAchievement.icon === 'crown'" xmlns="http://www.w3.org/2000/svg" class="w-14 h-14 text-yellow-500"
+               fill="currentColor" viewBox="0 0 24 24">
+            <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5ZM19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V18H19V19Z"/>
+          </svg>
+          <!-- Fire -->
+          <svg *ngIf="newAchievement.icon === 'fire'" xmlns="http://www.w3.org/2000/svg" class="w-14 h-14 text-orange-500"
+               fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 23C16.1421 23 19.5 19.6421 19.5 15.5C19.5 14.6345 19.2697 13.8032 19 13C19 13 18.5 14.5 17 14.5C17 14.5 18.151 11.4621 16 8C14.5 9.5 13.5 10 12 10C12 10 12.5 7.5 11 5C9.5 6.5 8 8.75 8 12C8 12 7 12 6 11C6 11 5 13 5 15.5C5 19.6421 7.85786 23 12 23ZM12 21C10.3431 21 9 19.6569 9 18C9 16.3431 10.3431 15 12 15C13.6569 15 15 16.3431 15 18C15 19.6569 13.6569 21 12 21Z"/>
+          </svg>
+          <!-- Bolt -->
+          <svg *ngIf="newAchievement.icon === 'bolt'" xmlns="http://www.w3.org/2000/svg" class="w-14 h-14 text-teal-400"
+               fill="currentColor" viewBox="0 0 24 24">
+            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z"/>
+          </svg>
+          <!-- Pencil -->
+          <svg *ngIf="newAchievement.icon === 'pencil'" xmlns="http://www.w3.org/2000/svg" class="w-14 h-14 text-violet-400"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Content -->
+      <div class="px-6 pb-6 text-center">
+        <!-- Name -->
+        <h2 class="text-2xl font-bold text-white">{{ newAchievement.name }}</h2>
+        
+        <!-- Description -->
+        <p class="mt-2 text-sm text-slate-400">{{ newAchievement.description }}</p>
+        
+        <!-- XP Reward -->
+        <div *ngIf="newAchievement.xpReward > 0" 
+             class="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-500/20 border border-teal-500/30">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-teal-400" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z"/>
+          </svg>
+          <span class="text-lg font-bold text-teal-400">+{{ newAchievement.xpReward }} XP</span>
+        </div>
+        
+        <!-- Close button -->
+        <button (click)="closeAchievementModal()"
+                class="mt-6 w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold transition-all shadow-lg shadow-amber-500/25">
+          ¡Genial!
+        </button>
+      </div>
     </div>
   </div>
 </div>

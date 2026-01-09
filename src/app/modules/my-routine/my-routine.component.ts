@@ -33,6 +33,7 @@ export class MyRoutineComponent implements OnInit {
   error: string | null = null;
   stopping = false;
   showDetail = false;
+  stopConfirmOpen = false;
 
   // Sesión seleccionada (highlight)
   selectedSessionId: number | null = null;
@@ -67,23 +68,47 @@ export class MyRoutineComponent implements OnInit {
     this.router.navigate(['/academia']);
   }
 
-  onStopRoutine(): void {
+    openStopConfirm(): void {
     if (this.stopping) return;
+    this.stopConfirmOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  closeStopConfirm(): void {
+    this.stopConfirmOpen = false;
+    this.cdr.markForCheck();
+  }
+
+  confirmStopRoutine(): void {
+    this.stopConfirmOpen = false;
+    this.cdr.markForCheck();
+    this.onStopRoutine(); // reutiliza tu lógica actual
+  }
+
+
+    onStopRoutine(): void {
+    if (this.stopping) return;
+
     this.stopping = true;
-    
+    this.stopConfirmOpen = false; // por si acaso
+    this.cdr.markForCheck();
+
     this.homeService.stopRoutine().subscribe({
       next: () => {
         this.stopping = false;
         this.routine = null;
         this.showDetail = false;
+        this.stopConfirmOpen = false;
         this.cdr.markForCheck();
       },
       error: () => {
         this.stopping = false;
+        this.stopConfirmOpen = false;
         this.cdr.markForCheck();
       }
     });
   }
+
 
   goToExplore(): void {
     this.router.navigate(['/academia']);
@@ -106,18 +131,19 @@ export class MyRoutineComponent implements OnInit {
   }
 
   // Drag and drop para reordenar sesiones dentro de un bloque
+  // ACTUALIZADO: Ahora usa blockId en lugar de blockNumber
   dropSession(event: CdkDragDrop<ActiveRoutineSession[]>, block: ActiveRoutineBlock): void {
     if (event.previousIndex !== event.currentIndex && this.routine) {
       moveItemInArray(block.sessions, event.previousIndex, event.currentIndex);
       
-      // Actualizar orderInBlock localmente
+      // Actualizar sessionOrder localmente
       block.sessions.forEach((s, idx) => {
-        s.orderInBlock = idx + 1;
+        s.sessionOrder = idx + 1;
       });
       
-      // Enviar al backend el nuevo orden
+      // Enviar al backend el nuevo orden usando blockId
       const sessionIds = block.sessions.map(s => s.sessionId);
-      this.homeService.reorderSessions(this.routine.id, block.blockNumber, sessionIds).subscribe({
+      this.homeService.reorderSessions(this.routine.id, block.blockId, sessionIds).subscribe({
         next: () => {
           console.log('Orden guardado correctamente');
         },
@@ -132,8 +158,9 @@ export class MyRoutineComponent implements OnInit {
     }
   }
 
+  // ACTUALIZADO: trackBy usa blockId en lugar de blockNumber
   trackByBlock(index: number, block: ActiveRoutineBlock): number {
-    return block.blockNumber;
+    return block.blockId;
   }
 
   trackBySession(index: number, session: ActiveRoutineSession): number {
@@ -151,4 +178,3 @@ export class MyRoutineComponent implements OnInit {
     return null;
   }
 }
-

@@ -15,5 +15,13 @@ export class AcademyService {
     );
   }
 
+  skipSession(routineDetailId: number) {
+  return this.http.post<{ sessionId: number; message: string }>(
+    `${this.baseUrl}/workouts/skip`,
+    { routineDetailId }
+  );
+}
+
+
   // ...lo que ya tengas
 }

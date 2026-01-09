@@ -12,6 +12,7 @@ import { Gender, Level, RegisterReq } from '../../models/auth.models';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
 })
+
 export class RegisterComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
@@ -21,6 +22,7 @@ export class RegisterComponent {
     { label: 'Masculino', value: 'MASCULINO' },
     { label: 'Otro',      value: 'OTRO' },
   ];
+  
 get trainDaysPercent(): string {
   const min = 1;
   const max = 7;
@@ -43,6 +45,7 @@ get trainDaysPercent(): string {
     birthday: '',      
     level: 'NOVATO',
     trainDays: 3,     
+    
   };
 
   loading = signal(false);

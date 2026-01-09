@@ -10,6 +10,7 @@ export interface ProfileHeaderDto {
   xpRankCode: string | null;
   xpRankLabel: string | null;
   joinedAt: string;
+  profilePictureUrl: string | null;
 }
 
 export interface ProfileStatsDto {

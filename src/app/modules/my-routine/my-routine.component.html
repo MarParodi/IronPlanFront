@@ -151,7 +151,7 @@
         </button>
         
         <button
-          (click)="onStopRoutine()"
+          (click)="openStopConfirm()"
           [disabled]="stopping"
           class="flex items-center gap-2 text-sm text-slate-400 hover:text-rose-400 transition disabled:opacity-50">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -199,7 +199,10 @@
         <div *ngFor="let block of routine.blocks; trackBy: trackByBlock">
           <!-- Título del bloque -->
           <h2 class="text-teal-400 font-bold text-sm uppercase tracking-wider mb-3">
-            {{ block.blockTitle }}
+            {{ block.name }}
+            <span *ngIf="block.durationWeeks" class="text-slate-500 font-normal">
+              — {{ block.durationWeeks }} semanas
+            </span>
           </h2>
 
           <!-- Sesiones del bloque (drag and drop) -->
@@ -287,3 +290,71 @@
     </div>
   </div>
 </ng-container>
+<!-- ==================== MODAL: Confirmar terminar rutina ==================== -->
+<ng-container *ngIf="stopConfirmOpen">
+  <!-- Backdrop -->
+  <div
+    class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+    (click)="closeStopConfirm()"
+  ></div>
+
+  <!-- Modal -->
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      class="w-full max-w-md rounded-2xl border border-slate-700/60 bg-[#171a1d] shadow-[0_20px_80px_rgba(0,0,0,0.75)]"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="p-5">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-100">¿Terminar rutina?</h3>
+            <p class="text-sm text-slate-400 mt-1">
+              Si reinicias la rutina, perderás todo tu progreso y deberás iniciar de cero.
+            </p>
+          </div>
+
+          <button
+            class="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition"
+            (click)="closeStopConfirm()"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="mt-4 rounded-xl bg-[#0f1516] border border-slate-700/40 p-3 text-sm text-slate-300">
+          <div class="flex items-center justify-between">
+            <span>Progreso actual</span>
+            <span class="font-semibold text-slate-100">
+              {{ routine?.progressPercent ?? 0 }}%
+            </span>
+          </div>
+          <div class="flex items-center justify-between mt-1">
+            <span>Sesiones</span>
+            <span class="font-semibold text-slate-100">
+              {{ routine?.completedSessions ?? 0 }}/{{ routine?.totalSessions ?? 0 }}
+            </span>
+          </div>
+        </div>
+
+        <div class="mt-5 flex gap-3">
+          <button
+            class="flex-1 py-3 rounded-xl border border-slate-700/60 text-slate-200 hover:bg-slate-800/40 transition font-semibold"
+            (click)="closeStopConfirm()"
+            [disabled]="stopping"
+          >
+            Cancelar
+          </button>
+
+          <button
+            class="flex-1 py-3 rounded-xl bg-rose-500 text-white hover:bg-rose-400 transition font-extrabold disabled:opacity-50"
+            (click)="confirmStopRoutine()"
+            [disabled]="stopping"
+          >
+            Sí, reiniciar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+

@@ -1,0 +1,137 @@
+:host {
+  display: block;
+  background-color: #0d1117; /* Fondo ultra oscuro */
+  min-height: 100vh;
+  color: white;
+  padding: 20px;
+}
+
+.settings-container {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.settings-card {
+  background-color: #161b22;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #30363d;
+}
+
+.header-settings {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+h2 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+
+.btn-back {
+  background: none;
+  border: none;
+  color: #8b949e;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+/* Estilo del Avatar */
+.avatar-edit-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  cursor: pointer;
+}
+
+.avatar-wrapper img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #00cfc1; /* Color cian de tu marca */
+}
+
+.camera-icon {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background: #00cfc1;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #000;
+  border: 3px solid #161b22;
+}
+
+.change-photo-text {
+  color: #8b949e;
+  font-size: 0.85rem;
+  margin-top: 10px;
+}
+
+/* Inputs y Formulario */
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  color: #8b949e;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #0d1117;
+  border-radius: 8px;
+  border: 1px solid #30363d;
+  padding: 0 12px;
+}
+
+.at-symbol { color: #58a6ff; font-weight: bold; }
+
+input, select {
+  width: 100%;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 12px;
+  color: white;
+  outline: none;
+}
+
+.input-wrapper input { border: none; }
+
+input:focus, select:focus {
+  border-color: #00cfc1;
+}
+
+/* Botón Guardar */
+.btn-save {
+  width: 100%;
+  background-color: #00cfc1;
+  color: #000;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: transform 0.2s;
+}
+
+.btn-save:active { transform: scale(0.98); }
+.btn-save:disabled { background-color: #30363d; color: #8b949e; cursor: not-allowed; }

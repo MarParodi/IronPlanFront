@@ -1,0 +1,194 @@
+<div class="min-h-screen bg-gradient-to-b from-[#0d0f11] via-[#111318] to-[#0d0f11]">
+  
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-[#0d0f11]/95 backdrop-blur-md border-b border-slate-800/40">
+    <div class="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
+      <button (click)="goBack()" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-800/50 hover:bg-slate-700/60 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+      <h1 class="text-lg font-semibold text-white flex items-center gap-2">
+        Notificaciones
+        <span *ngIf="unreadCount > 0" class="px-2 py-0.5 text-xs font-bold bg-rose-500 text-white rounded-full">
+          {{ unreadCount }}
+        </span>
+      </h1>
+      <div class="w-10"></div>
+    </div>
+  </header>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="flex flex-col items-center justify-center py-20">
+    <div class="w-12 h-12 border-4 border-teal-400/30 border-t-teal-400 rounded-full animate-spin"></div>
+    <p class="mt-4 text-slate-400 text-sm">Cargando notificaciones...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="max-w-lg mx-auto px-4 py-20 text-center">
+    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-rose-500/10 flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+      </svg>
+    </div>
+    <p class="text-slate-400 mb-4">{{ error }}</p>
+    <button (click)="loadNotifications()" class="px-6 py-2 bg-teal-500 hover:bg-teal-400 text-white font-medium rounded-lg transition-colors">
+      Reintentar
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && !error" class="max-w-lg mx-auto px-4 pb-8">
+    
+    <!-- Actions Bar -->
+    <div class="mt-4 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <!-- Filtro no leídas -->
+        <button (click)="onToggleUnreadOnly()"
+                class="px-3 py-1.5 rounded-full text-xs font-medium border transition-all"
+                [ngClass]="showUnreadOnly ? 'bg-teal-500/20 border-teal-500/50 text-teal-400' : 'bg-slate-800/40 border-slate-700/40 text-slate-400 hover:border-slate-600'">
+          {{ showUnreadOnly ? '● No leídas' : '○ Todas' }}
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Marcar todas como leídas -->
+        <button *ngIf="unreadCount > 0" (click)="onMarkAllAsRead()"
+                class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800/40 border border-slate-700/40 text-slate-300 hover:bg-slate-700/40 transition-all">
+          ✓ Marcar todas
+        </button>
+        <!-- Vaciar -->
+        <button *ngIf="notifications.length > 0" (click)="onOpenDeleteAllModal()"
+                class="px-3 py-1.5 rounded-lg text-xs font-medium bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 transition-all">
+          🗑 Vaciar
+        </button>
+      </div>
+    </div>
+
+    <!-- Type Filter -->
+    <div class="mt-3 flex flex-wrap gap-2">
+      <button *ngFor="let t of types"
+              (click)="onSelectType(t.value)"
+              class="px-3 py-1.5 rounded-full text-xs font-medium border transition-all"
+              [ngClass]="selectedType === t.value ? 'bg-slate-100 text-slate-900 border-transparent' : 'bg-slate-800/40 border-slate-700/40 text-slate-400 hover:border-slate-600'">
+        {{ t.label }}
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="notifications.length === 0 && !loading" class="py-20 text-center">
+      <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-slate-800/40 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-semibold text-white mb-2">Sin notificaciones</h3>
+      <p class="text-slate-500 text-sm">
+        {{ showUnreadOnly ? 'No tienes notificaciones sin leer' : 'No tienes notificaciones por el momento' }}
+      </p>
+    </div>
+
+    <!-- Notifications List -->
+    <div *ngIf="notifications.length > 0" class="mt-4 space-y-2">
+      <div *ngFor="let n of notifications; trackBy: trackByNotification"
+           (click)="onNotificationClick(n)"
+           class="p-4 rounded-2xl border transition-all cursor-pointer group"
+           [ngClass]="n.isRead 
+             ? 'bg-slate-800/20 border-slate-700/30 hover:bg-slate-800/40' 
+             : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/60'">
+        
+        <div class="flex items-start gap-3">
+          <!-- Icon -->
+          <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 border"
+               [ngClass]="getTypeBgColor(n.type)">
+            <span class="text-lg font-bold" [ngClass]="getTypeColor(n.type)">{{ getTypeIcon(n.type) }}</span>
+          </div>
+
+          <!-- Content -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <h4 class="font-semibold text-sm truncate"
+                  [ngClass]="n.isRead ? 'text-slate-300' : 'text-white'">
+                {{ n.title }}
+              </h4>
+              <span *ngIf="!n.isRead" class="w-2 h-2 rounded-full bg-teal-400 flex-shrink-0"></span>
+            </div>
+            <p class="text-xs mt-1 line-clamp-2"
+               [ngClass]="n.isRead ? 'text-slate-500' : 'text-slate-400'">
+              {{ n.message }}
+            </p>
+            <div class="flex items-center gap-2 mt-2">
+              <span class="text-[10px] text-slate-500">{{ formatTime(n.createdAt) }}</span>
+              <span *ngIf="n.priority === 'HIGH'" class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-rose-500/20 text-rose-400">
+                Importante
+              </span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button (click)="onToggleRead($event, n)"
+                    class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+                    [title]="n.isRead ? 'Marcar como no leída' : 'Marcar como leída'">
+              <svg *ngIf="!n.isRead" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+              <svg *ngIf="n.isRead" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 9v.906a2.25 2.25 0 0 1-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 0 0 1.183 1.981l6.478 3.488m8.839 2.51-4.66-2.51m0 0-1.023-.55a2.25 2.25 0 0 0-2.134 0l-1.022.55m0 0-4.661 2.51m16.5 1.615a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V8.844a2.25 2.25 0 0 1 1.183-1.981l7.5-4.039a2.25 2.25 0 0 1 2.134 0l7.5 4.039a2.25 2.25 0 0 1 1.183 1.98V19.5Z" />
+              </svg>
+            </button>
+            <button (click)="onDeleteNotification($event, n)"
+                    class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
+                    title="Eliminar">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="totalPages > 1" class="mt-6 flex items-center justify-center gap-4">
+      <button (click)="onPreviousPage()" [disabled]="page === 0"
+              class="px-4 py-2 rounded-lg text-sm font-medium bg-slate-800/40 border border-slate-700/40 text-slate-300 hover:bg-slate-700/40 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+        ← Anterior
+      </button>
+      <span class="text-sm text-slate-400">{{ page + 1 }} / {{ totalPages }}</span>
+      <button (click)="onNextPage()" [disabled]="page >= totalPages - 1"
+              class="px-4 py-2 rounded-lg text-sm font-medium bg-slate-800/40 border border-slate-700/40 text-slate-300 hover:bg-slate-700/40 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+        Siguiente →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Confirmar Eliminar Todas -->
+<div *ngIf="showDeleteAllModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+     (click)="onCloseDeleteAllModal()">
+  <div class="w-full max-w-sm bg-gradient-to-b from-[#1a1f25] to-[#111416] rounded-2xl border border-slate-700/50 shadow-2xl"
+       (click)="$event.stopPropagation()">
+    <div class="p-5 text-center">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-rose-500/20 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold text-white mb-2">¿Eliminar todas las notificaciones?</h3>
+      <p class="text-sm text-slate-400 mb-6">Esta acción no se puede deshacer.</p>
+      
+      <div class="space-y-3">
+        <button (click)="onConfirmDeleteAll()" [disabled]="deleting"
+                class="w-full py-3 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-semibold transition-all flex items-center justify-center gap-2">
+          <span *ngIf="deleting" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          {{ deleting ? 'Eliminando...' : 'Sí, eliminar todas' }}
+        </button>
+        <button (click)="onCloseDeleteAllModal()" [disabled]="deleting"
+                class="w-full py-3 rounded-xl bg-slate-800/60 border border-slate-700/50 text-slate-300 font-medium hover:bg-slate-700/60 transition-all">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -5,6 +5,8 @@ import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { AcademyService } from './service/sesion.service';
 import { TrainingSessionDetail } from './models/session.model';
 import { WorkoutService } from '../workout/services/workout.services';
+import { SessionExercise } from './models/session.model';
+import { HostListener } from '@angular/core'; 
 
 @Component({
   standalone: true,
@@ -50,7 +52,7 @@ export class SessionComponent {
 
     // 👇 Guardar en variables del componente
     this.routineId = routineId;
-    this.routineDetailId = sessionId;   // 👈 ESTE es el ID que pide el backend
+    this.routineDetailId = sessionId;   
 
     // Cargar la información de la sesión (detalle visual)
     this.academy.getSession(routineId, sessionId).subscribe({
@@ -66,13 +68,66 @@ export class SessionComponent {
     });
   }
 
+ selectedExercise = signal<SessionExercise | null>(null);
+isDetailsOpen = computed(() => this.selectedExercise() !== null);
+
+openExerciseDetails(ex: SessionExercise) {
+  this.selectedExercise.set(ex);
+}
+
+closeExerciseDetails() {
+  this.selectedExercise.set(null);
+}
+
+@HostListener('document:keydown.escape')
+onEsc() {
+  if (this.isDetailsOpen()) this.closeExerciseDetails();
+}
+
+skipConfirmOpen = signal(false);
+skipping = signal(false);
+
+openSkipConfirm() {
+  if (this.skipping()) return;
+  this.skipConfirmOpen.set(true);
+}
+
+closeSkipConfirm() {
+  if (this.skipping()) return;
+  this.skipConfirmOpen.set(false);
+}
+
+confirmSkip() {
+  if (this.skipping()) return;
+
+  this.skipping.set(true);
+
+  this.academy.skipSession(this.routineDetailId).subscribe({
+    next: () => {
+      this.skipping.set(false);
+      this.skipConfirmOpen.set(false);
+
+      // ✅ aquí decides a dónde regresar:
+      // 1) volver atrás:
+      history.back();
+
+      // 2) o ir a "Mi rutina activa":
+      // this.router.navigate(['/my-routine']);
+    },
+    error: (err) => {
+      console.error('skipSession error', err);
+      this.skipping.set(false);
+    }
+  });
+}
+
   onBack(): void {
     history.back();
   }
 
-  onSkip(): void {
-    console.log('Saltar sesión (por implementar)');
-  }
+onSkip(): void {
+  this.openSkipConfirm();
+}
 
   onStartSession() {
     console.log('routineDetailId que mando:', this.routineDetailId);

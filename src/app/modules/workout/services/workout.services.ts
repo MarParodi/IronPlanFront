@@ -10,7 +10,7 @@ import {
 } from '../models/workout.models';
 import { WorkoutSessionSummaryResponse } from '../models/workout-summary.model';
 import { Observable } from 'rxjs';
-
+import { WorkoutSessionDetailResponse } from '../models/workout-detail.models';
 @Injectable({ providedIn: 'root' })
 export class WorkoutService {
 
@@ -67,6 +67,28 @@ export class WorkoutService {
   getSessionSummary(sessionId: number): Observable<WorkoutSessionSummaryResponse> {
     const url = `${this.baseUrl}/workouts/${sessionId}/summary`;
     return this.http.get<WorkoutSessionSummaryResponse>(url);
+  }
+
+  getSessionDetail(sessionId: number): Observable<WorkoutSessionDetailResponse> {
+    return this.http.get<WorkoutSessionDetailResponse>(
+      `${this.baseUrl}/workouts/${sessionId}/detail`
+    );
+  }
+
+  /**
+   * Descartar sesión (elimina todo el progreso y marca como CANCELLED)
+   * POST /api/workouts/{sessionId}/discard
+   */
+  discardSession(sessionId: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/workouts/${sessionId}/discard`, {});
+  }
+
+  /**
+   * Finalizar sesión guardando el progreso actual
+   * POST /api/workouts/{sessionId}/finish
+   */
+  finishSession(sessionId: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/workouts/${sessionId}/finish`, {});
   }
 
 }

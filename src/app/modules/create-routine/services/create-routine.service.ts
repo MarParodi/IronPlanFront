@@ -28,6 +28,17 @@ export class CreateRoutineService {
     });
   }
 
+  uploadRoutineImage(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  return this.http.post<{ url: string; publicId: string }>(
+    `${this.baseUrl}/routines/upload-image`,
+    formData
+  );
+}
+
+
   /**
    * Obtener todos los ejercicios paginados
    */

@@ -2,6 +2,7 @@
 
 export type Goal = 'HIPERTROFIA' | 'FUERZA' | 'RESISTENCIA';
 export type Level = 'NOVATO' | 'INTERMEDIO' | 'AVANZADO';
+export type RoutineGender = 'MUJER' | 'HOMBRE' | 'UNISEX';
 
 export interface CreateExerciseRequest {
   exerciseId: number;
@@ -14,17 +15,26 @@ export interface CreateExerciseRequest {
   restMinutes?: number;
 }
 
+// ACTUALIZADO: Ahora sessionOrder en lugar de blockNumber/blockLabel/orderInBlock
 export interface CreateSessionRequest {
   title: string;
   icon?: string;
   muscles?: string;
   description?: string;
-  blockNumber: number;
-  blockLabel: string;
-  orderInBlock: number;
+  sessionOrder: number;
   exercises: CreateExerciseRequest[];
 }
 
+// NUEVO: Request para crear un bloque
+export interface CreateBlockRequest {
+  name: string;
+  description?: string;
+  orderIndex: number;
+  durationWeeks: number;
+  sessions: CreateSessionRequest[];
+}
+
+// ACTUALIZADO: Ahora usa blocks en lugar de sessions
 export interface CreateRoutineRequest {
   name: string;
   description: string;
@@ -33,9 +43,10 @@ export interface CreateRoutineRequest {
   suggestedLevel: Level;
   daysPerWeek: number;
   durationWeeks: number;
+  routineGender: RoutineGender;
   img?: string;
   isPublic: boolean;
-  sessions: CreateSessionRequest[];
+  blocks: CreateBlockRequest[];
 }
 
 export interface CreateRoutineResponse {
@@ -44,7 +55,15 @@ export interface CreateRoutineResponse {
   message: string;
 }
 
-// Para el formulario interno
+// Para el formulario interno - BlockForm con sus sesiones
+export interface BlockForm {
+  id: string; // ID temporal para el frontend
+  name: string;
+  description: string;
+  durationWeeks: number;
+  sessions: SessionForm[];
+}
+
 export interface SessionForm {
   id: string; // ID temporal para el frontend
   title: string;
@@ -74,4 +93,3 @@ export interface Exercise {
   equipment?: string;
   description?: string;
 }
-
