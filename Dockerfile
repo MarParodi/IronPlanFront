@@ -31,12 +31,8 @@ COPY --from=builder /app/package*.json ./
 # Instalar solo dependencias de producción
 RUN npm ci --only=production
 
-# Puerto expuesto
-EXPOSE 4000
-
 # Variables de entorno
 ENV NODE_ENV=production
-ENV PORT=4000
 
-# Comando de inicio para SSR
+# Comando de inicio para SSR (Railway inyecta PORT automáticamente)
 CMD ["node", "dist/ironplan-web/server/server.mjs"]
