@@ -6,7 +6,7 @@
   },
   "deploy": {
     "startCommand": "node dist/ironplan-web/server/server.mjs",
-    "healthcheckPath": "/",
-    "restartPolicyType": "ON_FAILURE"
+    "restartPolicyType": "ON_FAILURE",
+    "healthcheckTimeout": 300
   }
 }
