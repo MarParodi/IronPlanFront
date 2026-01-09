@@ -15,7 +15,15 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender
   },
   {
-    path: 'home',
+    path: 'academia',
+    renderMode: RenderMode.Prerender
+  },
+  {
+    path: 'mis-rutinas',
+    renderMode: RenderMode.Prerender
+  },
+  {
+    path: 'crear',
     renderMode: RenderMode.Prerender
   },
   {
@@ -35,11 +43,11 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender
   },
   {
-    path: 'mis-rutinas',
+    path: 'perfil/historial',
     renderMode: RenderMode.Prerender
   },
   {
-    path: 'create-routine',
+    path: 'user/settings',
     renderMode: RenderMode.Prerender
   },
   {
