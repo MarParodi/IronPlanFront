@@ -80,8 +80,7 @@
                   {{ exercise.name }}
                 </p>
                 <p class="text-xs text-slate-400 mt-0.5">
-                  {{ exercise.muscleGroup }}
-                  <span *ngIf="exercise.equipment" class="text-slate-500">· {{ exercise.equipment }}</span>
+                  {{ exercise.primaryMuscle }}
                 </p>
               </div>
 
@@ -205,7 +204,7 @@
             <!-- Info -->
             <div class="flex-1 min-w-0">
               <p class="font-semibold text-sm text-slate-100">{{ ex.exerciseName }}</p>
-              <p class="text-xs text-slate-400 mt-0.5">{{ ex.muscleGroup }}</p>
+              <p class="text-xs text-slate-400 mt-0.5">{{ ex.primaryMuscle }}</p>
 
               <!-- Badges -->
               <div class="flex flex-wrap gap-2 mt-2">
@@ -290,7 +289,7 @@
           <div>
             <p class="text-xs text-slate-400 uppercase tracking-wider">Configurar ejercicio</p>
             <h3 class="text-lg font-bold text-slate-100 mt-1">{{ exercise.name }}</h3>
-            <p class="text-xs text-slate-400">{{ exercise.muscleGroup }}</p>
+            <p class="text-xs text-slate-400">{{ exercise.primaryMuscle }}</p>
           </div>
           <button (click)="closeConfigModal()"
             class="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition">
