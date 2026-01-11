@@ -144,7 +144,7 @@ export class CustomSessionComponent implements OnInit {
       tempId: crypto.randomUUID(),
       exerciseId: exercise.id,
       exerciseName: exercise.name,
-      muscleGroup: exercise.muscleGroup,
+      primaryMuscle: exercise.primaryMuscle,
       sets: this.configSets(),
       repsMin: this.configRepsMin(),
       repsMax: this.configRepsMax(),
@@ -189,7 +189,7 @@ export class CustomSessionComponent implements OnInit {
     const fakeExercise: CatalogExercise = {
       id: item.exerciseId,
       name: item.exerciseName,
-      muscleGroup: item.muscleGroup
+      primaryMuscle: item.primaryMuscle
     };
     this.exerciseToConfig.set(fakeExercise);
     this.configSets.set(item.sets);

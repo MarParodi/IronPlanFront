@@ -1,12 +1,13 @@
 // Modelos para sesión personalizada
 
-// Ejercicio del catálogo (reutilizado)
+// Ejercicio del catálogo - debe coincidir con la respuesta del backend (Exercise.java)
 export interface CatalogExercise {
   id: number;
   name: string;
-  muscleGroup: string;
-  equipment?: string;
   description?: string;
+  instructions?: string;
+  primaryMuscle: string;
+  secondaryMuscle?: string;
   videoUrl?: string;
 }
 
@@ -15,7 +16,7 @@ export interface CustomExerciseItem {
   tempId: string; // ID temporal para el frontend
   exerciseId: number;
   exerciseName: string;
-  muscleGroup: string;
+  primaryMuscle: string;
   sets: number;
   repsMin: number;
   repsMax: number;
