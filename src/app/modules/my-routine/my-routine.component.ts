@@ -114,6 +114,10 @@ export class MyRoutineComponent implements OnInit {
     this.router.navigate(['/academia']);
   }
 
+  goToCustomSession(): void {
+    this.router.navigate(['/sesion-personalizada']);
+  }
+
   getDaysPerWeek(): number {
     return this.routine?.daysPerWeek ?? 0;
   }
