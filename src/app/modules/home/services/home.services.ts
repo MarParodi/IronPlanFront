@@ -5,10 +5,11 @@ import { map, Observable } from 'rxjs';
 import { CardsPage, Card } from '../models/response/card_response';
 import { RoutineDetailResponse } from '../models/response/detail_routine_response';
 import { RoutineOverviewResponse } from '../models/response/routine_overview_response';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class HomeService {
-  private readonly baseUrl = 'http://localhost:8080/api';
+  private readonly baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
