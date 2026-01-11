@@ -30,6 +30,13 @@ export const routes: Routes = [
 },
 
 {
+  path: 'sesion-personalizada',
+  loadComponent: () =>
+    import('./modules/custom-session/custom-session.component').then(m => m.CustomSessionComponent),
+  canActivate: [authGuard]
+},
+
+{
     path: 'routines/:id',
     loadComponent: () =>
       import('./modules/home/routine/routine.component')
