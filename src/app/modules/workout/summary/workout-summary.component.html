@@ -157,15 +157,13 @@
         🏠 Volver al inicio
       </button>
 
-      <button
-        (click)="onViewHistory()"
-        class="w-full inline-flex items-center justify-center gap-2 px-6 py-3
-               rounded-2xl bg-slate-800 border border-slate-700
-               text-slate-200 font-medium text-sm
-               hover:bg-slate-700 transition"
-      >
-        📊 Ver mi progreso
-      </button>
+      <li>
+            <a routerLink="/crear"
+              class="text-sm text-slate-400 hover:text-teal-400 transition-colors flex items-center gap-2 group">
+              <span class="w-1 h-1 bg-slate-600 rounded-full group-hover:bg-teal-400 transition-colors"></span>
+              Ver mi progreso
+            </a>
+          </li>
     </section>
 
   </div>
