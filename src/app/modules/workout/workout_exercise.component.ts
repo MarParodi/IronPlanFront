@@ -212,7 +212,19 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   private setupTimer(resp: WorkoutExerciseDetailResponse): void {
     this.stopTimer();
 
+    // Validar que startedAt exista y sea una fecha válida
+    if (!resp.progress?.startedAt) {
+      this.elapsedSeconds = 0;
+      return;
+    }
+
     const startedAt = new Date(resp.progress.startedAt).getTime();
+    
+    // Si la fecha no es válida, usar 0
+    if (isNaN(startedAt)) {
+      this.elapsedSeconds = 0;
+      return;
+    }
 
     this.timerSub = interval(1000).subscribe(() => {
       const now = Date.now();
