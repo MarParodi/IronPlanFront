@@ -157,24 +157,23 @@
     <!-- Paso 3 -->
     <div *ngIf="step() === 3" class="space-y-3">
       <p class="text-xs text-slate-400">
-        Este paso es <span class="font-semibold text-teal-300">opcional</span>. Complétalo solo si perteneces a una organización
-        (empresa, universidad, facultad, grupo, etc.). Si usas IronPlan de forma individual, puedes dejarlo en blanco y continuar.
+        Este paso es <span class="font-semibold text-teal-300">opcional</span>. 
+        Si tienes un código de invitación de tu organización ingrésalo aquí. 
+        Si no, puedes omitirlo y continuar como usuario individual.
       </p>
 
       <label class="block space-y-1">
-        <span class="text-sm font-medium text-slate-200">Código de organización o invitación</span>
-        <input [(ngModel)]="form3.organizationCode" name="organizationCode" type="text" class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm" />
+        <span class="text-sm font-medium text-slate-200">Código de invitación</span>
+        <input 
+          [(ngModel)]="form3.organizationCode" 
+          name="organizationCode" 
+          type="text" 
+          placeholder="Ej: ING-SOFT-02-2026"
+          class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm uppercase tracking-widest" />
       </label>
 
-      <label class="block space-y-1">
-        <span class="text-sm font-medium text-slate-200">Departamento / facultad / grupo</span>
-        <input [(ngModel)]="form3.organizationGroup" name="organizationGroup" type="text" class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm" />
-      </label>
-
-      <label class="block space-y-1">
-        <span class="text-sm font-medium text-slate-200">Rol dentro de la organización (opcional)</span>
-        <input [(ngModel)]="form3.organizationRole" name="organizationRole" type="text" class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm" />
-      </label>
+      <!-- Feedback visual si el código es inválido -->
+      <p *ngIf="error()" class="text-xs text-rose-400">{{ error() }}</p>
 
       <div class="flex gap-2 pt-1">
         <button (click)="back()" class="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-100 font-semibold text-sm hover:bg-white/10 transition">
@@ -185,7 +184,7 @@
           [disabled]="loading()"
           class="flex-1 py-3 rounded-xl bg-gradient-to-b from-teal-300 to-teal-500 text-slate-950 font-semibold text-sm shadow-[0_10px_25px_rgba(45,212,191,0.45)] hover:brightness-110 active:translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed transition"
         >
-          {{ loading() ? 'Guardando...' : 'Continuar / Omitir' }}
+          {{ loading() ? 'Validando...' : 'Continuar / Omitir' }}
         </button>
       </div>
     </div>

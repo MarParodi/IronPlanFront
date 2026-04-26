@@ -1,0 +1,446 @@
+<div class="admin-layout">
+ 
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+        </svg>
+        <span>Admin</span>
+      </div>
+    </div>
+ 
+    <nav class="sidebar-nav">
+      <button class="nav-item" [class.active]="activeSection === 'grupos'" (click)="setSection('grupos')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+        </svg>
+        <span>Grupos</span>
+      </button>
+ 
+      <button class="nav-item" [class.active]="activeSection === 'invitaciones'" (click)="setSection('invitaciones')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+        </svg>
+        <span>Invitaciones</span>
+      </button>
+ 
+      <button class="nav-item" [class.active]="activeSection === 'competencias'" (click)="setSection('competencias')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+        <span>Competencias</span>
+      </button>
+    </nav>
+ 
+    <div class="sidebar-footer">
+      <a routerLink="/home" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        <span>Volver al inicio</span>
+      </a>
+    </div>
+  </aside>
+ 
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main-content">
+ 
+    <!-- ======================== GRUPOS ======================== -->
+    <section *ngIf="activeSection === 'grupos'">
+      <div class="section-header">
+        <div>
+          <h1>Grupos organizacionales</h1>
+          <p class="section-subtitle">Administra la jerarquía de tu organización</p>
+        </div>
+        <button class="btn-primary" (click)="openCreateGroup()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+          Nuevo grupo
+        </button>
+      </div>
+ 
+      <!-- Loading -->
+      <div *ngIf="loadingTree" class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando organizaciones...</p>
+      </div>
+ 
+      <!-- Vista árbol -->
+      <app-org-tree
+        *ngIf="!loadingTree"
+        [nodes]="groupTree"
+        (onEdit)="onTreeEdit($event)"
+        (onDeactivate)="onTreeDeactivate($event)">
+      </app-org-tree>
+    </section>
+ 
+    <!-- ======================== INVITACIONES ======================== -->
+    <section *ngIf="activeSection === 'invitaciones'">
+      <div class="section-header">
+        <div>
+          <h1>Invitaciones</h1>
+          <p class="section-subtitle">Genera y administra códigos de acceso para los grupos</p>
+        </div>
+        <button class="btn-primary" (click)="openCreateInvitation()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+          Generar código
+        </button>
+      </div>
+ 
+      <div *ngIf="loadingInvitations" class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando invitaciones...</p>
+      </div>
+ 
+      <div *ngIf="!loadingInvitations" class="table-container">
+        <table *ngIf="invitations.length > 0" class="data-table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Grupo</th>
+              <th>Usos</th>
+              <th>Expira</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let inv of invitations">
+              <td>
+                <div class="code-cell">
+                  <span class="code-text">{{ inv.code }}</span>
+                  <button class="btn-copy" (click)="copyCode(inv.code)" title="Copiar">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+              <td class="td-group">{{ inv.groupName }}</td>
+              <td class="td-uses">{{ inv.usesCount }} / {{ inv.maxUses ?? '∞' }}</td>
+              <td class="td-expires">{{ inv.expiresAt ? (inv.expiresAt | date:'dd/MM/yyyy') : 'Sin límite' }}</td>
+              <td>
+                <span class="status-badge" [class.badge-active]="inv.active" [class.badge-inactive]="!inv.active">
+                  {{ inv.active ? 'Activa' : 'Inactiva' }}
+                </span>
+              </td>
+              <td>
+                <button *ngIf="inv.active" class="btn-icon btn-icon-danger" (click)="deactivateInvitation(inv)" title="Desactivar">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+ 
+        <div *ngIf="invitations.length === 0" class="empty-state">
+          <p>No hay invitaciones generadas.</p>
+          <button class="btn-primary" (click)="openCreateInvitation()">Generar primer código</button>
+        </div>
+      </div>
+    </section>
+ 
+    <!-- ======================== COMPETENCIAS ======================== -->
+    <section *ngIf="activeSection === 'competencias'">
+      <div class="section-header">
+        <div>
+          <h1>Competencias</h1>
+          <p class="section-subtitle">Crea y gestiona retos entre grupos</p>
+        </div>
+        <button class="btn-primary" (click)="openCreateCompetition()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+          Nueva competencia
+        </button>
+      </div>
+ 
+      <div class="filter-bar">
+        <select [(ngModel)]="competitionStatusFilter" (change)="loadCompetitions()" class="filter-select">
+          <option value="">Todos los estados</option>
+          <option value="DRAFT">Borrador</option>
+          <option value="ACTIVE">Activa</option>
+          <option value="FINISHED">Finalizada</option>
+        </select>
+        <select [(ngModel)]="competitionTypeFilter" (change)="loadCompetitions()" class="filter-select">
+          <option value="">Todos los tipos</option>
+          <option value="RANKING">Ranking</option>
+          <option value="CHALLENGE">Challenge</option>
+          <option value="VERSUS">Versus</option>
+        </select>
+      </div>
+ 
+      <div *ngIf="loadingCompetitions" class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando competencias...</p>
+      </div>
+ 
+      <div *ngIf="!loadingCompetitions" class="card-grid">
+        <div *ngFor="let c of competitions" class="item-card competition-card">
+          <div class="item-card-header">
+            <div class="item-badge" [ngClass]="getCompetitionTypeClass(c.competitionType)">
+              {{ c.competitionType }}
+            </div>
+            <span class="status-badge"
+              [class.badge-draft]="c.status === 'DRAFT'"
+              [class.badge-active]="c.status === 'ACTIVE'"
+              [class.badge-finished]="c.status === 'FINISHED'">
+              {{ getStatusLabel(c.status) }}
+            </span>
+          </div>
+          <h3 class="item-name">{{ c.name }}</h3>
+          <p class="item-code">{{ c.scopeLevel }} · {{ c.metricType }}</p>
+          <p class="item-dates" *ngIf="c.startDate">
+            {{ c.startDate | date:'dd/MM/yy' }}
+            {{ c.endDate ? '→ ' + (c.endDate | date:'dd/MM/yy') : '→ Sin fecha fin' }}
+          </p>
+          <div class="item-actions">
+            <button *ngIf="c.status === 'DRAFT'" class="btn-sm btn-success" (click)="activateCompetition(c)">Activar</button>
+            <button *ngIf="c.status === 'ACTIVE'" class="btn-sm btn-warning" (click)="finishCompetition(c)">Finalizar</button>
+            <button class="btn-icon" (click)="viewCompetition(c)" title="Ver detalle">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+ 
+        <div *ngIf="competitions.length === 0" class="empty-state">
+          <p>No hay competencias creadas.</p>
+          <button class="btn-primary" (click)="openCreateCompetition()">Crear primera competencia</button>
+        </div>
+      </div>
+    </section>
+ 
+  </main>
+</div>
+ 
+<!-- ======================== MODAL CREAR/EDITAR GRUPO ======================== -->
+<div *ngIf="showGroupModal" class="modal-overlay" (click)="closeGroupModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ editingGroup ? 'Editar grupo' : 'Nuevo grupo' }}</h2>
+      <button class="modal-close" (click)="closeGroupModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+ 
+      <label class="form-label">
+        Nombre
+        <input [(ngModel)]="groupForm.name" type="text" class="form-input"
+               placeholder="Ej: Facultad de Ingeniería"/>
+      </label>
+ 
+      <label class="form-label">
+        Tipo
+        <select [(ngModel)]="groupForm.groupType" class="form-input">
+          <option value="">Selecciona un tipo</option>
+          <option value="EMPRESA">Raíz — Organización (Nivel 1)</option>
+          <option value="FACULTAD">
+            {{ groupForm.organizationKind ? currentKindConfig.level2 : 'Nivel 2' }} (Nivel 2)
+          </option>
+          <option value="CARRERA">
+            {{ groupForm.organizationKind ? currentKindConfig.level3 : 'Nivel 3' }} (Nivel 3)
+          </option>
+          <option value="GRUPO">
+            {{ groupForm.organizationKind ? currentKindConfig.level4 : 'Nivel 4' }} (Nivel 4)
+          </option>
+        </select>
+      </label>
+ 
+      <!-- Tipo de organización — solo si es raíz -->
+      <label class="form-label" *ngIf="groupForm.groupType === 'EMPRESA'">
+        Tipo de organización
+        <select [(ngModel)]="groupForm.organizationKind" class="form-input">
+          <option value="">Selecciona el tipo</option>
+          <option value="UNIVERSIDAD">Universidad / Escuela</option>
+          <option value="EMPRESA">Empresa / Corporativo</option>
+          <option value="GIMNASIO">Gimnasio / Club deportivo</option>
+          <option value="INSTITUCION">Institución / ONG</option>
+        </select>
+        <div *ngIf="groupForm.organizationKind" class="hierarchy-preview">
+          <span class="h-node root-node">{{ currentKindConfig.level1 }}</span>
+          <span class="h-arrow">→</span>
+          <span class="h-node">{{ currentKindConfig.level2 }}</span>
+          <span class="h-arrow">→</span>
+          <span class="h-node">{{ currentKindConfig.level3 }}</span>
+          <span class="h-arrow">→</span>
+          <span class="h-node">{{ currentKindConfig.level4 }}</span>
+        </div>
+      </label>
+ 
+      <!-- Grupo padre — solo si no es raíz -->
+      <label class="form-label" *ngIf="groupForm.groupType && groupForm.groupType !== 'EMPRESA'">
+        Grupo padre
+        <select [(ngModel)]="groupForm.parentId" class="form-input">
+          <option value="">Selecciona el padre</option>
+          <option *ngFor="let p of availableParents" [value]="p.id">
+            {{ p.name }} ({{ getGroupTypeLabel(p.groupType) }})
+          </option>
+        </select>
+      </label>
+ 
+      <label class="form-label">
+        Código
+        <input [(ngModel)]="groupForm.code" type="text" class="form-input"
+               placeholder="Ej: ING-SIS-A" style="text-transform: uppercase;"/>
+      </label>
+ 
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeGroupModal()">Cancelar</button>
+      <button class="btn-primary" (click)="saveGroup()" [disabled]="savingGroup">
+        {{ savingGroup ? 'Guardando...' : (editingGroup ? 'Guardar cambios' : 'Crear grupo') }}
+      </button>
+    </div>
+  </div>
+</div>
+ 
+<!-- ======================== MODAL INVITACIÓN ======================== -->
+<div *ngIf="showInvitationModal" class="modal-overlay" (click)="closeInvitationModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Generar código de invitación</h2>
+      <button class="modal-close" (click)="closeInvitationModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <label class="form-label">
+        Grupo destino
+        <select [(ngModel)]="invitationForm.groupId" class="form-input">
+          <option value="">Selecciona un grupo</option>
+          <option *ngFor="let g of leafGroups" [value]="g.id">{{ g.name }}</option>
+        </select>
+      </label>
+      <label class="form-label">
+        Código personalizado <span class="label-hint">(opcional, se genera automático)</span>
+        <input [(ngModel)]="invitationForm.code" type="text" class="form-input"
+               placeholder="Ej: ING-A-2024" style="text-transform: uppercase;"/>
+      </label>
+      <div class="form-row">
+        <label class="form-label">
+          Máx. usos <span class="label-hint">(vacío = ilimitado)</span>
+          <input [(ngModel)]="invitationForm.maxUses" type="number" min="1" class="form-input"/>
+        </label>
+        <label class="form-label">
+          Expira el <span class="label-hint">(vacío = sin límite)</span>
+          <input [(ngModel)]="invitationForm.expiresAt" type="date" class="form-input"/>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeInvitationModal()">Cancelar</button>
+      <button class="btn-primary" (click)="saveInvitation()" [disabled]="savingInvitation">
+        {{ savingInvitation ? 'Generando...' : 'Generar código' }}
+      </button>
+    </div>
+  </div>
+</div>
+ 
+<!-- ======================== MODAL COMPETENCIA ======================== -->
+<div *ngIf="showCompetitionModal" class="modal-overlay" (click)="closeCompetitionModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Nueva competencia</h2>
+      <button class="modal-close" (click)="closeCompetitionModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <label class="form-label">
+        Nombre
+        <input [(ngModel)]="competitionForm.name" type="text" class="form-input" placeholder="Ej: Reto Febrero"/>
+      </label>
+      <div class="form-row">
+        <label class="form-label">
+          Tipo
+          <select [(ngModel)]="competitionForm.competitionType" class="form-input">
+            <option value="">Selecciona</option>
+            <option value="RANKING">Ranking</option>
+            <option value="CHALLENGE">Challenge</option>
+            <option value="VERSUS">Versus (2 grupos)</option>
+          </select>
+        </label>
+        <label class="form-label">
+          Métrica
+          <select [(ngModel)]="competitionForm.metricType" class="form-input">
+            <option value="">Selecciona</option>
+            <option value="SESSIONS">Sesiones</option>
+            <option value="ACTIVE_MINUTES">Minutos activos</option>
+            <option value="WORKOUTS_COUNT">Entrenamientos</option>
+          </select>
+        </label>
+      </div>
+      <div class="form-row">
+        <label class="form-label">
+          Scope
+          <select [(ngModel)]="competitionForm.scopeLevel" (change)="loadScopeGroups()" class="form-input">
+            <option value="">Selecciona</option>
+            <option value="CARRERA">Carrera / Área</option>
+            <option value="FACULTAD">Facultad / Departamento</option>
+            <option value="EMPRESA">Toda la organización</option>
+          </select>
+        </label>
+        <label class="form-label">
+          Nodo anfitrión
+          <select [(ngModel)]="competitionForm.scopeReferenceId" class="form-input">
+            <option value="">Selecciona el nodo</option>
+            <option *ngFor="let sg of scopeGroups" [value]="sg.id">{{ sg.name }}</option>
+          </select>
+        </label>
+      </div>
+      <div class="form-row">
+        <label class="form-label">
+          Fecha inicio
+          <input [(ngModel)]="competitionForm.startDate" type="date" class="form-input"/>
+        </label>
+        <label class="form-label">
+          Fecha fin <span class="label-hint">(vacío = permanente)</span>
+          <input [(ngModel)]="competitionForm.endDate" type="date" class="form-input"/>
+        </label>
+      </div>
+      <div *ngIf="competitionForm.competitionType === 'VERSUS'" class="versus-selector">
+        <p class="form-hint">Selecciona exactamente 2 grupos:</p>
+        <div class="checkbox-list">
+          <label *ngFor="let vg of versusGroups" class="checkbox-item">
+            <input type="checkbox" [value]="vg.id" (change)="toggleVersusGroup(vg.id)"/>
+            <span>{{ vg.name }}</span>
+          </label>
+        </div>
+        <p *ngIf="competitionForm.participantGroupIds.length !== 2" class="form-hint"
+           style="color: var(--color-text-warning)">
+          {{ competitionForm.participantGroupIds.length }}/2 grupos seleccionados
+        </p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeCompetitionModal()">Cancelar</button>
+      <button class="btn-primary" (click)="saveCompetition()" [disabled]="savingCompetition">
+        {{ savingCompetition ? 'Creando...' : 'Crear competencia' }}
+      </button>
+    </div>
+  </div>
+</div>
+ 
+<!-- Toast -->
+<div *ngIf="toast.show" class="toast"
+     [class.toast-success]="toast.type === 'success'"
+     [class.toast-error]="toast.type === 'error'">
+  {{ toast.message }}
+</div>

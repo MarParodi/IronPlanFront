@@ -173,42 +173,38 @@ get trainDaysPercent(): string {
   }
 
   submitStep3() {
-    const token = this.auth.onboardingToken;
-    if (!token) {
-      this.error.set('Tu registro expiró. Vuelve a iniciar.');
-      this.step.set(1);
-      return;
-    }
-    const hasOrgData =
-      this.form3.organizationCode.trim() ||
-      this.form3.organizationGroup.trim() ||
-      (this.form3.organizationRole ?? '').trim();
-
-    // Si el usuario no completa nada, simplemente salta al paso 4 (uso individual).
-    if (!hasOrgData) {
-      this.step.set(4);
-      this.error.set(null);
-      return;
-    }
-
-    const payload: RegisterStep3Req = {
-      onboardingToken: token,
-      organizationCode: this.form3.organizationCode.trim(),
-      organizationGroup: this.form3.organizationGroup.trim(),
-      organizationRole: this.form3.organizationRole?.trim() || null,
-    };
-
-    this.loading.set(true);
-    this.error.set(null);
-
-    this.auth.registerStep3(payload).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.step.set(4);
-      },
-      error: (e) => this.handleError(e),
-    });
+  const token = this.auth.onboardingToken;
+  if (!token) {
+    this.error.set('Tu registro expiró. Vuelve a iniciar.');
+    this.step.set(1);
+    return;
   }
+
+  // Si no puso código, omitir paso (usuario individual)
+  if (!this.form3.organizationCode.trim()) {
+    this.step.set(4);
+    this.error.set(null);
+    return;
+  }
+
+  const payload: RegisterStep3Req = {
+    onboardingToken: token,
+    organizationCode: this.form3.organizationCode.trim().toUpperCase(),
+    organizationGroup: '',
+    organizationRole: '',
+  };
+
+  this.loading.set(true);
+  this.error.set(null);
+
+  this.auth.registerStep3(payload).subscribe({
+    next: () => {
+      this.loading.set(false);
+      this.step.set(4);
+    },
+    error: (e) => this.handleError(e),
+  });
+}
 
   submitStep4() {
     const token = this.auth.onboardingToken;

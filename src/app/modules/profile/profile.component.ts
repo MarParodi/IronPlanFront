@@ -4,6 +4,9 @@ import { RouterModule, Router } from '@angular/router';
 import { ProfileService } from './services/profile.service';
 import { ProfileResponse, XP_RANKS } from './models/profile.models';
 import { Achievement, UserAchievement } from './models/achievement.models';
+import { AuthService } from '../auth/services/auth.service';
+
+
 
 @Component({
   selector: 'app-profile',
@@ -14,6 +17,8 @@ import { Achievement, UserAchievement } from './models/achievement.models';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProfileComponent implements OnInit {
+  showLogoutModal = false;
+
   profile: ProfileResponse | null = null;
   loading = true;
   error: string | null = null;
@@ -28,7 +33,9 @@ export class ProfileComponent implements OnInit {
   constructor(
     private profileService: ProfileService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService 
+    
   ) {}
 
   ngOnInit(): void {
@@ -36,6 +43,19 @@ export class ProfileComponent implements OnInit {
     this.loadAchievements();
     this.checkUnseenAchievements();
   }
+
+  //Nuevo
+
+  confirmLogout(): void {
+  this.showLogoutModal = true;
+}
+
+logout(): void {
+  this.authService.logout();
+  this.router.navigate(['/login']);
+}
+
+  //Nuevo
 
   loadProfile(): void {
     this.loading = true;

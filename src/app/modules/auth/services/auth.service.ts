@@ -106,6 +106,18 @@ login(payload: { identifier?: string; password: string }) {
     );
   }
 
+  forgotPassword(payload: { email: string }) {
+    return this.http.post(`${this.base}/auth/forgot-password`, payload);
+  }
+
+  verifyResetCode(payload: { email: string; code: string }) {
+    return this.http.post(`${this.base}/auth/verify-reset-code`, payload);
+  }
+
+  resetPassword(payload: { email: string; code: string; newPassword: string }) {
+    return this.http.post(`${this.base}/auth/reset-password`, payload);
+  }
+
   logout() {
     this.storage?.removeItem(this._tokenKey);
     this.storage?.removeItem(this._roleKey);

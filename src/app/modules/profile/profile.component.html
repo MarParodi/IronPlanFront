@@ -2,18 +2,20 @@
   
   <!-- Header fijo -->
   <header class="sticky top-0 z-40 bg-[#0d0f11]/95 backdrop-blur-md border-b border-slate-800/40">
-    <div class="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-      <!-- User icon button -->
-      <button (click)="goBack()" 
-              class="w-10 h-10 flex items-center justify-center rounded-full bg-teal-500/20 hover:bg-teal-500/30 transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-        </svg>
-      </button>
-      
-      <h1 class="text-lg font-semibold text-white">Perfil</h1>
-      
-      <!-- Settings button -->
+  <div class="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
+    <!-- User icon button -->
+    <button (click)="goBack()" 
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-teal-500/20 hover:bg-teal-500/30 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+      </svg>
+    </button>
+
+    <h1 class="text-lg font-semibold text-white">Perfil</h1>
+
+    <!-- Botones derecha -->
+    <div class="flex items-center gap-2">
+      <!-- Settings -->
       <button (click)="goToSettings()" 
               class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-800/50 hover:bg-slate-700/60 transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -21,8 +23,17 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
         </svg>
       </button>
+
+      <!-- Logout -->
+      <button (click)="confirmLogout()"
+              class="w-10 h-10 flex items-center justify-center rounded-full bg-rose-500/10 hover:bg-rose-500/20 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+        </svg>
+      </button>
     </div>
-  </header>
+  </div>
+</header>
 
   <!-- Loading State -->
   <div *ngIf="loading" class="flex flex-col items-center justify-center py-20">
@@ -369,4 +380,43 @@
       </div>
     </div>
   </div>
+
+
+
+
+<!-- Modal confirmar logout -->
+<div *ngIf="showLogoutModal"
+     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+     (click)="showLogoutModal = false">
+  <div class="w-full max-w-sm bg-[#1b1f22] border border-white/10 rounded-2xl shadow-2xl p-6 space-y-4"
+       (click)="$event.stopPropagation()">
+
+    <!-- Ícono -->
+    <div class="w-14 h-14 mx-auto rounded-full bg-rose-500/10 flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+      </svg>
+    </div>
+
+    <div class="text-center space-y-1">
+      <h2 class="text-lg font-semibold text-white">¿Cerrar sesión?</h2>
+      <p class="text-sm text-slate-400">Tendrás que volver a iniciar sesión para acceder a tu cuenta.</p>
+    </div>
+
+    <div class="flex gap-3 pt-1">
+      <button (click)="showLogoutModal = false"
+              class="flex-1 py-2.5 rounded-xl border border-white/10 text-slate-300 text-sm font-medium hover:bg-white/5 transition-colors">
+        Cancelar
+      </button>
+      <button (click)="logout()"
+              class="flex-1 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-400 text-white text-sm font-semibold transition-colors">
+        Cerrar sesión
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+
 </div>

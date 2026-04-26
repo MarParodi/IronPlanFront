@@ -10,6 +10,8 @@ export const routes: Routes = [
 },
   { path: 'login', loadComponent: () => import('./modules/auth/pages/login/login.component').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./modules/auth/pages/register/register.component').then(m => m.RegisterComponent) },
+  { path: 'forgot', loadComponent: () => import('./modules/auth/pages/forgotpassword/forgotpassword.component').then(m => m.ForgotpasswordComponent) },
+  { path: 'admin', loadComponent: () => import('./modules/admin/admin.component').then(m => m.AdminComponent)},
   {
   path: 'academia',
   loadComponent: () =>
