@@ -581,3 +581,49 @@
   to   { transform: translateY(0); opacity: 1; }
 }
  
+
+
+/* ===== HIERARCHY PREVIEW ===== */
+.hierarchy-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.h-node {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: rgba(45,212,191,0.12);
+  color: #2dd4bf;
+}
+
+.h-node.root-node {
+  background: rgba(45,212,191,0.2);
+  font-weight: 600;
+}
+
+.h-arrow {
+  font-size: 11px;
+  color: #475569;
+}
+
+/* Badge individual en cards de competencia */
+.member-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(168,85,247,0.15);
+  color: #d8b4fe;
+  margin-left: 4px;
+  vertical-align: middle;
+}

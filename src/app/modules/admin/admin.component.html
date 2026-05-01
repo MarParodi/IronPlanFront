@@ -58,17 +58,15 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
           </svg>
-          Nuevo grupo
+          Nueva organización
         </button>
       </div>
  
-      <!-- Loading -->
       <div *ngIf="loadingTree" class="loading-state">
         <div class="spinner"></div>
         <p>Cargando organizaciones...</p>
       </div>
  
-      <!-- Vista árbol -->
       <app-org-tree
         *ngIf="!loadingTree"
         [nodes]="groupTree"
@@ -152,7 +150,7 @@
       <div class="section-header">
         <div>
           <h1>Competencias</h1>
-          <p class="section-subtitle">Crea y gestiona retos entre grupos</p>
+          <p class="section-subtitle">Crea y gestiona retos entre grupos y miembros</p>
         </div>
         <button class="btn-primary" (click)="openCreateCompetition()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -196,7 +194,11 @@
             </span>
           </div>
           <h3 class="item-name">{{ c.name }}</h3>
-          <p class="item-code">{{ c.scopeLevel }} · {{ c.metricType }}</p>
+          <p class="item-code">
+            {{ c.scopeLevel }}
+            <span *ngIf="c.isMemberCompetition" class="member-badge">Individual</span>
+            · {{ c.metricType }}
+          </p>
           <p class="item-dates" *ngIf="c.startDate">
             {{ c.startDate | date:'dd/MM/yy' }}
             {{ c.endDate ? '→ ' + (c.endDate | date:'dd/MM/yy') : '→ Sin fecha fin' }}
@@ -223,11 +225,11 @@
   </main>
 </div>
  
-<!-- ======================== MODAL CREAR/EDITAR GRUPO ======================== -->
+<!-- ======================== MODAL EDITAR SUBGRUPO (simple) ======================== -->
 <div *ngIf="showGroupModal" class="modal-overlay" (click)="closeGroupModal()">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>{{ editingGroup ? 'Editar grupo' : 'Nuevo grupo' }}</h2>
+      <h2>Editar subgrupo</h2>
       <button class="modal-close" (click)="closeGroupModal()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -235,208 +237,46 @@
       </button>
     </div>
     <div class="modal-body">
- 
       <label class="form-label">
         Nombre
-        <input [(ngModel)]="groupForm.name" type="text" class="form-input"
-               placeholder="Ej: Facultad de Ingeniería"/>
+        <input [(ngModel)]="groupForm.name" type="text" class="form-input"/>
       </label>
- 
-      <label class="form-label">
-        Tipo
-        <select [(ngModel)]="groupForm.groupType" class="form-input">
-          <option value="">Selecciona un tipo</option>
-          <option value="EMPRESA">Raíz — Organización (Nivel 1)</option>
-          <option value="FACULTAD">
-            {{ groupForm.organizationKind ? currentKindConfig.level2 : 'Nivel 2' }} (Nivel 2)
-          </option>
-          <option value="CARRERA">
-            {{ groupForm.organizationKind ? currentKindConfig.level3 : 'Nivel 3' }} (Nivel 3)
-          </option>
-          <option value="GRUPO">
-            {{ groupForm.organizationKind ? currentKindConfig.level4 : 'Nivel 4' }} (Nivel 4)
-          </option>
-        </select>
-      </label>
- 
-      <!-- Tipo de organización — solo si es raíz -->
-      <label class="form-label" *ngIf="groupForm.groupType === 'EMPRESA'">
-        Tipo de organización
-        <select [(ngModel)]="groupForm.organizationKind" class="form-input">
-          <option value="">Selecciona el tipo</option>
-          <option value="UNIVERSIDAD">Universidad / Escuela</option>
-          <option value="EMPRESA">Empresa / Corporativo</option>
-          <option value="GIMNASIO">Gimnasio / Club deportivo</option>
-          <option value="INSTITUCION">Institución / ONG</option>
-        </select>
-        <div *ngIf="groupForm.organizationKind" class="hierarchy-preview">
-          <span class="h-node root-node">{{ currentKindConfig.level1 }}</span>
-          <span class="h-arrow">→</span>
-          <span class="h-node">{{ currentKindConfig.level2 }}</span>
-          <span class="h-arrow">→</span>
-          <span class="h-node">{{ currentKindConfig.level3 }}</span>
-          <span class="h-arrow">→</span>
-          <span class="h-node">{{ currentKindConfig.level4 }}</span>
-        </div>
-      </label>
- 
-      <!-- Grupo padre — solo si no es raíz -->
-      <label class="form-label" *ngIf="groupForm.groupType && groupForm.groupType !== 'EMPRESA'">
-        Grupo padre
-        <select [(ngModel)]="groupForm.parentId" class="form-input">
-          <option value="">Selecciona el padre</option>
-          <option *ngFor="let p of availableParents" [value]="p.id">
-            {{ p.name }} ({{ getGroupTypeLabel(p.groupType) }})
-          </option>
-        </select>
-      </label>
- 
       <label class="form-label">
         Código
         <input [(ngModel)]="groupForm.code" type="text" class="form-input"
-               placeholder="Ej: ING-SIS-A" style="text-transform: uppercase;"/>
+               style="text-transform: uppercase;"/>
       </label>
- 
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" (click)="closeGroupModal()">Cancelar</button>
       <button class="btn-primary" (click)="saveGroup()" [disabled]="savingGroup">
-        {{ savingGroup ? 'Guardando...' : (editingGroup ? 'Guardar cambios' : 'Crear grupo') }}
+        {{ savingGroup ? 'Guardando...' : 'Guardar cambios' }}
       </button>
     </div>
   </div>
 </div>
  
 <!-- ======================== MODAL INVITACIÓN ======================== -->
-<div *ngIf="showInvitationModal" class="modal-overlay" (click)="closeInvitationModal()">
-  <div class="modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Generar código de invitación</h2>
-      <button class="modal-close" (click)="closeInvitationModal()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
-    </div>
-    <div class="modal-body">
-      <label class="form-label">
-        Grupo destino
-        <select [(ngModel)]="invitationForm.groupId" class="form-input">
-          <option value="">Selecciona un grupo</option>
-          <option *ngFor="let g of leafGroups" [value]="g.id">{{ g.name }}</option>
-        </select>
-      </label>
-      <label class="form-label">
-        Código personalizado <span class="label-hint">(opcional, se genera automático)</span>
-        <input [(ngModel)]="invitationForm.code" type="text" class="form-input"
-               placeholder="Ej: ING-A-2024" style="text-transform: uppercase;"/>
-      </label>
-      <div class="form-row">
-        <label class="form-label">
-          Máx. usos <span class="label-hint">(vacío = ilimitado)</span>
-          <input [(ngModel)]="invitationForm.maxUses" type="number" min="1" class="form-input"/>
-        </label>
-        <label class="form-label">
-          Expira el <span class="label-hint">(vacío = sin límite)</span>
-          <input [(ngModel)]="invitationForm.expiresAt" type="date" class="form-input"/>
-        </label>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" (click)="closeInvitationModal()">Cancelar</button>
-      <button class="btn-primary" (click)="saveInvitation()" [disabled]="savingInvitation">
-        {{ savingInvitation ? 'Generando...' : 'Generar código' }}
-      </button>
-    </div>
-  </div>
-</div>
+<app-invitation-form
+  *ngIf="showInvitationModal"
+  (saved)="onInvitationSaved()"
+  (cancelled)="onInvitationCancelled()">
+</app-invitation-form>
  
-<!-- ======================== MODAL COMPETENCIA ======================== -->
-<div *ngIf="showCompetitionModal" class="modal-overlay" (click)="closeCompetitionModal()">
-  <div class="modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Nueva competencia</h2>
-      <button class="modal-close" (click)="closeCompetitionModal()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
-    </div>
-    <div class="modal-body">
-      <label class="form-label">
-        Nombre
-        <input [(ngModel)]="competitionForm.name" type="text" class="form-input" placeholder="Ej: Reto Febrero"/>
-      </label>
-      <div class="form-row">
-        <label class="form-label">
-          Tipo
-          <select [(ngModel)]="competitionForm.competitionType" class="form-input">
-            <option value="">Selecciona</option>
-            <option value="RANKING">Ranking</option>
-            <option value="CHALLENGE">Challenge</option>
-            <option value="VERSUS">Versus (2 grupos)</option>
-          </select>
-        </label>
-        <label class="form-label">
-          Métrica
-          <select [(ngModel)]="competitionForm.metricType" class="form-input">
-            <option value="">Selecciona</option>
-            <option value="SESSIONS">Sesiones</option>
-            <option value="ACTIVE_MINUTES">Minutos activos</option>
-            <option value="WORKOUTS_COUNT">Entrenamientos</option>
-          </select>
-        </label>
-      </div>
-      <div class="form-row">
-        <label class="form-label">
-          Scope
-          <select [(ngModel)]="competitionForm.scopeLevel" (change)="loadScopeGroups()" class="form-input">
-            <option value="">Selecciona</option>
-            <option value="CARRERA">Carrera / Área</option>
-            <option value="FACULTAD">Facultad / Departamento</option>
-            <option value="EMPRESA">Toda la organización</option>
-          </select>
-        </label>
-        <label class="form-label">
-          Nodo anfitrión
-          <select [(ngModel)]="competitionForm.scopeReferenceId" class="form-input">
-            <option value="">Selecciona el nodo</option>
-            <option *ngFor="let sg of scopeGroups" [value]="sg.id">{{ sg.name }}</option>
-          </select>
-        </label>
-      </div>
-      <div class="form-row">
-        <label class="form-label">
-          Fecha inicio
-          <input [(ngModel)]="competitionForm.startDate" type="date" class="form-input"/>
-        </label>
-        <label class="form-label">
-          Fecha fin <span class="label-hint">(vacío = permanente)</span>
-          <input [(ngModel)]="competitionForm.endDate" type="date" class="form-input"/>
-        </label>
-      </div>
-      <div *ngIf="competitionForm.competitionType === 'VERSUS'" class="versus-selector">
-        <p class="form-hint">Selecciona exactamente 2 grupos:</p>
-        <div class="checkbox-list">
-          <label *ngFor="let vg of versusGroups" class="checkbox-item">
-            <input type="checkbox" [value]="vg.id" (change)="toggleVersusGroup(vg.id)"/>
-            <span>{{ vg.name }}</span>
-          </label>
-        </div>
-        <p *ngIf="competitionForm.participantGroupIds.length !== 2" class="form-hint"
-           style="color: var(--color-text-warning)">
-          {{ competitionForm.participantGroupIds.length }}/2 grupos seleccionados
-        </p>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" (click)="closeCompetitionModal()">Cancelar</button>
-      <button class="btn-primary" (click)="saveCompetition()" [disabled]="savingCompetition">
-        {{ savingCompetition ? 'Creando...' : 'Crear competencia' }}
-      </button>
-    </div>
-  </div>
-</div>
+<!-- ======================== CASCADE FORM (crear/editar org completa) ======================== -->
+<app-org-cascade-form
+  *ngIf="showCascadeModal"
+  [editId]="cascadeEditId"
+  (saved)="onCascadeSaved()"
+  (cancelled)="onCascadeCancelled()">
+</app-org-cascade-form>
+ 
+<!-- ======================== COMPETITION FORM (nuevo) ======================== -->
+<app-competition-form
+  *ngIf="showCompetitionModal"
+  (saved)="onCompetitionSaved()"
+  (cancelled)="onCompetitionCancelled()">
+</app-competition-form>
  
 <!-- Toast -->
 <div *ngIf="toast.show" class="toast"

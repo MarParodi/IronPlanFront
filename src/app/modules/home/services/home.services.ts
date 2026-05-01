@@ -110,6 +110,11 @@ unlockRoutine(routineId: string | number) {
       sessionIds
     });
   }
+
+  getActiveCompetitions(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.baseUrl}/competitions/active`);
+}
+
 }
 
 // Interfaces para rutina activa con progreso

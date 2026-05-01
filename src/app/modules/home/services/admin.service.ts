@@ -31,10 +31,23 @@ export class AdminService {
   deactivateGroup(id: number): Observable<any> {
     return this.http.post(`${this.base}/admin/organizational-groups/${id}/deactivate`, {});
   }
-
+ 
   getGroupTree(): Observable<any[]> {
-  return this.http.get<any[]>(`${this.base}/admin/organizational-groups/tree`);
-}
+    return this.http.get<any[]>(`${this.base}/admin/organizational-groups/tree`);
+  }
+ 
+  // Cascade — crear/editar jerarquía completa de una org
+  createOrganizationCascade(body: any): Observable<any> {
+    return this.http.post(`${this.base}/admin/organizational-groups/cascade`, body);
+  }
+ 
+  updateOrganizationCascade(id: number, body: any): Observable<any> {
+    return this.http.put(`${this.base}/admin/organizational-groups/cascade/${id}`, body);
+  }
+ 
+  getOrganizationCascade(id: number): Observable<any> {
+    return this.http.get(`${this.base}/admin/organizational-groups/cascade/${id}`);
+  }
  
   // ─── INVITACIONES ─────────────────────────────────────────
  
@@ -46,7 +59,8 @@ export class AdminService {
   }
  
   createInvitation(body: any): Observable<any> {
-    return this.http.post(`${this.base}/admin/organizational-groups/${body.organizationalGroupId}/invitations`, body);
+    return this.http.post(
+      `${this.base}/admin/organizational-groups/${body.organizationalGroupId}/invitations`, body);
   }
  
   deactivateInvitation(id: number): Observable<any> {
@@ -72,5 +86,17 @@ export class AdminService {
  
   finishCompetition(id: number): Observable<any> {
     return this.http.post(`${this.base}/admin/competitions/${id}/finish`, {});
+  }
+ 
+  // ─── SCOPE / SELECTOR DE PARTICIPANTES ───────────────────
+ 
+  // Hijos directos de un nodo (para navegar la jerarquía en el selector)
+  getScopeChildren(groupId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.base}/competitions/scope/${groupId}/children`);
+  }
+ 
+  // Miembros de un grupo hoja (para competencia individual)
+  getGroupMembers(groupId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.base}/competitions/scope/${groupId}/members`);
   }
 }

@@ -4,11 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AdminService } from '../home/services/admin.service';
 import { OrgTreeComponent, GroupTreeNode } from './org-three.component';
+import { OrgCascadeFormComponent } from './org-cascade-form.component';
+import { CompetitionFormComponent } from './competition-form.component';
+import { InvitationFormComponent } from './invitation-form.component';
  
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, OrgTreeComponent],
+  imports: [CommonModule, FormsModule, RouterModule, OrgTreeComponent, OrgCascadeFormComponent, CompetitionFormComponent, InvitationFormComponent],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css']
 })
@@ -28,6 +31,10 @@ export class AdminComponent implements OnInit {
   savingGroup = false;
   availableParents: any[] = [];
   leafGroups: any[] = [];
+ 
+  // Cascade form (crear/editar org completa)
+  showCascadeModal = false;
+  cascadeEditId?: number;
  
   groupForm = {
     name: '',
@@ -55,14 +62,6 @@ export class AdminComponent implements OnInit {
   invitations: any[] = [];
   loadingInvitations = false;
   showInvitationModal = false;
-  savingInvitation = false;
- 
-  invitationForm = {
-    groupId: null as number | null,
-    code: '',
-    maxUses: null as number | null,
-    expiresAt: ''
-  };
  
   // ─── COMPETENCIAS ─────────────────────────────────────────
   competitions: any[] = [];
@@ -70,20 +69,6 @@ export class AdminComponent implements OnInit {
   competitionStatusFilter = '';
   competitionTypeFilter = '';
   showCompetitionModal = false;
-  savingCompetition = false;
-  scopeGroups: any[] = [];
-  versusGroups: any[] = [];
- 
-  competitionForm = {
-    name: '',
-    competitionType: '',
-    scopeLevel: '',
-    scopeReferenceId: null as number | null,
-    metricType: '',
-    startDate: '',
-    endDate: '',
-    participantGroupIds: [] as number[]
-  };
  
   // ─── TOAST ────────────────────────────────────────────────
   toast = { show: false, message: '', type: 'success' as 'success' | 'error' };
@@ -126,11 +111,28 @@ export class AdminComponent implements OnInit {
   }
  
   openCreateGroup() {
-    this.editingGroup = null;
-    this.groupForm = { name: '', groupType: '', parentId: null, code: '', organizationKind: '' };
-    this.loadAvailableParents();
-    this.showGroupModal = true;
+    this.cascadeEditId = undefined;
+    this.showCascadeModal = true;
   }
+ 
+  onTreeEdit(node: GroupTreeNode) {
+    if (node.groupType === 'EMPRESA') {
+      this.cascadeEditId = node.id;
+      this.showCascadeModal = true;
+    } else {
+      this.editGroup(node);
+    }
+  }
+ 
+  onTreeDeactivate(node: GroupTreeNode) { this.deactivateGroup(node); }
+ 
+  onCascadeSaved() {
+    this.showCascadeModal = false;
+    this.loadGroups();
+    this.showToast('Organización guardada', 'success');
+  }
+ 
+  onCascadeCancelled() { this.showCascadeModal = false; }
  
   editGroup(g: any) {
     this.editingGroup = g;
@@ -198,9 +200,6 @@ export class AdminComponent implements OnInit {
  
   closeGroupModal() { this.showGroupModal = false; }
  
-  onTreeEdit(node: GroupTreeNode)       { this.editGroup(node); }
-  onTreeDeactivate(node: GroupTreeNode) { this.deactivateGroup(node); }
- 
   getGroupTypeLabel(type: string): string {
     const labels: Record<string, string> = {
       EMPRESA: 'Empresa', FACULTAD: 'Facultad', CARRERA: 'Carrera', GRUPO: 'Grupo'
@@ -227,45 +226,20 @@ export class AdminComponent implements OnInit {
   }
  
   openCreateInvitation() {
-    this.invitationForm = { groupId: null, code: '', maxUses: null, expiresAt: '' };
-    this.loadLeafGroups();
     this.showInvitationModal = true;
   }
  
-  loadLeafGroups() {
-    this.adminService.getGroups({ type: 'GRUPO', active: 'true' }).subscribe({
-      next: (data) => { this.leafGroups = data; },
-      error: (err) => {
-        console.error('Error cargando grupos:', err);
-        this.showToast('Error cargando grupos disponibles', 'error');
-      }
-    });
+  // El componente ya muestra el código generado internamente.
+  // Solo refrescamos la lista, sin cerrar el modal.
+  onInvitationSaved() {
+    this.loadInvitations();
+    this.showToast('Código generado', 'success');
   }
  
-  saveInvitation() {
-    if (!this.invitationForm.groupId) {
-      this.showToast('Selecciona un grupo destino', 'error');
-      return;
-    }
-    this.savingInvitation = true;
-    const payload = {
-      organizationalGroupId: this.invitationForm.groupId,
-      code: this.invitationForm.code || undefined,
-      maxUses: this.invitationForm.maxUses || undefined,
-      expiresAt: this.invitationForm.expiresAt || undefined
-    };
-    this.adminService.createInvitation(payload).subscribe({
-      next: () => {
-        this.savingInvitation = false;
-        this.closeInvitationModal();
-        this.loadInvitations();
-        this.showToast('Código generado', 'success');
-      },
-      error: (err) => {
-        this.savingInvitation = false;
-        this.showToast(err?.error?.message || 'Error al crear invitación', 'error');
-      }
-    });
+  // El usuario cierra el modal manualmente (botón Cerrar o X).
+  onInvitationCancelled() {
+    this.showInvitationModal = false;
+    this.loadInvitations(); // refrescar por si generó alguno antes de cerrar
   }
  
   deactivateInvitation(inv: any) {
@@ -279,8 +253,6 @@ export class AdminComponent implements OnInit {
   copyCode(code: string) {
     navigator.clipboard.writeText(code).then(() => this.showToast('Código copiado', 'success'));
   }
- 
-  closeInvitationModal() { this.showInvitationModal = false; }
  
   // ─── COMPETENCIAS ─────────────────────────────────────────
  
@@ -296,64 +268,17 @@ export class AdminComponent implements OnInit {
   }
  
   openCreateCompetition() {
-    this.competitionForm = {
-      name: '', competitionType: '', scopeLevel: '', scopeReferenceId: null,
-      metricType: '', startDate: '', endDate: '', participantGroupIds: []
-    };
-    this.scopeGroups = [];
-    this.versusGroups = [];
     this.showCompetitionModal = true;
   }
  
-  loadScopeGroups() {
-    if (!this.competitionForm.scopeLevel) return;
-    this.adminService.getGroups({ type: this.competitionForm.scopeLevel, active: 'true' }).subscribe({
-      next: (data) => {
-        this.scopeGroups = data;
-        this.versusGroups = this.groups.filter((g: any) => g.groupType === 'GRUPO');
-      }
-    });
+  onCompetitionSaved() {
+    this.showCompetitionModal = false;
+    this.loadCompetitions();
+    this.showToast('Competencia creada', 'success');
   }
  
-  toggleVersusGroup(id: number) {
-    const idx = this.competitionForm.participantGroupIds.indexOf(id);
-    if (idx >= 0) {
-      this.competitionForm.participantGroupIds.splice(idx, 1);
-    } else {
-      if (this.competitionForm.participantGroupIds.length < 2) {
-        this.competitionForm.participantGroupIds.push(id);
-      }
-    }
-  }
- 
-  saveCompetition() {
-    const f = this.competitionForm;
-    if (!f.name || !f.competitionType || !f.scopeLevel || !f.scopeReferenceId || !f.metricType || !f.startDate) {
-      this.showToast('Completa todos los campos requeridos', 'error');
-      return;
-    }
-    if (f.competitionType === 'VERSUS' && f.participantGroupIds.length !== 2) {
-      this.showToast('VERSUS requiere exactamente 2 grupos', 'error');
-      return;
-    }
-    this.savingCompetition = true;
-    const payload = {
-      ...f,
-      endDate: f.endDate || undefined,
-      participantGroupIds: f.participantGroupIds.length > 0 ? f.participantGroupIds : undefined
-    };
-    this.adminService.createCompetition(payload).subscribe({
-      next: () => {
-        this.savingCompetition = false;
-        this.closeCompetitionModal();
-        this.loadCompetitions();
-        this.showToast('Competencia creada', 'success');
-      },
-      error: (err) => {
-        this.savingCompetition = false;
-        this.showToast(err?.error?.message || 'Error al crear competencia', 'error');
-      }
-    });
+  onCompetitionCancelled() {
+    this.showCompetitionModal = false;
   }
  
   activateCompetition(c: any) {
@@ -396,3 +321,4 @@ export class AdminComponent implements OnInit {
     setTimeout(() => { this.toast.show = false; }, 3000);
   }
 }
+ 
