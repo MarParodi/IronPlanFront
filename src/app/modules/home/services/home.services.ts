@@ -115,6 +115,30 @@ unlockRoutine(routineId: string | number) {
   return this.http.get<any[]>(`${this.baseUrl}/competitions/active`);
 }
 
+getMe(): Observable<any> {
+  return this.http.get<any>(`${this.baseUrl}/users/me`);
+}
+
+getCompetitionById(id: number): Observable<any> {
+  return this.http.get<any>(`${this.baseUrl}/admin/competitions/${id}`);
+}
+
+getMyScore(id: number): Observable<any> {
+  return this.http.get<any>(`${this.baseUrl}/competitions/${id}/my-score`);
+}
+
+getLeaderboard(id: number): Observable<any[]> {
+  return this.http.get<any[]>(`${this.baseUrl}/competitions/${id}/leaderboard`);
+}
+
+getMemberLeaderboard(id: number): Observable<any[]> {
+  return this.http.get<any[]>(`${this.baseUrl}/competitions/${id}/leaderboard/members`);
+}
+
+getInternalRanking(id: number): Observable<any[]> {
+  return this.http.get<any[]>(`${this.baseUrl}/competitions/${id}/leaderboard/internal`);
+}
+
 }
 
 // Interfaces para rutina activa con progreso

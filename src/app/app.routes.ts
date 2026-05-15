@@ -125,6 +125,13 @@ export const routes: Routes = [
     import('./modules/workout/workout-detail/workout-detail.component')
       .then(m => m.WorkoutDetailComponent),
 },
+{
+  path: 'competitions/:id',
+  loadComponent: () =>
+    import('./modules/competition-detail/competition-detail.component')
+      .then(m => m.CompetitionDetailComponent),
+  canActivate: [authGuard]
+},
 
 
   { path: '**', redirectTo: '' }

@@ -33,6 +33,10 @@ type XpRoutineCandidate = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit, OnDestroy {
+
+  userOrgRoot: string | null = null;
+  userOrgMiddle: string | null = null;
+
   // DI
   private readonly _cdr = inject(ChangeDetectorRef);
   private readonly _router = inject(Router);
@@ -113,6 +117,8 @@ pendingRoutine: XpRoutineCandidate | null = null;
       next: (me) => {
         this.userXp = me?.xpPoints ?? 0;
         this.userGroupName = me?.organizationalGroupName ?? null;
+        this.userOrgRoot   = me?.organizationRootName ?? null;
+        this.userOrgMiddle = me?.organizationMiddlePath ?? null;
         this._cdr.markForCheck();
       },
     });
@@ -139,6 +145,10 @@ pendingRoutine: XpRoutineCandidate | null = null;
       this._cdr.markForCheck();
     }
   });
+}
+
+openCompetition(c: any): void {
+  this._router.navigate(['/competitions', c.id]);
 }
 
 getCompetitionTypeLabel(type: string): string {

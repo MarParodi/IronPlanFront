@@ -320,5 +320,12 @@ export class AdminComponent implements OnInit {
     this.toast = { show: true, message, type };
     setTimeout(() => { this.toast.show = false; }, 3000);
   }
+
+  recalculateCompetition(c: any) {
+  this.adminService.recalculateCompetition(c.id).subscribe({
+    next: () => this.showToast('Scores recalculados', 'success'),
+    error: () => this.showToast('Error al recalcular', 'error')
+  });
+}
 }
  

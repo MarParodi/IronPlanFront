@@ -99,4 +99,8 @@ export class AdminService {
   getGroupMembers(groupId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.base}/competitions/scope/${groupId}/members`);
   }
+
+  recalculateCompetition(id: number): Observable<any> {
+  return this.http.post(`${this.base}/admin/competitions/${id}/recalculate`, {});
+}
 }
