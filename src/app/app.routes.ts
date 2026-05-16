@@ -72,6 +72,13 @@ export const routes: Routes = [
     import('./modules/profile/profile.component').then(m => m.ProfileComponent),
   canActivate: [authGuard]
 },
+{
+  path: 'perfil/competencias',
+  loadComponent: () =>
+    import('./modules/profile/my-competitions/my-competitions.component')
+      .then(m => m.MyCompetitionsComponent),
+  canActivate: [authGuard]
+},
 
 {
   path: 'user/settings',

@@ -103,4 +103,43 @@ export class AdminService {
   recalculateCompetition(id: number): Observable<any> {
   return this.http.post(`${this.base}/admin/competitions/${id}/recalculate`, {});
 }
+
+getExercises() {
+    return this.http.get<any[]>(`${this.base}/exercises`);
+  }
+ 
+  createExercise(payload: any) {
+    return this.http.post(`${this.base}/exercises`, payload);
+  }
+ 
+  updateExercise(id: number, payload: any) {
+    return this.http.put(`${this.base}/exercises/${id}`, payload);
+  }
+ 
+  deactivateExercise(id: number) {
+    return this.http.patch(`${this.base}/exercises/${id}/deactivate`, {});
+  }
+ 
+  activateExercise(id: number) {
+    return this.http.patch(`${this.base}/exercises/${id}/activate`, {});
+  }
+
+   getCompetitionById(id: number) {
+    return this.http.get<any>(`${this.base}/admin/competitions/${id}`);
+  }
+ 
+  getLeaderboard(id: number) {
+    return this.http.get<any[]>(`${this.base}/competitions/${id}/leaderboard`);
+  }
+ 
+  getMemberLeaderboard(id: number) {
+    return this.http.get<any[]>(`${this.base}/competitions/${id}/leaderboard/members`);
+  }
+
+  getParticipantMembers(competitionId: number, groupId: number) {
+    return this.http.get<any[]>(
+        `${this.base}/admin/competitions/${competitionId}/participants/${groupId}/members`
+    );
+}
+
 }

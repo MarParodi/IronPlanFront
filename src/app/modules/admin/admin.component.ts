@@ -7,17 +7,23 @@ import { OrgTreeComponent, GroupTreeNode } from './org-three.component';
 import { OrgCascadeFormComponent } from './org-cascade-form.component';
 import { CompetitionFormComponent } from './competition-form.component';
 import { InvitationFormComponent } from './invitation-form.component';
+import { ExerciseFormComponent, Exercise, MUSCLE_OPTIONS } from './exercise-form.component';
+import { CompetitionDetailModalComponent } from './competition-detail.component';
  
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, OrgTreeComponent, OrgCascadeFormComponent, CompetitionFormComponent, InvitationFormComponent],
+  imports: [CommonModule, FormsModule, RouterModule, OrgTreeComponent, OrgCascadeFormComponent, CompetitionFormComponent, InvitationFormComponent, ExerciseFormComponent, CompetitionDetailModalComponent],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css']
 })
 export class AdminComponent implements OnInit {
+
+  //propiedades modal detalle competencia
+  showCompetitionDetailModal = false;
+  selectedCompetitionId?: number;
  
-  activeSection: 'grupos' | 'invitaciones' | 'competencias' = 'grupos';
+  activeSection: 'grupos' | 'invitaciones' | 'competencias' | 'ejercicios' = 'grupos';
  
   // ─── GRUPOS ───────────────────────────────────────────────
   groups: any[] = [];
@@ -31,6 +37,18 @@ export class AdminComponent implements OnInit {
   savingGroup = false;
   availableParents: any[] = [];
   leafGroups: any[] = [];
+
+
+  //Propiedades para ejercicio
+  exercises: Exercise[]         = [];
+  filteredExercises: Exercise[] = [];
+  loadingExercises              = false;
+  showExerciseModal             = false;
+  editingExercise?: Exercise;
+  exerciseSearch                = '';
+  exerciseMuscleFilter          = '';
+  exerciseStatusFilter          = '';
+  muscleOptions                 = MUSCLE_OPTIONS;
  
   // Cascade form (crear/editar org completa)
   showCascadeModal = false;
@@ -79,11 +97,12 @@ export class AdminComponent implements OnInit {
     this.loadGroups();
   }
  
-  setSection(section: 'grupos' | 'invitaciones' | 'competencias') {
+  setSection(section: 'grupos' | 'invitaciones' | 'competencias' | 'ejercicios') {
     this.activeSection = section;
     if (section === 'grupos')       this.loadGroups();
     if (section === 'invitaciones') this.loadInvitations();
     if (section === 'competencias') this.loadCompetitions();
+    if (section === 'ejercicios') this.loadExercises();
   }
  
   // ─── GRUPOS ───────────────────────────────────────────────
@@ -296,7 +315,15 @@ export class AdminComponent implements OnInit {
     });
   }
  
-  viewCompetition(c: any) {}
+  viewCompetition(c: any) {
+    this.selectedCompetitionId  = c.id;
+    this.showCompetitionDetailModal = true;
+  }
+ 
+  onCompetitionDetailClosed() {
+    this.showCompetitionDetailModal = false;
+    this.selectedCompetitionId = undefined;
+  }
  
   closeCompetitionModal() { this.showCompetitionModal = false; }
  
@@ -327,5 +354,87 @@ export class AdminComponent implements OnInit {
     error: () => this.showToast('Error al recalcular', 'error')
   });
 }
+
+loadExercises() {
+  this.loadingExercises = true;
+  this.adminService.getExercises().subscribe({
+    next: (data: any) => {
+      // Maneja tanto array directo como objeto con content/data
+      this.exercises         = Array.isArray(data) ? data : (data.content ?? data.data ?? []);
+      this.filteredExercises = [...this.exercises];
+      this.loadingExercises  = false;
+      this.filterExercises();
+    },
+    error: () => {
+      this.loadingExercises = false;
+      this.showToast('Error cargando ejercicios', 'error');
+    }
+  });
+}
+ 
+  filterExercises() {
+    const search = this.exerciseSearch.toLowerCase().trim();
+    const muscle = this.exerciseMuscleFilter;
+    const status = this.exerciseStatusFilter;
+ 
+    this.filteredExercises = this.exercises.filter(ex => {
+      const matchSearch = !search ||
+        ex.name.toLowerCase().includes(search) ||
+        ex.description?.toLowerCase().includes(search) ||
+        ex.primaryMuscle?.toLowerCase().includes(search);
+ 
+      const matchMuscle = !muscle || ex.primaryMuscle === muscle;
+ 
+      const matchStatus = !status ||
+        (status === 'active'   &&  ex.active) ||
+        (status === 'inactive' && !ex.active);
+ 
+      return matchSearch && matchMuscle && matchStatus;
+    });
+  }
+ 
+  openCreateExercise() {
+    this.editingExercise  = undefined;
+    this.showExerciseModal = true;
+  }
+ 
+  editExercise(ex: Exercise) {
+    this.editingExercise  = { ...ex };
+    this.showExerciseModal = true;
+  }
+ 
+  onExerciseSaved() {
+    this.showExerciseModal = false;
+    this.editingExercise   = undefined;
+    this.loadExercises();
+    this.showToast(
+      this.editingExercise ? 'Ejercicio actualizado' : 'Ejercicio creado',
+      'success'
+    );
+  }
+ 
+  onExerciseCancelled() {
+    this.showExerciseModal = false;
+    this.editingExercise   = undefined;
+  }
+ 
+  toggleExercise(ex: Exercise) {
+    const accion = ex.active ? 'desactivar' : 'activar';
+    if (!confirm(`¿${accion.charAt(0).toUpperCase() + accion.slice(1)} "${ex.name}"?`)) return;
+ 
+    const req = ex.active
+      ? this.adminService.deactivateExercise(ex.id!)
+      : this.adminService.activateExercise(ex.id!);
+ 
+    req.subscribe({
+      next: () => {
+        this.loadExercises();
+        this.showToast(`Ejercicio ${ex.active ? 'desactivado' : 'activado'}`, 'success');
+      },
+      error: () => this.showToast('Error al cambiar estado', 'error')
+    });
+  }
+
+
 }
  
