@@ -131,7 +131,7 @@ export const ORG_HIERARCHY: Record<string, {
               <div class="child-badge" style="background:rgba(139,92,246,0.15);color:#c4b5fd;">
                 {{ getLevelName(root, 2) }}
               </div>
-              <div class="child-actions">
+              <div class="child-actions" *ngIf="canManage">
                 <button class="btn-tree-icon" (click)="$event.stopPropagation(); onEdit.emit(l2)" title="Editar">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -156,7 +156,7 @@ export const ORG_HIERARCHY: Record<string, {
                   <span class="level3-badge" style="background:rgba(59,130,246,0.15);color:#93c5fd;">
                     {{ getLevelName(root, 3) }}
                   </span>
-                  <div class="child-actions">
+                  <div class="child-actions" *ngIf="canManage">
                     <button class="btn-tree-icon" (click)="$event.stopPropagation(); onEdit.emit(l3)" title="Editar">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -182,7 +182,7 @@ export const ORG_HIERARCHY: Record<string, {
                     <span class="leaf-status" [class.badge-active]="l4.active" [class.badge-inactive]="!l4.active">
                       {{ l4.active ? 'Activo' : 'Inactivo' }}
                     </span>
-                    <div class="child-actions">
+                    <div class="child-actions" *ngIf="canManage">
                       <button class="btn-tree-icon" (click)="onEdit.emit(l4)" title="Editar">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round"
@@ -218,7 +218,7 @@ export const ORG_HIERARCHY: Record<string, {
         </div>
  
         <!-- Acciones raíz -->
-        <div class="org-footer">
+        <div class="org-footer" *ngIf="canManage">
           <button class="btn-tree-sm" (click)="onEdit.emit(root)">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -408,6 +408,7 @@ export const ORG_HIERARCHY: Record<string, {
 })
 export class OrgTreeComponent {
   @Input() nodes: GroupTreeNode[] = [];
+  @Input() canManage = false;
   @Output() onEdit       = new EventEmitter<GroupTreeNode>();
   @Output() onDeactivate = new EventEmitter<GroupTreeNode>();
  

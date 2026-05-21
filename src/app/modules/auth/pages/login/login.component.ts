@@ -29,12 +29,8 @@ export class LoginComponent {
       identifier: this.form.identifier.trim(),
       password: this.form.password
     }).subscribe({
-      next: (res) => {
-        if (res.role === 'ADMIN') {
-          this.router.navigate(['/admin']);
-        } else {
-          this.router.navigate(['/']);
-        }
+      next: () => {
+        this.router.navigate(['/']);
       },
       error: (e) => {
         const fe = e?.error?.errors;

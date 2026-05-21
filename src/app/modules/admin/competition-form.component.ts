@@ -15,7 +15,8 @@ interface ScopeNode {
 interface BreadcrumbItem {
   id: number;
   name: string;
-  parentId?: number; // ID del padre de este nodo (para scopeReferenceId)
+  groupType: string;
+  parentId?: number;
 }
  
 interface Participant {
@@ -230,7 +231,7 @@ interface Participant {
             {{ getInitials(selectedParticipants[0].name) }}
           </div>
           <div class="versus-empty-avatar" *ngIf="!selectedParticipants[0]">?</div>
-          <span class="versus-name">{{ selectedParticipants[0]?.name || '—' }}</span>
+          <span class="versus-name">{{ selectedParticipants[0].name || '—' }}</span>
           <span class="versus-type-label" *ngIf="selectedParticipants[0]">
             {{ getNodeLabel(selectedParticipants[0].groupType) }}
           </span>
@@ -245,7 +246,7 @@ interface Participant {
             {{ getInitials(selectedParticipants[1].name) }}
           </div>
           <div class="versus-empty-avatar" *ngIf="!selectedParticipants[1]">?</div>
-          <span class="versus-name">{{ selectedParticipants[1]?.name || '—' }}</span>
+          <span class="versus-name">{{ selectedParticipants[1].name || '—' }}</span>
           <span class="versus-type-label" *ngIf="selectedParticipants[1]">
             {{ getNodeLabel(selectedParticipants[1].groupType) }}
           </span>
@@ -543,9 +544,11 @@ export class CompetitionFormComponent implements OnInit {
   loadingNodes     = false;
   isMemberLevel    = false;
  
-  // El padre de los nodos actualmente visibles → scopeReferenceId del payload
+  /** Nodo organizacional anfitrión del reto (padre de los participantes visibles). */
   currentParentId?: number;
- 
+  /** Tipo del nodo anfitrión: CARRERA, FACULTAD, etc. (no el tipo de cada participante). */
+  currentScopeLevel = 'EMPRESA';
+
   selectedParticipants: Participant[] = [];
   isMemberCompetition = false;
  
@@ -582,25 +585,29 @@ export class CompetitionFormComponent implements OnInit {
     this.isMemberLevel        = false;
     this.isMemberCompetition  = false;
     this.currentParentId      = org.id;
+    this.currentScopeLevel    = org.groupType;
     this.loadChildren(org.id);
   }
- 
+
   resetNavigation() {
     if (!this.selectedRoot) return;
     this.breadcrumb           = [];
     this.isMemberLevel        = false;
+    this.isMemberCompetition  = false;
     this.selectedParticipants = [];
     this.currentParentId      = this.selectedRoot.id;
+    this.currentScopeLevel    = this.selectedRoot.groupType;
     this.loadChildren(this.selectedRoot.id);
   }
- 
+
   navigateTo(bc: BreadcrumbItem, event?: Event) {
     const idx          = this.breadcrumb.findIndex(b => b.id === bc.id);
     this.breadcrumb    = this.breadcrumb.slice(0, idx + 1);
     this.isMemberLevel = false;
+    this.isMemberCompetition = false;
     this.selectedParticipants = [];
-    // El padre de los nodos que se van a mostrar es el padre del breadcrumb anterior
-    this.currentParentId = idx > 0 ? this.breadcrumb[idx - 1].id : this.selectedRoot!.id;
+    this.currentParentId   = bc.id;
+    this.currentScopeLevel = bc.groupType;
     this.loadChildren(bc.id);
   }
  
@@ -631,18 +638,26 @@ export class CompetitionFormComponent implements OnInit {
   // ─── Bajar un nivel (flecha →) sin seleccionar ────────────────────────────
  
   drillDown(node: ScopeNode) {
-    // Al bajar de nivel, limpiamos la selección porque ahora compiten otros
     this.selectedParticipants = [];
     this.isMemberCompetition  = false;
-    this.currentParentId      = node.id;          // el padre de los hijos es este nodo
-    this.breadcrumb.push({ id: node.id, name: node.name, parentId: this.currentParentId });
+    this.isMemberLevel        = false;
+    this.currentParentId      = node.id;
+    this.currentScopeLevel    = node.groupType;
+    this.breadcrumb.push({
+      id: node.id,
+      name: node.name,
+      groupType: node.groupType,
+      parentId: this.currentParentId
+    });
     this.loadChildren(node.id);
   }
- 
+
   goToMembers(node: ScopeNode) {
     this.selectedParticipants = [];
+    this.isMemberCompetition  = true;
     this.currentParentId      = node.id;
-    this.breadcrumb.push({ id: node.id, name: node.name });
+    this.currentScopeLevel    = 'GRUPO';
+    this.breadcrumb.push({ id: node.id, name: node.name, groupType: 'GRUPO' });
     this.loadMembers(node.id);
   }
  
@@ -711,21 +726,22 @@ export class CompetitionFormComponent implements OnInit {
       metricType:       this.form.metricType,
       startDate:        this.form.startDate,
       endDate:          this.form.endDate || undefined,
-      scopeReferenceId: this.currentParentId,         // ← padre de los participantes
-      scopeLevel:       this.resolveScopeLevel(),      // ← nivel de los participantes
+      scopeReferenceId: this.currentParentId,
+      scopeLevel:       this.isMemberCompetition ? 'GRUPO' : this.currentScopeLevel,
     };
- 
+
     if (this.isMemberCompetition) {
-      payload.participantUserIds  = this.selectedParticipants.map(p => p.id);
+      payload.participantUserIds = this.selectedParticipants.map(p => p.id);
     } else {
       payload.participantGroupIds = this.selectedParticipants.map(p => p.id);
     }
- 
+
     this.adminService.createCompetition(payload).subscribe({
       next: () => { this.saving = false; this.saved.emit(); },
       error: (err) => {
         this.saving   = false;
-        this.errorMsg = err?.error?.message || 'Error al crear la competencia';
+        const body = err?.error;
+        this.errorMsg = body?.message || body?.error || err?.message || 'Error al crear la competencia';
       }
     });
   }
@@ -741,26 +757,6 @@ export class CompetitionFormComponent implements OnInit {
   currentLevelLabel(): string {
     if (!this.currentNodes.length) return 'grupos';
     return this.getNodeLabel(this.currentNodes[0].groupType).toLowerCase() + 's';
-  }
- 
-  /**
-   * El scopeLevel del payload es el tipo de los nodos seleccionados.
-   * Si estamos en nivel miembro → GRUPO (competencia dentro de un grupo)
-   * Si no, tomamos el groupType del primer participante seleccionado.
-   */
-  private resolveScopeLevel(): string {
-    if (this.isMemberCompetition) return 'GRUPO';
- 
-    if (this.selectedParticipants.length > 0) {
-      return this.selectedParticipants[0].groupType;
-    }
- 
-    // Fallback: groupType del primer nodo visible
-    if (this.currentNodes.length > 0) {
-      return this.currentNodes[0].groupType;
-    }
- 
-    return 'EMPRESA';
   }
  
   getNodeLabel(groupType: string): string {

@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AdminService } from '../home/services/admin.service';
+import { UserService } from '../user/services/user.service';
 import { OrgTreeComponent, GroupTreeNode } from './org-three.component';
 import { OrgCascadeFormComponent } from './org-cascade-form.component';
 import { CompetitionFormComponent } from './competition-form.component';
 import { InvitationFormComponent } from './invitation-form.component';
 import { ExerciseFormComponent, Exercise, MUSCLE_OPTIONS } from './exercise-form.component';
 import { CompetitionDetailModalComponent } from './competition-detail.component';
- 
+
 @Component({
   selector: 'app-admin',
   standalone: true,
@@ -90,13 +91,33 @@ export class AdminComponent implements OnInit {
  
   // ─── TOAST ────────────────────────────────────────────────
   toast = { show: false, message: '', type: 'success' as 'success' | 'error' };
- 
-  constructor(private adminService: AdminService) {}
- 
+
+  /** Creador de la organización: puede editar grupos, invitaciones y competencias */
+  canManage = false;
+  /** Admin global de plataforma: acceso al catálogo de ejercicios */
+  isGlobalAdmin = false;
+  constructor(
+    private adminService: AdminService,
+    private userService: UserService,
+    private router: Router
+  ) {}
+
   ngOnInit(): void {
-    this.loadGroups();
+    this.userService.getMe().subscribe({
+      next: (me) => {
+        this.isGlobalAdmin = me?.role === 'ADMIN';
+        this.canManage = !!me?.canManageOrganization;
+
+        if (!this.canManage && !this.isGlobalAdmin) {
+          this.router.navigate(['/grupos/mis-grupos']);
+          return;
+        }
+        this.loadGroups();
+      },
+      error: () => this.router.navigate(['/grupos/mis-grupos'])
+    });
   }
- 
+
   setSection(section: 'grupos' | 'invitaciones' | 'competencias' | 'ejercicios') {
     this.activeSection = section;
     if (section === 'grupos')       this.loadGroups();

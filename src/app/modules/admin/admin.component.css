@@ -1,13 +1,23 @@
 :host {
   display: block;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
 }
  
+.readonly-banner {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: #93c5fd;
+  font-size: 13px;
+}
+
 /* ===== LAYOUT ===== */
 .admin-layout {
   display: flex;
-  height: 100vh;
+  height: 100%;
   background: #0d0f11;
   color: #f1f5f9;
   overflow: hidden;

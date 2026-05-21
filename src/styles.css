@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply bg-[#111416] text-slate-100 antialiased;
+  }
+}
+
 /* Animaciones personalizadas */
 @keyframes fadeIn {
   from {

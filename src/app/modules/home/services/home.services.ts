@@ -120,7 +120,11 @@ getMe(): Observable<any> {
 }
 
 getCompetitionById(id: number): Observable<any> {
-  return this.http.get<any>(`${this.baseUrl}/admin/competitions/${id}`);
+  return this.http.get<any>(`${this.baseUrl}/competitions/${id}`);
+}
+
+getCompetitionDetail(id: number): Observable<any> {
+  return this.http.get<any>(`${this.baseUrl}/competitions/${id}`);
 }
 
 getMyScore(id: number): Observable<any> {

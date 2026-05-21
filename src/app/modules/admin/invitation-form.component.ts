@@ -89,8 +89,8 @@ interface BreadcrumbItem {
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             <span>
-              Baja hasta el nivel más específico (grupo/equipo).
-              La invitación ubicará al usuario exactamente ahí.
+              Haz clic en un grupo para seleccionarlo como destino.
+              Si tiene subgrupos, usa la flecha para bajar un nivel.
             </span>
           </div>
  
@@ -98,10 +98,9 @@ interface BreadcrumbItem {
           <div class="node-list" *ngIf="!loadingNodes">
             <div *ngFor="let node of currentNodes"
                  class="node-item"
-                 [class.node-selected]="selectedGroupId === node.id"
-                 (click)="handleNodeClick(node)">
+                 [class.node-selected]="selectedGroupId === node.id">
  
-              <div class="node-left">
+              <div class="node-left" (click)="selectGroup(node)">
                 <!-- Ícono hoja vs intermedio -->
                 <div class="node-icon" [class.node-icon-leaf]="node.isLeaf">
                   <svg *ngIf="node.isLeaf" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -120,11 +119,14 @@ interface BreadcrumbItem {
                   {{ node.memberCount }} miembros
                 </span>
                 <span class="node-badge">{{ getNodeLabel(node.groupType) }}</span>
-                <svg *ngIf="!node.isLeaf" class="node-arrow"
-                     width="13" height="13" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                </svg>
+                <button *ngIf="!node.isLeaf" type="button" class="node-drill"
+                        (click)="drillDown(node); $event.stopPropagation()"
+                        title="Ver subgrupos">
+                  <svg class="node-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </button>
                 <svg *ngIf="node.isLeaf && selectedGroupId === node.id"
                      width="14" height="14" viewBox="0 0 24 24" fill="none"
                      stroke="#2dd4bf" stroke-width="2.5">
@@ -133,8 +135,12 @@ interface BreadcrumbItem {
               </div>
             </div>
  
-            <div *ngIf="currentNodes.length === 0" class="empty-nodes">
-              No hay subgrupos en este nivel
+            <div *ngIf="currentNodes.length === 0 && !loadingNodes" class="empty-nodes">
+              <span>No hay subgrupos en este nivel.</span>
+              <button *ngIf="currentLevelGroup" type="button" class="btn-use-level"
+                      (click)="selectGroup(currentLevelGroup)">
+                Usar «{{ currentLevelGroup.name }}» como destino
+              </button>
             </div>
           </div>
  
@@ -196,6 +202,14 @@ interface BreadcrumbItem {
           </div>
         </div>
  
+        <div class="field">
+          <label class="field-label">Rol al unirse con este código</label>
+          <select [(ngModel)]="form.membershipRole" class="field-input">
+            <option value="MEMBER">Miembro (solo consulta)</option>
+            <option value="ADMIN">Administrador (gestión del grupo)</option>
+          </select>
+        </div>
+
         <div class="row2">
           <div class="field">
             <label class="field-label">
@@ -391,9 +405,29 @@ interface BreadcrumbItem {
       font-size: 10px; padding: 2px 7px; border-radius: 5px;
       background: rgba(45,212,191,0.12); color: #0d9488; font-weight: 500;
     }
+    .node-drill {
+      display: flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 6px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer; padding: 0;
+    }
+    .node-drill:hover { background: rgba(255,255,255,0.1); border-color: rgba(45,212,191,0.35); }
     .node-arrow { color: #475569; }
+    .node-drill:hover .node-arrow { color: #2dd4bf; }
  
-    .empty-nodes { font-size: 12px; color: #334155; padding: 8px; font-style: italic; }
+    .empty-nodes {
+      display: flex; flex-direction: column; gap: 8px;
+      font-size: 12px; color: #64748b; padding: 10px;
+      background: rgba(255,255,255,0.03); border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .btn-use-level {
+      align-self: flex-start; font-size: 12px; font-weight: 500;
+      color: #2dd4bf; background: rgba(45,212,191,0.1);
+      border: 1px solid rgba(45,212,191,0.3); border-radius: 7px;
+      padding: 6px 12px; cursor: pointer;
+    }
+    .btn-use-level:hover { background: rgba(45,212,191,0.18); }
     .loading-nodes {
       display: flex; align-items: center; gap: 8px;
       padding: 10px; font-size: 12px; color: #64748b;
@@ -495,15 +529,18 @@ export class InvitationFormComponent implements OnInit {
   breadcrumb: BreadcrumbItem[] = [];
   loadingNodes                 = false;
  
-  // Grupo hoja seleccionado
+  // Grupo destino seleccionado
   selectedGroupId?: number;
   selectedGroupName = '';
+  /** Nivel actual de navegación (último breadcrumb o raíz) */
+  currentLevelGroup?: ScopeNode;
  
   // ─── Formulario ──────────────────────────────────────────────────────────
   form = {
     code: '',
     maxUses: null as number | null,
-    expiresAt: ''
+    expiresAt: '',
+    membershipRole: 'MEMBER' as 'MEMBER' | 'ADMIN'
   };
  
   saving        = false;
@@ -533,24 +570,25 @@ export class InvitationFormComponent implements OnInit {
   selectRoot(org: ScopeNode) {
     this.selectedRoot    = org;
     this.breadcrumb      = [];
-    this.selectedGroupId = undefined;
-    this.selectedGroupName = '';
+    this.currentLevelGroup = org;
+    this.selectGroup(org);
     this.loadChildren(org.id);
   }
  
   resetNavigation() {
     if (!this.selectedRoot) return;
     this.breadcrumb        = [];
-    this.selectedGroupId   = undefined;
-    this.selectedGroupName = '';
+    this.currentLevelGroup = this.selectedRoot;
+    this.selectGroup(this.selectedRoot);
     this.loadChildren(this.selectedRoot.id);
   }
  
   navigateTo(bc: BreadcrumbItem) {
     const idx       = this.breadcrumb.findIndex(b => b.id === bc.id);
     this.breadcrumb = this.breadcrumb.slice(0, idx + 1);
-    this.selectedGroupId   = undefined;
-    this.selectedGroupName = '';
+    const node: ScopeNode = { id: bc.id, name: bc.name, groupType: '', isLeaf: false, memberCount: 0, children: [] };
+    this.currentLevelGroup = node;
+    this.selectGroup(node);
     this.loadChildren(bc.id);
   }
  
@@ -559,8 +597,12 @@ export class InvitationFormComponent implements OnInit {
   this.adminService.getScopeChildren(groupId).subscribe({
     next: (data) => {
       this.currentNodes = data.map((n: any) => ({
-        ...n,
-        isLeaf: n.isLeaf ?? n.leaf
+        id: n.id,
+        name: n.name,
+        groupType: n.groupType,
+        memberCount: n.memberCount ?? 0,
+        children: n.children ?? [],
+        isLeaf: !!(n.isLeaf ?? n.leaf)
       }));
       this.loadingNodes = false;
     },
@@ -568,16 +610,17 @@ export class InvitationFormComponent implements OnInit {
   });
 }
  
-  handleNodeClick(node: ScopeNode) {
-    if (node.isLeaf) {
-      // Seleccionar este grupo como destino de la invitación
-      this.selectedGroupId   = node.id;
-      this.selectedGroupName = node.name;
-    } else {
-      // Bajar un nivel
-      this.breadcrumb.push({ id: node.id, name: node.name });
-      this.loadChildren(node.id);
-    }
+  selectGroup(node: ScopeNode) {
+    this.selectedGroupId   = node.id;
+    this.selectedGroupName = node.name;
+    this.errorMsg = '';
+  }
+
+  drillDown(node: ScopeNode) {
+    this.breadcrumb.push({ id: node.id, name: node.name });
+    this.currentLevelGroup = node;
+    this.selectGroup(node);
+    this.loadChildren(node.id);
   }
  
   clearSelection() {
@@ -600,6 +643,7 @@ export class InvitationFormComponent implements OnInit {
       organizationalGroupId: this.selectedGroupId,
       code:     this.form.code.trim() || undefined,
       maxUses:  this.form.maxUses     || undefined,
+      membershipRole: this.form.membershipRole,
       expiresAt: this.form.expiresAt  || undefined,
     };
  
@@ -621,7 +665,8 @@ export class InvitationFormComponent implements OnInit {
     this.selectedGroupId   = undefined;
     this.selectedGroupName = '';
     this.breadcrumb        = [];
-    this.form              = { code: '', maxUses: null, expiresAt: '' };
+    this.currentLevelGroup = this.selectedRoot;
+    this.form              = { code: '', maxUses: null, expiresAt: '', membershipRole: 'MEMBER' };
     this.errorMsg          = '';
     this.copied            = false;
     if (this.selectedRoot) this.loadChildren(this.selectedRoot.id);

@@ -11,13 +11,35 @@ export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./modules/auth/pages/login/login.component').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./modules/auth/pages/register/register.component').then(m => m.RegisterComponent) },
   { path: 'forgot', loadComponent: () => import('./modules/auth/pages/forgotpassword/forgotpassword.component').then(m => m.ForgotpasswordComponent) },
-  { path: 'admin', loadComponent: () => import('./modules/admin/admin.component').then(m => m.AdminComponent)},
+  { path: 'admin', redirectTo: 'grupos/mis-grupos', pathMatch: 'full' },
   {
-  path: 'academia',
-  loadComponent: () =>
-    import('./modules/home/home.component').then(m => m.HomeComponent),
-  canActivate: [authGuard]
-},
+    path: 'grupos',
+    loadComponent: () => import('./modules/grupos/grupos-shell.component').then(m => m.GruposShellComponent),
+    canActivate: [authGuard],
+    children: [
+      { path: '', redirectTo: 'mis-grupos', pathMatch: 'full' },
+      { path: 'mis-grupos', loadComponent: () => import('./modules/grupos/mis-grupos.component').then(m => m.MisGruposComponent) },
+      { path: 'administrar', loadComponent: () => import('./modules/admin/admin.component').then(m => m.AdminComponent) },
+      {
+        path: ':groupId',
+        children: [
+          { path: '', redirectTo: 'resumen', pathMatch: 'full' },
+          { path: 'resumen', loadComponent: () => import('./modules/grupos/group-detail.component').then(m => m.GroupDetailComponent) },
+          { path: 'miembros', loadComponent: () => import('./modules/grupos/group-detail.component').then(m => m.GroupDetailComponent) },
+          { path: 'retos', loadComponent: () => import('./modules/grupos/group-detail.component').then(m => m.GroupDetailComponent) },
+          { path: 'retos/:competitionId', loadComponent: () => import('./modules/grupos/grupo-reto-detail.component').then(m => m.GrupoRetoDetailComponent) },
+          { path: 'metricas', loadComponent: () => import('./modules/grupos/group-detail.component').then(m => m.GroupDetailComponent) },
+          { path: 'configuracion', loadComponent: () => import('./modules/grupos/group-detail.component').then(m => m.GroupDetailComponent) },
+        ]
+      },
+    ]
+  },
+  {
+    path: 'academia',
+    loadComponent: () =>
+      import('./modules/home/home.component').then(m => m.HomeComponent),
+    canActivate: [authGuard]
+  },
 {
   path: 'mis-rutinas',
   loadComponent: () =>

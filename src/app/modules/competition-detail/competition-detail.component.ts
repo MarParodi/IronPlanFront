@@ -109,7 +109,7 @@ import { forkJoin } from 'rxjs';
 
         <!-- GROUP -->
         <div
-          *ngIf="!myScore.memberCompetition"
+          *ngIf="!myScore.isMemberCompetition"
           class="grid grid-cols-3 gap-3 p-5">
 
           <div class="rounded-xl border border-slate-900 bg-[#0f1419] p-4">
@@ -148,7 +148,7 @@ import { forkJoin } from 'rxjs';
 
         <!-- INDIVIDUAL -->
         <div
-          *ngIf="myScore.memberCompetition"
+          *ngIf="myScore.isMemberCompetition"
           class="grid grid-cols-2 gap-3 p-5">
 
           <div class="rounded-xl border border-slate-900 bg-[#0f1419] p-4">
@@ -283,10 +283,47 @@ import { forkJoin } from 'rxjs';
         </div>
       </div>
 
-      <!-- LEADERBOARD -->
+      <!-- Ranking interno del grupo (scope GRUPO) -->
+      <div
+        *ngIf="myScore?.isMemberCompetition && memberLeaderboard.length > 0"
+        class="rounded-xl border border-slate-900 bg-[#0b0f13] overflow-hidden">
+
+        <div class="px-5 py-4 border-b border-slate-900">
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-600">
+            Ranking interno del grupo
+          </p>
+          <p class="text-[11px] text-slate-500 mt-1">
+            Competencia entre miembros del mismo grupo.
+          </p>
+        </div>
+
+        <div class="divide-y divide-slate-900">
+          <div
+            *ngFor="let entry of memberLeaderboard"
+            class="grid grid-cols-[70px_1fr_120px] items-center px-5 py-3"
+            [ngClass]="{ 'bg-cyan-500/5': isCurrentUser(entry.userId) }">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold"
+              [ngClass]="{
+                'bg-yellow-500/10 text-yellow-400': entry.rank === 1,
+                'bg-slate-800 text-slate-400': entry.rank !== 1
+              }">
+              {{ entry.rank }}
+            </div>
+            <p class="text-sm text-slate-200 truncate">
+              {{ entry.fullName }}
+              <span *ngIf="isCurrentUser(entry.userId)" class="text-cyan-500/70 text-xs ml-1">(tú)</span>
+            </p>
+            <span class="text-right text-sm font-semibold text-slate-300">
+              {{ entry.score | number:'1.0-0' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEADERBOARD grupal -->
       <div
         *ngIf="competition?.competitionType !== 'VERSUS'
-               && !myScore?.memberCompetition
+               && !myScore?.isMemberCompetition
                && leaderboard.length > 0"
 
         class="rounded-xl border border-slate-900
@@ -295,7 +332,10 @@ import { forkJoin } from 'rxjs';
         <div class="px-5 py-4 border-b border-slate-900">
 
           <p class="text-xs font-semibold uppercase tracking-wider text-slate-600">
-            Tabla de posiciones
+            Ranking por equipos
+          </p>
+          <p class="text-[11px] text-slate-500 mt-1">
+            Puntuación total de cada grupo (suma de actividad de sus miembros).
           </p>
         </div>
 
@@ -385,6 +425,42 @@ import { forkJoin } from 'rxjs';
         </div>
       </div>
 
+      <!-- Ranking interno de tu equipo -->
+      <div
+        *ngIf="!myScore?.isMemberCompetition && internalRanking.length > 0"
+        class="rounded-xl border border-violet-500/20 bg-[#0b0f13] overflow-hidden">
+
+        <div class="px-5 py-4 border-b border-slate-900">
+          <p class="text-xs font-semibold uppercase tracking-wider text-violet-400">
+            Ranking interno de tu equipo
+            <span *ngIf="myScore?.groupName" class="text-slate-500 font-normal normal-case">
+              — {{ myScore.groupName }}
+            </span>
+          </p>
+          <p class="text-[11px] text-slate-500 mt-1">
+            Solo miembros de tu equipo ven este ranking.
+          </p>
+        </div>
+
+        <div class="divide-y divide-slate-900">
+          <div
+            *ngFor="let entry of internalRanking"
+            class="grid grid-cols-[70px_1fr_120px] items-center px-5 py-3"
+            [ngClass]="{ 'bg-violet-500/5': isCurrentUser(entry.userId) }">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold bg-slate-800 text-slate-400">
+              {{ entry.position }}
+            </div>
+            <p class="text-sm text-slate-200 truncate">
+              {{ entry.fullName }}
+              <span *ngIf="isCurrentUser(entry.userId)" class="text-violet-400/80 text-xs ml-1">(tú)</span>
+            </p>
+            <span class="text-right text-sm font-semibold text-slate-300">
+              {{ entry.score | number:'1.0-0' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <!-- EMPTY -->
       <div
         *ngIf="leaderboard.length === 0 && memberLeaderboard.length === 0"
@@ -429,6 +505,7 @@ export class CompetitionDetailComponent implements OnInit {
   private homeService = inject(HomeService);
   private cdr = inject(ChangeDetectorRef);
   ancestorGroupIds: number[] = [];
+  currentUserId: number | null = null;
 
   competition: any = null;
   myScore: any = null;
@@ -450,6 +527,7 @@ export class CompetitionDetailComponent implements OnInit {
       next: (me: any) => {
         this.myGroupId = me?.organizationalGroupId ?? null;
         this.ancestorGroupIds = me?.ancestorGroupIds ?? [];
+        this.currentUserId = me?.id ?? null;
         this.loadCompetition(Number(id));
       },
 
@@ -461,40 +539,15 @@ export class CompetitionDetailComponent implements OnInit {
 
     this.loading = true;
 
-    forkJoin({
-      competition: this.homeService.getCompetitionById(id),
-      myScore: this.homeService.getMyScore(id),
-      leaderboard: this.homeService.getLeaderboard(id),
-    }).subscribe({
+    this.homeService.getCompetitionDetail(id).subscribe({
 
-      next: ({ competition, myScore, leaderboard }) => {
+      next: (data) => {
 
-        this.competition = competition;
-        this.myScore = myScore;
-
-        if (myScore?.memberCompetition) {
-
-          this.homeService.getMemberLeaderboard(id).subscribe({
-            next: (ml) => {
-              this.memberLeaderboard = ml;
-              this.cdr.markForCheck();
-            }
-          });
-
-        } else {
-
-          this.leaderboard = leaderboard;
-
-          if (this.myGroupId) {
-
-            this.homeService.getInternalRanking(id).subscribe({
-              next: (ir) => {
-                this.internalRanking = ir;
-                this.cdr.markForCheck();
-              }
-            });
-          }
-        }
+        this.competition = data.competition;
+        this.myScore = data.myScore;
+        this.leaderboard = data.groupLeaderboard ?? [];
+        this.memberLeaderboard = data.memberLeaderboard ?? [];
+        this.internalRanking = data.internalRanking ?? [];
 
         this.loading = false;
         this.cdr.markForCheck();
@@ -512,12 +565,14 @@ export class CompetitionDetailComponent implements OnInit {
   }
 
   isMyGroup(groupId: number): boolean {
+    const participantId = this.myScore?.participantGroupId;
+    if (participantId) return groupId === participantId;
+    if (this.myGroupId && groupId === this.myGroupId) return true;
+    return this.ancestorGroupIds.includes(groupId);
+  }
 
-    if (!this.myGroupId) {
-      return false;
-    }
-
-    return groupId === this.myGroupId;
+  isCurrentUser(userId: number): boolean {
+    return this.currentUserId != null && userId === this.currentUserId;
   }
 
   getInitials(name: string): string {
