@@ -366,11 +366,17 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
         next: () => {
           this.saving = false;
 
-          // Si es el último ejercicio, ir al resumen
           if (this.isLastExercise) {
-            this.router.navigate(['/workouts', this.sessionId, 'summary']);
+            // Primero finalizar la sesión, luego ir al summary
+            this.workoutService.finishSession(this.sessionId).subscribe({
+              next: () => {
+                this.router.navigate(['/workouts', this.sessionId, 'summary']);
+              },
+              error: () => {
+                this.router.navigate(['/workouts', this.sessionId, 'summary']);
+              }
+            });
           } else {
-            // Ir al siguiente ejercicio por order+1
             const nextOrder = this.data!.exerciseOrder + 1;
             this.router.navigate(['/workouts', this.sessionId, 'exercise', nextOrder]);
           }

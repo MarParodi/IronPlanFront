@@ -33,6 +33,10 @@ type XpRoutineCandidate = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit, OnDestroy {
+
+  userOrgRoot: string | null = null;
+  userOrgMiddle: string | null = null;
+
   // DI
   private readonly _cdr = inject(ChangeDetectorRef);
   private readonly _router = inject(Router);
@@ -45,6 +49,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private readonly searchSubject$ = new Subject<string>();
   backendBaseUrl = environment.apiUrl.replace(/\/api$/, '');
+
+
+  activeCompetitions: any[] = [];
+  userGroupName: string | null = null;
+  userGroupPath: string | null = null;
+  loadingCompetitions = false;
 
   // UI state
   loading = false;
@@ -106,11 +116,14 @@ pendingRoutine: XpRoutineCandidate | null = null;
     this._userService.getMe().subscribe({
       next: (me) => {
         this.userXp = me?.xpPoints ?? 0;
+        this.userGroupName = me?.organizationalGroupName ?? null;
+        this.userOrgRoot   = me?.organizationRootName ?? null;
+        this.userOrgMiddle = me?.organizationMiddlePath ?? null;
         this._cdr.markForCheck();
       },
     });
 
-
+    this.loadActiveCompetitions();
     this.load();
   }
 
@@ -118,6 +131,39 @@ pendingRoutine: XpRoutineCandidate | null = null;
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  loadActiveCompetitions(): void {
+  this.loadingCompetitions = true;
+  this._homeService.getActiveCompetitions().subscribe({
+    next: (data) => {
+      this.activeCompetitions = data;
+      this.loadingCompetitions = false;
+      this._cdr.markForCheck();
+    },
+    error: () => {
+      this.loadingCompetitions = false;
+      this._cdr.markForCheck();
+    }
+  });
+}
+
+openCompetition(c: any): void {
+  this._router.navigate(['/competitions', c.id]);
+}
+
+getCompetitionTypeLabel(type: string): string {
+  const labels: Record<string, string> = {
+    RANKING: 'Ranking', CHALLENGE: 'Challenge', VERSUS: 'Versus'
+  };
+  return labels[type] ?? type;
+}
+
+getMetricLabel(metric: string): string {
+  const labels: Record<string, string> = {
+    SESSIONS: 'Sesiones', ACTIVE_MINUTES: 'Minutos activos', WORKOUTS_COUNT: 'Entrenamientos'
+  };
+  return labels[metric] ?? metric;
+}
 
   // ----- Data loading -----
   load(): void {

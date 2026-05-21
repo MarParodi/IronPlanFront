@@ -8,6 +8,23 @@ import { environment } from '../../../../environments/environment';
 import { RecentWorkoutDto } from '../models/profile.models';
 import { map } from 'rxjs/operators';
 
+
+export interface CompetitionResponse {
+  id:                  number;
+  name:                string;
+  competitionType:     'RANKING' | 'CHALLENGE' | 'VERSUS';
+  scopeLevel:          string;
+  scopeReferenceId:    number;
+  scopeReferenceName:  string;
+  metricType:          'SESSIONS' | 'ACTIVE_MINUTES' | 'WORKOUTS_COUNT';
+  startDate:           string;
+  endDate:             string | null;
+  status:              'DRAFT' | 'ACTIVE' | 'FINISHED';
+  createdAt:           string;
+  participantCount:    number;
+  isMemberCompetition: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -128,5 +145,12 @@ export class ProfileService {
   markAchievementsAsSeen(codes: string[]): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/achievements/mark-seen`, { codes });
   }
+
+  getMyCompetitions(): Observable<CompetitionResponse[]> {
+  return this.http.get<any>(`${this.baseUrl}/competitions/my-competitions`).pipe(
+    map(data => Array.isArray(data) ? data : (data.content ?? data.data ?? []))
+  );
+}
+
 }
 

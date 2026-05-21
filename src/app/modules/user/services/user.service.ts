@@ -23,4 +23,22 @@ private readonly baseUrl = environment.apiUrl;
   getMe(): Observable<any> {
     return this.http.get(`${this.baseUrl}/users/me`);
   }
+
+  validateOrganizationCode(code: string): Observable<{
+    code: string;
+    groupId: number;
+    groupName: string;
+    organizationRootName: string;
+  }> {
+    return this.http.post<{
+      code: string;
+      groupId: number;
+      groupName: string;
+      organizationRootName: string;
+    }>(`${this.baseUrl}/users/me/organization/validate-code`, { code });
+  }
+
+  joinOrganization(code: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/users/me/organization/join`, { code });
+  }
 }

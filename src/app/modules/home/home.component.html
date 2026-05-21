@@ -2,14 +2,80 @@
   <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
 
     <!-- HEADER DE LA SECCIÓN -->
-    <div class="space-y-2">
-      <h1 class="text-2xl md:text-3xl font-bold text-slate-50">
-        Explorar Rutinas
-      </h1>
-      <p class="text-sm md:text-base text-slate-400">
-        Encuentra la rutina perfecta para alcanzar tus objetivos
-      </p>
+<div class="space-y-2">
+  <h1 class="text-2xl md:text-3xl font-bold text-slate-50">
+    Explorar Rutinas
+  </h1>
+  <p class="text-sm md:text-base text-slate-400">
+    Encuentra la rutina perfecta para alcanzar tus objetivos
+  </p>
+</div>
+
+<!-- Mi organización + Competencias — card unificado -->
+<div *ngIf="userGroupName"
+     class="rounded-2xl bg-[#171a1d] border border-slate-800 overflow-hidden">
+
+  <!-- Info del grupo -->
+  <div class="flex items-start gap-3 px-4 pt-4 pb-3">
+    <div class="w-9 h-9 rounded-xl bg-teal-500/10 border border-teal-500/20
+                flex items-center justify-center flex-shrink-0 mt-0.5">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+      </svg>
     </div>
+    <div class="min-w-0 flex-1">
+      <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-wide">
+        MI ORGANIZACIÓN · {{ userOrgRoot }}
+      </p>
+      <p *ngIf="userOrgMiddle"
+         class="text-sm font-semibold text-slate-200 truncate mt-0.5">
+        {{ userOrgMiddle }}
+      </p>
+      <p class="text-xs text-teal-400 font-medium mt-0.5">{{ userGroupName }}</p>
+    </div>
+  </div>
+
+  <!-- Competencias activas dentro del mismo card -->
+  <ng-container *ngIf="!loadingCompetitions && activeCompetitions.length > 0">
+    <div class="h-px bg-slate-800/60 mx-4"></div>
+    <div class="px-4 py-3 space-y-2">
+      <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-wide">
+        Mis competencias activas
+      </p>
+      <div class="space-y-2">
+        <div *ngFor="let c of activeCompetitions"
+             class="flex items-center gap-3 px-3 py-2.5 rounded-xl
+                    bg-slate-800/40 hover:bg-slate-800/70
+                    transition-all cursor-pointer"
+             (click)="openCompetition(c)">
+          <span class="text-[10px] font-bold px-2 py-1 rounded-md flex-shrink-0"
+            [ngClass]="{
+              'bg-teal-500/15 text-teal-300': c.competitionType === 'RANKING',
+              'bg-violet-500/15 text-violet-300': c.competitionType === 'CHALLENGE',
+              'bg-orange-500/15 text-orange-300': c.competitionType === 'VERSUS'
+            }">
+            {{ getCompetitionTypeLabel(c.competitionType) }}
+          </span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm text-slate-200 font-semibold truncate">{{ c.name }}</p>
+            <p class="text-xs text-slate-500">
+              {{ getMetricLabel(c.metricType) }}
+              <span *ngIf="c.endDate"> · hasta {{ c.endDate | date:'dd/MM/yy' }}</span>
+              <span *ngIf="!c.endDate"> · permanente</span>
+            </p>
+          </div>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+               stroke="#475569" stroke-width="2" class="flex-shrink-0">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="pb-1"></div>
+</div>
 
     <!-- BARRA DE BÚSQUEDA -->
     <div class="relative">

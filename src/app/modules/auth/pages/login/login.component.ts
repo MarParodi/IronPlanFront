@@ -29,7 +29,9 @@ export class LoginComponent {
       identifier: this.form.identifier.trim(),
       password: this.form.password
     }).subscribe({
-      next: () => this.router.navigate(['/']),
+      next: () => {
+        this.router.navigate(['/']);
+      },
       error: (e) => {
         const fe = e?.error?.errors;
         if (fe && typeof fe === 'object') {

@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { AuthService } from '../../../modules/auth/services/auth.service';
+import { UserService } from '../../../modules/user/services/user.service';
 import { NotificationService } from '../../../modules/notifications/services/notification.service';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -21,7 +22,8 @@ import { CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  private _tokenSvc = inject(AuthService);
+  private _authSvc = inject(AuthService);
+  private _userSvc = inject(UserService);
   private _router = inject(Router);
   private _cdr = inject(ChangeDetectorRef);
   private _notificationSvc = inject(NotificationService);
@@ -31,8 +33,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isLoginPage = false;
   isPromotionsPage = false;
   unreadNotifications = 0;
+  showMisGrupos = false;
 
   ngOnInit(): void {
+    if (this._authSvc.isLoggedIn) {
+      this._userSvc.getMe().subscribe({
+        next: () => {
+          this.showMisGrupos = true;
+          this._cdr.markForCheck();
+        }
+      });
+    }
     // Cerrar menú móvil en cambio de ruta
     this._router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -63,6 +74,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    this._tokenSvc.logout();
+    this._authSvc.logout();
   }
 }
