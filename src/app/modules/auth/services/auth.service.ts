@@ -45,10 +45,25 @@ export class AuthService {
     return this.storage?.getItem(this._onboardingTokenKey) ?? null;
   }
 
-  get isLoggedIn(): boolean {
-    // En SSR siempre false (no hay storage)
-    return !!this.token;
+  private isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    // exp está en segundos, Date.now() en milisegundos
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true; 
   }
+}
+
+get isLoggedIn(): boolean {
+  const token = this.token;
+  if (!token) return false;
+  if (this.isTokenExpired(token)) {
+    this.logout(); // Limpia el token inválido automáticamente
+    return false;
+  }
+  return true;
+}
 
 login(payload: { identifier?: string; password: string }) {
   // Normaliza: si viene usernameOrEmail, lo mapeamos a identifier
