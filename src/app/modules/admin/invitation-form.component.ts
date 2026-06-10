@@ -280,7 +280,7 @@ interface BreadcrumbItem {
       display: flex; align-items: center; justify-content: center; padding: 16px;
     }
     .modal {
-      background: #171a1d; border: 1px solid rgba(255,255,255,0.09);
+      background: rgb(var(--ip-surface)); border: 1px solid var(--ip-card-border-color);
       border-radius: 18px; width: 100%; max-width: 500px;
       max-height: 88vh; display: flex; flex-direction: column;
       box-shadow: 0 25px 60px rgba(0,0,0,0.7);

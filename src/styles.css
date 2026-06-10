@@ -13,13 +13,25 @@
     --ip-surface-elevated: 241 245 249;
     --ip-header: 255 255 255;
     --ip-footer: 241 245 249;
+    --ip-modal-from: 255 255 255;
+    --ip-overlay: 241 245 249;
+    --ip-input-bg: 241 245 249;
     --ip-text-primary: 15 23 42;
     --ip-text-secondary: 71 85 105;
     --ip-text-muted: 100 116 139;
     --ip-border: 226 232 240;
+    --ip-border-subtle: 226 232 240;
+    --ip-hover: 241 245 249;
+    --ip-backdrop: 15 23 42;
     --ip-scrollbar-track: 226 232 240;
     --ip-scrollbar-thumb: 148 163 184;
     --ip-scrollbar-thumb-hover: 100 116 139;
+    --ip-accent: 0 178 178;
+    --ip-card-border-color: rgba(226, 232, 240, 0.9);
+    --ip-faint-border-color: rgba(226, 232, 240, 0.6);
+    --ip-hover-overlay: rgba(15, 23, 42, 0.04);
+    --ip-modal-shadow: 0 25px 60px rgba(15, 23, 42, 0.15);
+    --ip-backdrop-color: rgba(15, 23, 42, 0.45);
   }
 
   .dark {
@@ -32,13 +44,25 @@
     --ip-surface-elevated: 31 31 31;
     --ip-header: 13 15 17;
     --ip-footer: 10 12 14;
+    --ip-modal-from: 26 31 37;
+    --ip-overlay: 23 26 29;
+    --ip-input-bg: 13 17 23;
     --ip-text-primary: 241 245 249;
     --ip-text-secondary: 148 163 184;
     --ip-text-muted: 100 116 139;
     --ip-border: 30 41 59;
+    --ip-border-subtle: 51 65 85;
+    --ip-hover: 30 41 59;
+    --ip-backdrop: 0 0 0;
     --ip-scrollbar-track: 13 15 17;
     --ip-scrollbar-thumb: 51 65 85;
     --ip-scrollbar-thumb-hover: 71 85 105;
+    --ip-accent: 0 178 178;
+    --ip-card-border-color: rgba(255, 255, 255, 0.09);
+    --ip-faint-border-color: rgba(255, 255, 255, 0.06);
+    --ip-hover-overlay: rgba(255, 255, 255, 0.04);
+    --ip-modal-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+    --ip-backdrop-color: rgba(0, 0, 0, 0.75);
   }
 
   body {
@@ -62,6 +86,58 @@
       rgb(var(--ip-page-from)),
       rgb(var(--ip-page-to))
     );
+  }
+
+  .bg-ip-modal-gradient {
+    background-image: linear-gradient(
+      to bottom,
+      rgb(var(--ip-modal-from)),
+      rgb(var(--ip-page))
+    );
+  }
+
+  .bg-ip-overlay-fade {
+    background-image: linear-gradient(
+      to top,
+      rgb(var(--ip-overlay)),
+      transparent
+    );
+  }
+
+  .bg-ip-overlay-fade-soft {
+    background-image: linear-gradient(
+      to top,
+      rgb(var(--ip-overlay)),
+      rgb(var(--ip-overlay) / 0.5),
+      transparent
+    );
+  }
+
+  .bg-ip-fade-up {
+    background-image: linear-gradient(
+      to top,
+      rgb(var(--ip-surface-elevated) / 0.9),
+      transparent
+    );
+  }
+
+  .bg-ip-backdrop {
+    background-color: var(--ip-backdrop-color);
+  }
+}
+
+@layer components {
+  .ip-card {
+    @apply rounded-2xl bg-ip-surface border border-ip-border/60;
+  }
+
+  .ip-panel {
+    @apply rounded-2xl bg-ip-surface-elevated/70 border border-ip-border/60;
+  }
+
+  .ip-input {
+    @apply w-full rounded-xl border border-ip-border/60 bg-ip-surface px-4 py-3 text-ip-primary outline-none transition;
+    @apply focus:border-teal-400/90 focus:ring-2 focus:ring-teal-400/30;
   }
 }
 

@@ -12,7 +12,7 @@ import { filter } from 'rxjs/operators';
   template: `
     <div *ngIf="detail" class="space-y-6 max-w-4xl">
       <a routerLink="/grupos/mis-grupos"
-        class="inline-flex items-center gap-1 text-sm text-slate-400 hover:text-teal-400 transition">
+        class="inline-flex items-center gap-1 text-sm text-ip-muted hover:text-teal-400 transition">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
         </svg>
@@ -20,9 +20,9 @@ import { filter } from 'rxjs/operators';
       </a>
 
       <header class="space-y-2">
-        <p class="text-sm text-slate-400">{{ detail.hierarchyPath.displayPath }}</p>
+        <p class="text-sm text-ip-muted">{{ detail.hierarchyPath.displayPath }}</p>
         <div class="flex flex-wrap items-center gap-3">
-          <h2 class="text-2xl font-bold text-slate-50">{{ detail.groupName }}</h2>
+          <h2 class="text-2xl font-bold text-ip-primary">{{ detail.groupName }}</h2>
           <span [class]="roleBadgeClass(detail.role === 'ADMIN')">
             {{ detail.role === 'ADMIN' ? 'Administrador' : 'Miembro' }}
           </span>
@@ -38,29 +38,29 @@ import { filter } from 'rxjs/operators';
         </a>
       </nav>
 
-      <div class="rounded-2xl bg-ip-surface border border-slate-800 p-5 md:p-6">
+      <div class="rounded-2xl bg-ip-surface border border-ip-border p-5 md:p-6">
         <section *ngIf="tab === 'resumen'" class="space-y-4">
-          <h3 class="text-base font-semibold text-slate-200">Resumen</h3>
+          <h3 class="text-base font-semibold text-ip-primary">Resumen</h3>
           <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="rounded-xl bg-ip-page border border-slate-800/80 p-4">
-              <dt class="text-[10px] uppercase tracking-wide text-slate-500 font-semibold">Organización</dt>
-              <dd class="mt-1 text-sm text-slate-100">{{ detail.hierarchyPath.rootName || '—' }}</dd>
+            <div class="rounded-xl bg-ip-page border border-ip-border/80 p-4">
+              <dt class="text-[10px] uppercase tracking-wide text-ip-primary0 font-semibold">Organización</dt>
+              <dd class="mt-1 text-sm text-ip-primary">{{ detail.hierarchyPath.rootName || '—' }}</dd>
             </div>
-            <div class="rounded-xl bg-ip-page border border-slate-800/80 p-4">
-              <dt class="text-[10px] uppercase tracking-wide text-slate-500 font-semibold">Código</dt>
-              <dd class="mt-1 text-sm text-slate-100 font-mono">{{ detail.groupCode }}</dd>
+            <div class="rounded-xl bg-ip-page border border-ip-border/80 p-4">
+              <dt class="text-[10px] uppercase tracking-wide text-ip-primary0 font-semibold">Código</dt>
+              <dd class="mt-1 text-sm text-ip-primary font-mono">{{ detail.groupCode }}</dd>
             </div>
-            <div class="rounded-xl bg-ip-page border border-slate-800/80 p-4">
-              <dt class="text-[10px] uppercase tracking-wide text-slate-500 font-semibold">Miembros</dt>
-              <dd class="mt-1 text-sm text-slate-100">{{ detail.memberCount }}</dd>
+            <div class="rounded-xl bg-ip-page border border-ip-border/80 p-4">
+              <dt class="text-[10px] uppercase tracking-wide text-ip-primary0 font-semibold">Miembros</dt>
+              <dd class="mt-1 text-sm text-ip-primary">{{ detail.memberCount }}</dd>
             </div>
-            <div class="rounded-xl bg-ip-page border border-slate-800/80 p-4">
-              <dt class="text-[10px] uppercase tracking-wide text-slate-500 font-semibold">Retos activos</dt>
-              <dd class="mt-1 text-sm text-slate-100">{{ detail.activeCompetitionsCount }}</dd>
+            <div class="rounded-xl bg-ip-page border border-ip-border/80 p-4">
+              <dt class="text-[10px] uppercase tracking-wide text-ip-primary0 font-semibold">Retos activos</dt>
+              <dd class="mt-1 text-sm text-ip-primary">{{ detail.activeCompetitionsCount }}</dd>
             </div>
-            <div class="rounded-xl bg-ip-page border border-slate-800/80 p-4">
-              <dt class="text-[10px] uppercase tracking-wide text-slate-500 font-semibold">Estado</dt>
-              <dd class="mt-1 text-sm" [class.text-teal-400]="detail.active" [class.text-slate-400]="!detail.active">
+            <div class="rounded-xl bg-ip-page border border-ip-border/80 p-4">
+              <dt class="text-[10px] uppercase tracking-wide text-ip-primary0 font-semibold">Estado</dt>
+              <dd class="mt-1 text-sm" [class.text-teal-400]="detail.active" [class.text-ip-muted]="!detail.active">
                 {{ detail.active ? 'Activo' : 'Inactivo' }}
               </dd>
             </div>
@@ -69,15 +69,15 @@ import { filter } from 'rxjs/operators';
 
         <section *ngIf="tab === 'miembros'" class="space-y-4">
           <div>
-            <h3 class="text-base font-semibold text-slate-200">Miembros</h3>
-            <p class="text-xs text-slate-500 mt-1">
+            <h3 class="text-base font-semibold text-ip-primary">Miembros</h3>
+            <p class="text-xs text-ip-primary0 mt-1">
               Personas asignadas directamente a este grupo.
               <span *ngIf="detail.canManage"> Puedes dar de alta, cambiar rol o dar de baja.</span>
             </p>
           </div>
 
-          <div *ngIf="detail.canManage" class="rounded-xl bg-ip-page border border-slate-800 p-4 space-y-3">
-            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Añadir miembro</p>
+          <div *ngIf="detail.canManage" class="rounded-xl bg-ip-page border border-ip-border p-4 space-y-3">
+            <p class="text-xs font-semibold uppercase tracking-wide text-ip-primary0">Añadir miembro</p>
             <div class="flex flex-col sm:flex-row gap-3">
               <input [(ngModel)]="addIdentifier" type="text" class="member-input flex-1"
                 placeholder="Email o nombre de usuario" [disabled]="addingMember" />
@@ -94,10 +94,10 @@ import { filter } from 'rxjs/operators';
           <p *ngIf="membersError" class="text-sm text-red-300 bg-red-500/10 border border-red-500/25 rounded-lg px-3 py-2">{{ membersError }}</p>
           <p *ngIf="membersSuccess" class="text-sm text-teal-300 bg-teal-500/10 border border-teal-500/25 rounded-lg px-3 py-2">{{ membersSuccess }}</p>
 
-          <div *ngIf="loadingMembers" class="text-sm text-slate-400 py-6 text-center">Cargando...</div>
-          <div *ngIf="!loadingMembers && members.length" class="overflow-x-auto rounded-xl border border-slate-800">
+          <div *ngIf="loadingMembers" class="text-sm text-ip-muted py-6 text-center">Cargando...</div>
+          <div *ngIf="!loadingMembers && members.length" class="overflow-x-auto rounded-xl border border-ip-border">
             <table class="w-full text-sm text-left">
-              <thead class="bg-ip-page text-slate-500 text-xs uppercase">
+              <thead class="bg-ip-page text-ip-primary0 text-xs uppercase">
                 <tr>
                   <th class="px-4 py-3">Nombre</th>
                   <th class="px-4 py-3">Usuario</th>
@@ -107,8 +107,8 @@ import { filter } from 'rxjs/operators';
               </thead>
               <tbody class="divide-y divide-slate-800">
                 <tr *ngFor="let m of members" class="hover:bg-slate-800/30">
-                  <td class="px-4 py-3 text-slate-200">{{ m.fullName }}</td>
-                  <td class="px-4 py-3 text-slate-400">{{ m.username }}</td>
+                  <td class="px-4 py-3 text-ip-primary">{{ m.fullName }}</td>
+                  <td class="px-4 py-3 text-ip-muted">{{ m.username }}</td>
                   <td class="px-4 py-3">
                     <select *ngIf="detail.canManage"
                       [ngModel]="m.role"
@@ -120,7 +120,7 @@ import { filter } from 'rxjs/operators';
                     </select>
                     <span *ngIf="!detail.canManage" class="text-xs font-medium"
                       [class.text-teal-400]="m.role === 'ADMIN'"
-                      [class.text-slate-400]="m.role !== 'ADMIN'">
+                      [class.text-ip-muted]="m.role !== 'ADMIN'">
                       {{ m.role === 'ADMIN' ? 'Administrador' : 'Miembro' }}
                     </span>
                   </td>
@@ -134,23 +134,23 @@ import { filter } from 'rxjs/operators';
               </tbody>
             </table>
           </div>
-          <p *ngIf="!loadingMembers && !members.length" class="text-sm text-slate-400">Sin miembros asignados a este grupo.</p>
+          <p *ngIf="!loadingMembers && !members.length" class="text-sm text-ip-muted">Sin miembros asignados a este grupo.</p>
         </section>
 
         <section *ngIf="tab === 'retos'" class="space-y-4">
           <div>
-            <h3 class="text-base font-semibold text-slate-200">Retos</h3>
-            <p class="text-xs text-slate-500 mt-1">
+            <h3 class="text-base font-semibold text-ip-primary">Retos</h3>
+            <p class="text-xs text-ip-primary0 mt-1">
               Rankings y ganadores según entrenamientos, sesiones o minutos activos del período del reto.
             </p>
           </div>
-          <div *ngIf="loadingRetos" class="text-sm text-slate-400 py-6 text-center">Cargando...</div>
+          <div *ngIf="loadingRetos" class="text-sm text-ip-muted py-6 text-center">Cargando...</div>
           <article *ngFor="let r of retos"
-            class="rounded-xl bg-ip-page border border-slate-800 p-4 space-y-3 hover:border-slate-700 transition">
+            class="rounded-xl bg-ip-page border border-ip-border p-4 space-y-3 hover:border-ip-border transition">
             <div class="flex items-start justify-between gap-2">
               <div>
-                <h4 class="font-semibold text-slate-100">{{ r.name }}</h4>
-                <p class="text-xs text-slate-500 mt-1">
+                <h4 class="font-semibold text-ip-primary">{{ r.name }}</h4>
+                <p class="text-xs text-ip-primary0 mt-1">
                   {{ retoTypeLabel(r.competitionType) }} · {{ r.metricLabel || r.metricType }}
                   · {{ r.participantCount }} participantes
                 </p>
@@ -160,7 +160,7 @@ import { filter } from 'rxjs/operators';
             <div *ngIf="r.leader?.name" class="flex items-center gap-2 text-sm">
               <span>🏆</span>
               <span class="text-teal-400 font-medium">{{ r.leader?.name }}</span>
-              <span class="text-slate-500">
+              <span class="text-ip-primary0">
                 — {{ r.leader?.score | number:'1.0-1' }}
                 <span *ngIf="r.leader?.tie"> (empate)</span>
               </span>
@@ -173,14 +173,14 @@ import { filter } from 'rxjs/operators';
               </svg>
             </a>
           </article>
-          <p *ngIf="!loadingRetos && !retos.length" class="text-sm text-slate-400">No hay retos activos o finalizados en este grupo.</p>
+          <p *ngIf="!loadingRetos && !retos.length" class="text-sm text-ip-muted">No hay retos activos o finalizados en este grupo.</p>
         </section>
 
         <section *ngIf="tab === 'metricas'" class="space-y-5">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h3 class="text-base font-semibold text-slate-200">Métricas organizacionales</h3>
-              <p *ngIf="metrics" class="text-xs text-slate-500 mt-1">
+              <h3 class="text-base font-semibold text-ip-primary">Métricas organizacionales</h3>
+              <p *ngIf="metrics" class="text-xs text-ip-primary0 mt-1">
                 {{ metrics.periodStart | date:'dd/MM/yyyy' }} – {{ metrics.periodEnd | date:'dd/MM/yyyy' }}
               </p>
             </div>
@@ -191,7 +191,7 @@ import { filter } from 'rxjs/operators';
             </select>
           </div>
 
-          <div *ngIf="loadingMetricas" class="text-sm text-slate-400 py-8 text-center">Cargando métricas...</div>
+          <div *ngIf="loadingMetricas" class="text-sm text-ip-muted py-8 text-center">Cargando métricas...</div>
           <p *ngIf="metricasError" class="text-sm text-red-300 bg-red-500/10 border border-red-500/25 rounded-lg px-3 py-2">{{ metricasError }}</p>
 
           <ng-container *ngIf="!loadingMetricas && metrics">
@@ -218,11 +218,11 @@ import { filter } from 'rxjs/operators';
               </div>
             </div>
 
-            <div class="rounded-xl bg-ip-page border border-slate-800 p-4 space-y-3">
-              <h4 class="text-sm font-semibold text-slate-300">Actividad semanal (entrenamientos)</h4>
-              <div *ngIf="!metrics.weeklyWorkouts.length" class="text-xs text-slate-500">Sin datos en el período.</div>
+            <div class="rounded-xl bg-ip-page border border-ip-border p-4 space-y-3">
+              <h4 class="text-sm font-semibold text-ip-secondary">Actividad semanal (entrenamientos)</h4>
+              <div *ngIf="!metrics.weeklyWorkouts.length" class="text-xs text-ip-primary0">Sin datos en el período.</div>
               <div *ngFor="let w of metrics.weeklyWorkouts" class="space-y-1">
-                <div class="flex justify-between text-xs text-slate-400">
+                <div class="flex justify-between text-xs text-ip-muted">
                   <span>{{ w.weekLabel }}</span>
                   <span>{{ w.workouts }} · {{ w.activeMembers }} activos</span>
                 </div>
@@ -233,15 +233,15 @@ import { filter } from 'rxjs/operators';
               </div>
             </div>
 
-            <div class="rounded-xl bg-ip-page border border-slate-800 overflow-hidden">
-              <h4 class="text-sm font-semibold text-slate-300 px-4 py-3 border-b border-slate-800">
+            <div class="rounded-xl bg-ip-page border border-ip-border overflow-hidden">
+              <h4 class="text-sm font-semibold text-ip-secondary px-4 py-3 border-b border-ip-border">
                 Top participantes
               </h4>
-              <div *ngIf="!metrics.topParticipants.length" class="text-sm text-slate-500 px-4 py-6">
+              <div *ngIf="!metrics.topParticipants.length" class="text-sm text-ip-primary0 px-4 py-6">
                 Aún no hay actividad registrada en este grupo.
               </div>
               <table *ngIf="metrics.topParticipants.length" class="w-full text-sm text-left">
-                <thead class="bg-[#0f1214] text-slate-500 text-xs uppercase">
+                <thead class="bg-ip-input text-ip-primary0 text-xs uppercase">
                   <tr>
                     <th class="px-4 py-2 w-10">#</th>
                     <th class="px-4 py-2">Miembro</th>
@@ -251,13 +251,13 @@ import { filter } from 'rxjs/operators';
                 </thead>
                 <tbody class="divide-y divide-slate-800">
                   <tr *ngFor="let p of metrics.topParticipants" class="hover:bg-slate-800/30">
-                    <td class="px-4 py-2 text-slate-500">{{ p.rank }}</td>
+                    <td class="px-4 py-2 text-ip-primary0">{{ p.rank }}</td>
                     <td class="px-4 py-2">
-                      <div class="text-slate-200">{{ p.fullName }}</div>
-                      <div class="text-xs text-slate-500">{{ p.username }}</div>
+                      <div class="text-ip-primary">{{ p.fullName }}</div>
+                      <div class="text-xs text-ip-primary0">{{ p.username }}</div>
                     </td>
                     <td class="px-4 py-2 text-right text-teal-400 font-medium">{{ p.workouts }}</td>
-                    <td class="px-4 py-2 text-right text-slate-400">{{ p.activeMinutes }}</td>
+                    <td class="px-4 py-2 text-right text-ip-muted">{{ p.activeMinutes }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -266,8 +266,8 @@ import { filter } from 'rxjs/operators';
         </section>
 
         <section *ngIf="tab === 'configuracion'" class="space-y-3">
-          <h3 class="text-base font-semibold text-slate-200">Configuración</h3>
-          <p class="text-sm text-slate-400">Gestiona invitaciones, estructura y retos desde Administrar grupos.</p>
+          <h3 class="text-base font-semibold text-ip-primary">Configuración</h3>
+          <p class="text-sm text-ip-muted">Gestiona invitaciones, estructura y retos desde Administrar grupos.</p>
           <a routerLink="/grupos/administrar"
             class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
                    bg-teal-500/15 text-teal-400 border border-teal-500/25 hover:bg-teal-500/25 transition">
@@ -330,7 +330,7 @@ import { filter } from 'rxjs/operators';
     .btn-remove:disabled { opacity: 0.5; cursor: not-allowed; }
     .metric-card {
       border-radius: 12px;
-      background: #111416;
+      background: rgb(var(--ip-page));
       border: 1px solid rgb(30 41 59);
       padding: 1rem;
       display: flex;
@@ -438,13 +438,13 @@ export class GroupDetailComponent implements OnInit {
   roleBadgeClass(isAdmin: boolean): string {
     return isAdmin
       ? 'text-xs font-semibold px-2.5 py-1 rounded-md bg-teal-500/15 text-teal-400 border border-teal-500/25'
-      : 'text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-700/50 text-slate-300';
+      : 'text-xs font-semibold px-2.5 py-1 rounded-md bg-ip-surface/50 text-ip-secondary';
   }
 
   statusBadgeClass(isActive: boolean): string {
     return isActive
       ? 'text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-teal-500/15 text-teal-400'
-      : 'text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-700/50 text-slate-400';
+      : 'text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-ip-surface/50 text-ip-muted';
   }
 
   retoTypeLabel(t: string): string {
@@ -460,8 +460,8 @@ export class GroupDetailComponent implements OnInit {
   retoStatusClass(s: string): string {
     const base = 'text-[10px] font-semibold uppercase px-2 py-0.5 rounded';
     if (s === 'ACTIVE') return `${base} bg-teal-500/15 text-teal-400`;
-    if (s === 'FINISHED') return `${base} bg-slate-600/40 text-slate-300`;
-    return `${base} bg-slate-700/50 text-slate-400`;
+    if (s === 'FINISHED') return `${base} bg-slate-600/40 text-ip-secondary`;
+    return `${base} bg-ip-surface/50 text-ip-muted`;
   }
 
   loadMembers(force = false) {

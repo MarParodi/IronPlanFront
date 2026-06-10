@@ -315,7 +315,7 @@ export interface MemberLeaderboardEntry {
       display: flex; align-items: center; justify-content: center; padding: 16px;
     }
     .modal {
-      background: #171a1d; border: 1px solid rgba(255,255,255,0.09);
+      background: rgb(var(--ip-surface)); border: 1px solid var(--ip-card-border-color);
       border-radius: 20px; width: 100%; max-width: 640px;
       max-height: 90vh; display: flex; flex-direction: column;
       box-shadow: 0 30px 80px rgba(0,0,0,0.8);
@@ -414,7 +414,7 @@ export interface MemberLeaderboardEntry {
       display: flex; align-items: center; gap: 12px;
       padding: 20px 16px;
       background: linear-gradient(135deg, rgba(45,212,191,0.04) 0%, rgba(251,146,60,0.04) 100%);
-      border: 1px solid rgba(255,255,255,0.07); border-radius: 14px;
+      border: 1px solid var(--ip-faint-border-color); border-radius: 14px;
     }
     .versus-side {
       flex: 1; display: flex; flex-direction: column;

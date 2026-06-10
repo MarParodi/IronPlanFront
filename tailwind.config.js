@@ -17,6 +17,7 @@ module.exports = {
           secondary: 'rgb(var(--ip-text-secondary) / <alpha-value>)',
           border: 'rgb(var(--ip-border) / <alpha-value>)',
           muted: 'rgb(var(--ip-text-muted) / <alpha-value>)',
+          input: 'rgb(var(--ip-input-bg) / <alpha-value>)',
         },
       },
     },

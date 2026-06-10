@@ -122,7 +122,7 @@ export class AchievementsComponent implements OnInit {
       'pencil': 'text-violet-400',
       'target': 'text-emerald-400'
     };
-    return iconMap[icon] || 'text-slate-400';
+    return iconMap[icon] || 'text-ip-muted';
   }
 
   getCategoryLabel(category: string): string {
@@ -142,6 +142,6 @@ export class AchievementsComponent implements OnInit {
       'xp': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
       'social': 'bg-blue-500/20 text-blue-400 border-blue-500/30'
     };
-    return colors[category] || 'bg-slate-500/20 text-slate-400 border-slate-500/30';
+    return colors[category] || 'bg-slate-500/20 text-ip-muted border-slate-500/30';
   }
 }

@@ -16,7 +16,7 @@ import { forkJoin } from 'rxjs';
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-<div class="min-h-screen bg-[#05070a] text-slate-100">
+<div class="min-h-screen bg-ip-page text-ip-primary">
   <div class="max-w-5xl mx-auto px-6 py-8 space-y-5">
 
     <!-- HEADER -->
@@ -25,12 +25,12 @@ import { forkJoin } from 'rxjs';
       <button
         (click)="goBack()"
         class="w-10 h-10 flex items-center justify-center
-               rounded-xl border border-slate-900
-               bg-[#0b0f13] hover:bg-[#11161c]
+               rounded-xl border border-ip-border
+               bg-ip-surface hover:bg-ip-surface
                transition-all duration-200">
 
         <svg xmlns="http://www.w3.org/2000/svg"
-             class="w-4 h-4 text-slate-400"
+             class="w-4 h-4 text-ip-muted"
              fill="none"
              viewBox="0 0 24 24"
              stroke="currentColor"
@@ -48,7 +48,7 @@ import { forkJoin } from 'rxjs';
           {{ competition?.name ?? 'Competencia' }}
         </h1>
 
-        <p class="text-sm text-slate-500 mt-1">
+        <p class="text-sm text-ip-primary0 mt-1">
           {{ getTypeLabel(competition?.competitionType) }}
           ·
           {{ getMetricLabel(competition?.metricType) }}
@@ -88,7 +88,7 @@ import { forkJoin } from 'rxjs';
 
       <div class="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
 
-      <p class="text-sm text-slate-500">
+      <p class="text-sm text-ip-primary0">
         Cargando competencia...
       </p>
     </div>
@@ -98,11 +98,11 @@ import { forkJoin } from 'rxjs';
       <!-- MI POSICIÓN -->
       <div
         *ngIf="myScore"
-        class="rounded-xl border border-slate-900
-               bg-[#0b0f13] overflow-hidden">
+        class="rounded-xl border border-ip-border
+               bg-ip-surface overflow-hidden">
 
         <div class="px-5 py-4 border-b border-slate-900">
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-600">
+          <p class="text-xs font-semibold uppercase tracking-wider text-ip-muted">
             Mi posición
           </p>
         </div>
@@ -112,9 +112,9 @@ import { forkJoin } from 'rxjs';
           *ngIf="!myScore.isMemberCompetition"
           class="grid grid-cols-3 gap-3 p-5">
 
-          <div class="rounded-xl border border-slate-900 bg-[#0f1419] p-4">
+          <div class="rounded-xl border border-ip-border bg-ip-surface p-4">
 
-            <p class="text-xs text-slate-500 mb-2">
+            <p class="text-xs text-ip-primary0 mb-2">
               Posición grupal
             </p>
 
@@ -123,20 +123,20 @@ import { forkJoin } from 'rxjs';
             </h3>
           </div>
 
-          <div class="rounded-xl border border-slate-900 bg-[#0f1419] p-4">
+          <div class="rounded-xl border border-ip-border bg-ip-surface p-4">
 
-            <p class="text-xs text-slate-500 mb-2">
+            <p class="text-xs text-ip-primary0 mb-2">
               Score grupo
             </p>
 
-            <h3 class="text-3xl font-bold text-white">
+            <h3 class="text-3xl font-bold text-ip-primary">
               {{ myScore.groupScore | number:'1.0-0' }}
             </h3>
           </div>
 
-          <div class="rounded-xl border border-slate-900 bg-[#0f1419] p-4">
+          <div class="rounded-xl border border-ip-border bg-ip-surface p-4">
 
-            <p class="text-xs text-slate-500 mb-2">
+            <p class="text-xs text-ip-primary0 mb-2">
               Ranking interno
             </p>
 
@@ -151,9 +151,9 @@ import { forkJoin } from 'rxjs';
           *ngIf="myScore.isMemberCompetition"
           class="grid grid-cols-2 gap-3 p-5">
 
-          <div class="rounded-xl border border-slate-900 bg-[#0f1419] p-4">
+          <div class="rounded-xl border border-ip-border bg-ip-surface p-4">
 
-            <p class="text-xs text-slate-500 mb-2">
+            <p class="text-xs text-ip-primary0 mb-2">
               Mi posición
             </p>
 
@@ -162,13 +162,13 @@ import { forkJoin } from 'rxjs';
             </h3>
           </div>
 
-          <div class="rounded-xl border border-slate-900 bg-[#0f1419] p-4">
+          <div class="rounded-xl border border-ip-border bg-ip-surface p-4">
 
-            <p class="text-xs text-slate-500 mb-2">
+            <p class="text-xs text-ip-primary0 mb-2">
               Mi score
             </p>
 
-            <h3 class="text-3xl font-bold text-white">
+            <h3 class="text-3xl font-bold text-ip-primary">
               {{ myScore.individualScore | number:'1.0-0' }}
             </h3>
           </div>
@@ -194,11 +194,11 @@ import { forkJoin } from 'rxjs';
       <!-- VERSUS -->
       <div
         *ngIf="competition?.competitionType === 'VERSUS' && leaderboard.length === 2"
-        class="rounded-xl border border-slate-900 bg-[#0b0f13] overflow-hidden">
+        class="rounded-xl border border-ip-border bg-ip-surface overflow-hidden">
 
         <div class="px-5 py-4 border-b border-slate-900">
 
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-600">
+          <p class="text-xs font-semibold uppercase tracking-wider text-ip-muted">
             Enfrentamiento
           </p>
         </div>
@@ -217,7 +217,7 @@ import { forkJoin } from 'rxjs';
               {{ getInitials(leaderboard[0].groupName) }}
             </div>
 
-            <p class="mt-4 text-sm font-medium text-slate-200">
+            <p class="mt-4 text-sm font-medium text-ip-primary">
               {{ leaderboard[0].groupName }}
             </p>
 
@@ -228,7 +228,7 @@ import { forkJoin } from 'rxjs';
                 'text-cyan-400':
                   leaderboard[0].groupScore >= leaderboard[1].groupScore,
 
-                'text-slate-600':
+                'text-ip-muted':
                   leaderboard[0].groupScore < leaderboard[1].groupScore
               }">
 
@@ -240,11 +240,11 @@ import { forkJoin } from 'rxjs';
           <div class="flex justify-center">
 
             <div class="w-16 h-16 rounded-full
-                        border border-slate-800
-                        bg-[#0f1419]
+                        border border-ip-border
+                        bg-ip-surface
                         flex items-center justify-center">
 
-              <span class="text-sm font-black tracking-widest text-slate-600">
+              <span class="text-sm font-black tracking-widest text-ip-muted">
                 VS
               </span>
             </div>
@@ -262,7 +262,7 @@ import { forkJoin } from 'rxjs';
               {{ getInitials(leaderboard[1].groupName) }}
             </div>
 
-            <p class="mt-4 text-sm font-medium text-slate-200">
+            <p class="mt-4 text-sm font-medium text-ip-primary">
               {{ leaderboard[1].groupName }}
             </p>
 
@@ -273,7 +273,7 @@ import { forkJoin } from 'rxjs';
                 'text-orange-400':
                   leaderboard[1].groupScore >= leaderboard[0].groupScore,
 
-                'text-slate-600':
+                'text-ip-muted':
                   leaderboard[1].groupScore < leaderboard[0].groupScore
               }">
 
@@ -286,13 +286,13 @@ import { forkJoin } from 'rxjs';
       <!-- Ranking interno del grupo (scope GRUPO) -->
       <div
         *ngIf="myScore?.isMemberCompetition && memberLeaderboard.length > 0"
-        class="rounded-xl border border-slate-900 bg-[#0b0f13] overflow-hidden">
+        class="rounded-xl border border-ip-border bg-ip-surface overflow-hidden">
 
         <div class="px-5 py-4 border-b border-slate-900">
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-600">
+          <p class="text-xs font-semibold uppercase tracking-wider text-ip-muted">
             Ranking interno del grupo
           </p>
-          <p class="text-[11px] text-slate-500 mt-1">
+          <p class="text-[11px] text-ip-primary0 mt-1">
             Competencia entre miembros del mismo grupo.
           </p>
         </div>
@@ -305,15 +305,15 @@ import { forkJoin } from 'rxjs';
             <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold"
               [ngClass]="{
                 'bg-yellow-500/10 text-yellow-400': entry.rank === 1,
-                'bg-slate-800 text-slate-400': entry.rank !== 1
+                'bg-slate-800 text-ip-muted': entry.rank !== 1
               }">
               {{ entry.rank }}
             </div>
-            <p class="text-sm text-slate-200 truncate">
+            <p class="text-sm text-ip-primary truncate">
               {{ entry.fullName }}
               <span *ngIf="isCurrentUser(entry.userId)" class="text-cyan-500/70 text-xs ml-1">(tú)</span>
             </p>
-            <span class="text-right text-sm font-semibold text-slate-300">
+            <span class="text-right text-sm font-semibold text-ip-secondary">
               {{ entry.score | number:'1.0-0' }}
             </span>
           </div>
@@ -326,15 +326,15 @@ import { forkJoin } from 'rxjs';
                && !myScore?.isMemberCompetition
                && leaderboard.length > 0"
 
-        class="rounded-xl border border-slate-900
-               bg-[#0b0f13] overflow-hidden">
+        class="rounded-xl border border-ip-border
+               bg-ip-surface overflow-hidden">
 
         <div class="px-5 py-4 border-b border-slate-900">
 
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-600">
+          <p class="text-xs font-semibold uppercase tracking-wider text-ip-muted">
             Ranking por equipos
           </p>
-          <p class="text-[11px] text-slate-500 mt-1">
+          <p class="text-[11px] text-ip-primary0 mt-1">
             Puntuación total de cada grupo (suma de actividad de sus miembros).
           </p>
         </div>
@@ -360,7 +360,7 @@ import { forkJoin } from 'rxjs';
 
                 [ngClass]="{
                   'bg-yellow-500/10 text-yellow-400': entry.rank === 1,
-                  'bg-slate-800 text-slate-400': entry.rank !== 1
+                  'bg-slate-800 text-ip-muted': entry.rank !== 1
                 }">
 
                 {{ entry.rank }}
@@ -378,7 +378,7 @@ import { forkJoin } from 'rxjs';
                   'bg-cyan-500/10 text-cyan-400':
                     isMyGroup(entry.groupId),
 
-                  'bg-[#11161c] text-slate-500':
+                  'bg-ip-surface text-ip-primary0':
                     !isMyGroup(entry.groupId)
                 }">
 
@@ -392,7 +392,7 @@ import { forkJoin } from 'rxjs';
 
                   [ngClass]="{
                     'text-cyan-300': isMyGroup(entry.groupId),
-                    'text-slate-200': !isMyGroup(entry.groupId)
+                    'text-ip-primary': !isMyGroup(entry.groupId)
                   }">
 
                   {{ entry.groupName }}
@@ -415,7 +415,7 @@ import { forkJoin } from 'rxjs';
 
                 [ngClass]="{
                   'text-cyan-400': entry.rank === 1,
-                  'text-slate-300': entry.rank !== 1
+                  'text-ip-secondary': entry.rank !== 1
                 }">
 
                 {{ entry.groupScore | number:'1.0-0' }}
@@ -428,16 +428,16 @@ import { forkJoin } from 'rxjs';
       <!-- Ranking interno de tu equipo -->
       <div
         *ngIf="!myScore?.isMemberCompetition && internalRanking.length > 0"
-        class="rounded-xl border border-violet-500/20 bg-[#0b0f13] overflow-hidden">
+        class="rounded-xl border border-violet-500/20 bg-ip-surface overflow-hidden">
 
         <div class="px-5 py-4 border-b border-slate-900">
           <p class="text-xs font-semibold uppercase tracking-wider text-violet-400">
             Ranking interno de tu equipo
-            <span *ngIf="myScore?.groupName" class="text-slate-500 font-normal normal-case">
+            <span *ngIf="myScore?.groupName" class="text-ip-primary0 font-normal normal-case">
               — {{ myScore.groupName }}
             </span>
           </p>
-          <p class="text-[11px] text-slate-500 mt-1">
+          <p class="text-[11px] text-ip-primary0 mt-1">
             Solo miembros de tu equipo ven este ranking.
           </p>
         </div>
@@ -447,14 +447,14 @@ import { forkJoin } from 'rxjs';
             *ngFor="let entry of internalRanking"
             class="grid grid-cols-[70px_1fr_120px] items-center px-5 py-3"
             [ngClass]="{ 'bg-violet-500/5': isCurrentUser(entry.userId) }">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold bg-slate-800 text-slate-400">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold bg-slate-800 text-ip-muted">
               {{ entry.position }}
             </div>
-            <p class="text-sm text-slate-200 truncate">
+            <p class="text-sm text-ip-primary truncate">
               {{ entry.fullName }}
               <span *ngIf="isCurrentUser(entry.userId)" class="text-violet-400/80 text-xs ml-1">(tú)</span>
             </p>
-            <span class="text-right text-sm font-semibold text-slate-300">
+            <span class="text-right text-sm font-semibold text-ip-secondary">
               {{ entry.score | number:'1.0-0' }}
             </span>
           </div>
@@ -467,11 +467,11 @@ import { forkJoin } from 'rxjs';
         class="h-[300px] flex flex-col items-center justify-center text-center">
 
         <div class="w-16 h-16 rounded-2xl
-                    border border-slate-900
-                    bg-[#0b0f13]
+                    border border-ip-border
+                    bg-ip-surface
                     flex items-center justify-center">
 
-          <svg class="w-7 h-7 text-slate-700"
+          <svg class="w-7 h-7 text-ip-secondary"
                fill="none"
                viewBox="0 0 24 24"
                stroke="currentColor"
@@ -484,11 +484,11 @@ import { forkJoin } from 'rxjs';
           </svg>
         </div>
 
-        <p class="mt-5 text-slate-400 font-medium">
+        <p class="mt-5 text-ip-muted font-medium">
           Sin datos aún
         </p>
 
-        <p class="mt-1 text-sm text-slate-600">
+        <p class="mt-1 text-sm text-ip-muted">
           Los scores se actualizan diariamente
         </p>
       </div>

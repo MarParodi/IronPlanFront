@@ -126,7 +126,7 @@ export class StatsComponent implements OnInit {
       'Core': 'bg-orange-500/20 text-orange-400 border-orange-500/30',
       'Abdominales': 'bg-orange-500/20 text-orange-400 border-orange-500/30'
     };
-    return colors[muscle] || 'bg-slate-500/20 text-slate-400 border-slate-500/30';
+    return colors[muscle] || 'bg-slate-500/20 text-ip-muted border-slate-500/30';
   }
 
   // ============ CONSISTENCY HELPERS ============

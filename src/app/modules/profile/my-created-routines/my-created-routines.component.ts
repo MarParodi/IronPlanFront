@@ -158,9 +158,9 @@ export class MyCreatedRoutinesComponent implements OnInit {
     const colors: Record<string, string> = {
       'DRAFT': 'text-amber-400 bg-amber-400/10 border-amber-400/30',
       'PUBLISHED': 'text-teal-400 bg-teal-400/10 border-teal-400/30',
-      'ARCHIVED': 'text-slate-400 bg-slate-400/10 border-slate-400/30'
+      'ARCHIVED': 'text-ip-muted bg-slate-400/10 border-slate-400/30'
     };
-    return colors[status] || 'text-slate-400 bg-slate-400/10 border-slate-400/30';
+    return colors[status] || 'text-ip-muted bg-slate-400/10 border-slate-400/30';
   }
 
   formatDate(dateStr: string): string {

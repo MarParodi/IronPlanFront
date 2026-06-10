@@ -1,6 +1,6 @@
 <ng-container *ngIf="loading(); else loaded">
   <div class="min-h-screen bg-ip-page text-ip-primary flex items-center justify-center">
-    <p class="text-slate-400 text-sm">Cargando sesión...</p>
+    <p class="text-ip-muted text-sm">Cargando sesión...</p>
   </div>
 </ng-container>
 
@@ -11,7 +11,7 @@
       <!-- Header: back + saltar -->
       <header class="flex items-center justify-between py-4 text-sm md:text-base">
         <button (click)="onBack()"
-          class="inline-flex items-center gap-2 text-slate-300 hover:text-slate-100 transition">
+          class="inline-flex items-center gap-2 text-ip-secondary hover:text-ip-primary transition">
           ← Volver
         </button>
 
@@ -36,14 +36,14 @@
         </div>
 
         <!-- Descripción -->
-        <p class="text-sm md:text-base text-slate-200 leading-relaxed">
+        <p class="text-sm md:text-base text-ip-primary leading-relaxed">
           {{ s.description }}
         </p>
 
         <!-- Duración estimada -->
         <div class="mt-2">
           <span class="inline-flex items-center gap-2 text-xs md:text-sm px-3 py-1.5 rounded-full
-                   bg-[#0f1516] border border-teal-400/60 text-teal-300">
+                   bg-ip-surface border border-teal-400/60 text-teal-300">
             ⏱️ Duración estimada: {{ s.estimatedMinutes }} min
           </span>
         </div>
@@ -67,7 +67,7 @@
                 <p class="text-xs md:text-sm font-bold text-amber-300">
                   {{ ex.repsMin }}-{{ ex.repsMax }} reps
                 </p>
-                <p class="text-[10px] md:text-xs text-slate-400">
+                <p class="text-[10px] md:text-xs text-ip-muted">
                   RIR {{ ex.rir }} · Descanso {{ ex.restMinutes }}&nbsp;min
                 </p>
               </div>
@@ -83,7 +83,7 @@
           </div>
 
           <!-- Nombre del ejercicio -->
-          <p class="text-sm md:text-base font-semibold text-slate-100">
+          <p class="text-sm md:text-base font-semibold text-ip-primary">
             {{ ex.name }}
           </p>
         </div>
@@ -92,21 +92,21 @@
       <!-- Footer stats + CTA -->
       <section class="mt-6 border-t border-teal-500/60 pt-4 space-y-4">
         <!-- Stats -->
-        <div class="flex items-center justify-between text-xs md:text-sm text-slate-300">
+        <div class="flex items-center justify-between text-xs md:text-sm text-ip-secondary">
           <div class="flex flex-col items-start">
-            <span class="font-semibold text-sm md:text-base text-slate-100">
+            <span class="font-semibold text-sm md:text-base text-ip-primary">
               {{ totalSeries() }}
             </span>
-            <span class="text-[10px] md:text-xs uppercase tracking-wide text-slate-400">
+            <span class="text-[10px] md:text-xs uppercase tracking-wide text-ip-muted">
               Total series
             </span>
           </div>
 
           <div class="flex flex-col items-start">
-            <span class="font-semibold text-sm md:text-base text-slate-100">
+            <span class="font-semibold text-sm md:text-base text-ip-primary">
               {{ estimatedMinutes() }}
             </span>
-            <span class="text-[10px] md:text-xs uppercase tracking-wide text-slate-400">
+            <span class="text-[10px] md:text-xs uppercase tracking-wide text-ip-muted">
               Minutos
             </span>
           </div>
@@ -115,7 +115,7 @@
             <span class="font-semibold text-sm md:text-base text-teal-300">
               +{{ estimatedXp() }}
             </span>
-            <span class="text-[10px] md:text-xs uppercase tracking-wide text-slate-400">
+            <span class="text-[10px] md:text-xs uppercase tracking-wide text-ip-muted">
               XP estimada
             </span>
           </div>
@@ -131,7 +131,7 @@
         </button>
 
         <!-- Link progreso -->
-        <button type="button" class="w-full text-[11px] md:text-xs text-center text-slate-400 hover:text-slate-200">
+        <button type="button" class="w-full text-[11px] md:text-xs text-center text-ip-muted hover:text-ip-primary">
           🏆 Ver progreso histórico
         </button>
       </section>
@@ -151,11 +151,11 @@
 <div *ngIf="selectedExercise() as ex" class="fixed inset-0 z-50 flex items-end md:items-center justify-center">
 
   <!-- Backdrop -->
-  <button type="button" (click)="closeExerciseDetails()" class="absolute inset-0 bg-black/70"
+  <button type="button" (click)="closeExerciseDetails()" class="absolute inset-0 bg-ip-surface-elevated/90"
     aria-label="Cerrar modal"></button>
 
   <!-- Panel -->
-  <div class="relative w-full md:max-w-2xl bg-[#14181b] rounded-t-3xl md:rounded-3xl
+  <div class="relative w-full md:max-w-2xl bg-ip-surface-elevated rounded-t-3xl md:rounded-3xl
               shadow-[0_30px_80px_rgba(0,0,0,0.75)]
               border border-teal-500/20
               p-5 md:p-6 m-0 md:m-6">
@@ -163,30 +163,30 @@
     <!-- Header -->
     <div class="flex items-start justify-between gap-4">
       <div>
-        <p class="text-xs text-slate-400">Detalles del ejercicio</p>
-        <h3 class="text-lg md:text-xl font-extrabold text-slate-100">
+        <p class="text-xs text-ip-muted">Detalles del ejercicio</p>
+        <h3 class="text-lg md:text-xl font-extrabold text-ip-primary">
           {{ ex.name }}
         </h3>
-        <p class="text-xs md:text-sm text-slate-400 mt-1">
+        <p class="text-xs md:text-sm text-ip-muted mt-1">
           {{ ex.sets }} series · {{ ex.repsMin }}-{{ ex.repsMax }} reps · RIR {{ ex.rir }}
           <span *ngIf="ex.restMinutes != null"> · Descanso {{ ex.restMinutes }} min</span>
         </p>
       </div>
 
       <button type="button" (click)="closeExerciseDetails()"
-        class="shrink-0 text-slate-300 hover:text-white rounded-xl px-3 py-2 bg-white/5 hover:bg-white/10 transition">
+        class="shrink-0 text-ip-secondary hover:text-ip-primary rounded-xl px-3 py-2 bg-ip-border/20 hover:bg-ip-border/40 transition">
         ✕
       </button>
     </div>
 
     <!-- Body -->
     <div class="mt-4 space-y-3">
-      <div class="bg-[#0f1516] border border-white/10 rounded-2xl p-4">
-        <p class="text-xs uppercase tracking-wide text-slate-400 mb-2">
+      <div class="bg-ip-surface border border-ip-border/60 rounded-2xl p-4">
+        <p class="text-xs uppercase tracking-wide text-ip-muted mb-2">
           Instrucciones
         </p>
 
-        <p class="text-sm md:text-base text-slate-200 leading-relaxed whitespace-pre-line">
+        <p class="text-sm md:text-base text-ip-primary leading-relaxed whitespace-pre-line">
           {{ ex.instructions || 'Sin instrucciones todavía.' }}
         </p>
       </div>
@@ -206,28 +206,28 @@
 <ng-container *ngIf="skipConfirmOpen()">
   <!-- Backdrop -->
   <div
-    class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+    class="fixed inset-0 z-50 bg-ip-surface-elevated/90 backdrop-blur-sm"
     (click)="closeSkipConfirm()"
   ></div>
 
   <!-- Panel -->
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
     <div
-      class="w-full max-w-md rounded-2xl border border-slate-700/60 bg-ip-surface
+      class="w-full max-w-md rounded-2xl border border-ip-border/60 bg-ip-surface
              shadow-[0_20px_80px_rgba(0,0,0,0.75)] p-5"
       (click)="$event.stopPropagation()"
     >
       <div class="flex items-start justify-between gap-3">
         <div>
-          <h3 class="text-lg font-extrabold text-slate-100">¿Saltar sesión?</h3>
-          <p class="text-sm text-slate-400 mt-1">
+          <h3 class="text-lg font-extrabold text-ip-primary">¿Saltar sesión?</h3>
+          <p class="text-sm text-ip-muted mt-1">
             Se marcará como <span class="text-rose-300 font-semibold">completada</span> sin registrar datos de entrenamiento y avanzarás a la siguiente.
             Podrás verla después en tu historial.
           </p>
         </div>
 
         <button
-          class="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition"
+          class="p-2 rounded-lg text-ip-muted hover:text-ip-primary hover:bg-ip-surface/40 transition"
           (click)="closeSkipConfirm()"
           [disabled]="skipping()"
         >
@@ -237,8 +237,8 @@
 
       <div class="mt-5 flex gap-3">
         <button
-          class="flex-1 py-3 rounded-xl border border-slate-700/60 text-slate-200
-                 hover:bg-slate-800/40 transition font-semibold disabled:opacity-50"
+          class="flex-1 py-3 rounded-xl border border-ip-border/60 text-ip-primary
+                 hover:bg-ip-surface/40 transition font-semibold disabled:opacity-50"
           (click)="closeSkipConfirm()"
           [disabled]="skipping()"
         >

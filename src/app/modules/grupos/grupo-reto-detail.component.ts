@@ -12,12 +12,12 @@ import { UserService } from '../user/services/user.service';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <div *ngIf="loading" class="text-sm text-slate-400 py-12 text-center">Cargando reto...</div>
+    <div *ngIf="loading" class="text-sm text-ip-muted py-12 text-center">Cargando reto...</div>
     <p *ngIf="error" class="text-sm text-red-300 bg-red-500/10 border border-red-500/25 rounded-lg px-3 py-2">{{ error }}</p>
 
     <div *ngIf="!loading && detail" class="space-y-6 max-w-4xl">
       <a [routerLink]="['/grupos', groupId, 'retos']"
-        class="inline-flex items-center gap-1 text-sm text-slate-400 hover:text-teal-400 transition">
+        class="inline-flex items-center gap-1 text-sm text-ip-muted hover:text-teal-400 transition">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
         </svg>
@@ -27,8 +27,8 @@ import { UserService } from '../user/services/user.service';
       <header class="space-y-3">
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 class="text-2xl font-bold text-slate-50">{{ detail.competition.name }}</h2>
-            <p class="text-sm text-slate-400 mt-1">
+            <h2 class="text-2xl font-bold text-ip-primary">{{ detail.competition.name }}</h2>
+            <p class="text-sm text-ip-muted mt-1">
               {{ typeLabel(detail.competition.competitionType) }}
               · {{ scopeLabel(detail.competition.scopeLevel) }}
               · {{ detail.metricLabel || metricLabel(detail.competition.metricType) }}
@@ -47,55 +47,55 @@ import { UserService } from '../user/services/user.service';
             <p class="text-xs uppercase tracking-wide text-teal-400 font-semibold">
               {{ detail.competition.status === 'FINISHED' ? 'Ganador' : 'Líder actual' }}
             </p>
-            <p class="text-lg font-semibold text-slate-100">
+            <p class="text-lg font-semibold text-ip-primary">
               {{ detail.winner?.name }}
-              <span *ngIf="detail.winner?.tie" class="text-sm text-slate-400 font-normal"> (empate)</span>
+              <span *ngIf="detail.winner?.tie" class="text-sm text-ip-muted font-normal"> (empate)</span>
             </p>
-            <p class="text-sm text-slate-400">
+            <p class="text-sm text-ip-muted">
               {{ detail.winner?.score | number:'1.0-1' }} {{ detail.metricLabel || metricLabel(detail.competition.metricType) }}
             </p>
           </div>
         </div>
-        <p *ngIf="!detail.winner?.name" class="text-sm text-slate-500">
+        <p *ngIf="!detail.winner?.name" class="text-sm text-ip-primary0">
           Aún no hay puntuación registrada. Los puntos se actualizan al completar entrenamientos.
         </p>
       </header>
 
       <div *ngIf="detail.myScore" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <div *ngIf="!detail.myScore.isMemberCompetition && detail.myScore.groupRank"
-          class="rounded-xl bg-ip-page border border-slate-800 p-4">
-          <p class="text-[10px] uppercase text-slate-500 font-semibold">Tu equipo</p>
+          class="rounded-xl bg-ip-page border border-ip-border p-4">
+          <p class="text-[10px] uppercase text-ip-primary0 font-semibold">Tu equipo</p>
           <p class="text-xl font-bold text-teal-400">#{{ detail.myScore.groupRank }}</p>
-          <p class="text-xs text-slate-400">{{ detail.myScore.groupScore | number:'1.0-1' }} pts</p>
-          <p *ngIf="detail.myScore.groupName" class="text-[11px] text-slate-500 mt-1 truncate">{{ detail.myScore.groupName }}</p>
+          <p class="text-xs text-ip-muted">{{ detail.myScore.groupScore | number:'1.0-1' }} pts</p>
+          <p *ngIf="detail.myScore.groupName" class="text-[11px] text-ip-primary0 mt-1 truncate">{{ detail.myScore.groupName }}</p>
         </div>
         <div *ngIf="detail.myScore.isMemberCompetition && detail.myScore.memberRank"
-          class="rounded-xl bg-ip-page border border-slate-800 p-4">
-          <p class="text-[10px] uppercase text-slate-500 font-semibold">Tu posición</p>
+          class="rounded-xl bg-ip-page border border-ip-border p-4">
+          <p class="text-[10px] uppercase text-ip-primary0 font-semibold">Tu posición</p>
           <p class="text-xl font-bold text-teal-400">#{{ detail.myScore.memberRank }}</p>
-          <p class="text-xs text-slate-400">{{ detail.myScore.individualScore | number:'1.0-1' }} pts</p>
+          <p class="text-xs text-ip-muted">{{ detail.myScore.individualScore | number:'1.0-1' }} pts</p>
         </div>
         <div *ngIf="detail.myScore.internalRank && !detail.myScore.isMemberCompetition"
-          class="rounded-xl bg-ip-page border border-slate-800 p-4">
-          <p class="text-[10px] uppercase text-slate-500 font-semibold">Dentro del equipo</p>
-          <p class="text-xl font-bold text-slate-200">#{{ detail.myScore.internalRank }}</p>
-          <p class="text-xs text-slate-400">{{ detail.myScore.individualScore | number:'1.0-1' }} pts</p>
+          class="rounded-xl bg-ip-page border border-ip-border p-4">
+          <p class="text-[10px] uppercase text-ip-primary0 font-semibold">Dentro del equipo</p>
+          <p class="text-xl font-bold text-ip-primary">#{{ detail.myScore.internalRank }}</p>
+          <p class="text-xs text-ip-muted">{{ detail.myScore.individualScore | number:'1.0-1' }} pts</p>
         </div>
       </div>
 
       <!-- VERSUS: enfrentamiento directo entre 2 grupos -->
       <section *ngIf="isVersusGroup && detail.groupLeaderboard?.length === 2"
-        class="rounded-2xl bg-ip-surface border border-slate-800 overflow-hidden">
-        <h3 class="text-sm font-semibold text-slate-300 px-4 py-3 border-b border-slate-800">Enfrentamiento</h3>
+        class="rounded-2xl bg-ip-surface border border-ip-border overflow-hidden">
+        <h3 class="text-sm font-semibold text-ip-secondary px-4 py-3 border-b border-ip-border">Enfrentamiento</h3>
         <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 p-6" *ngIf="detail.groupLeaderboard as lb">
           <div class="text-center">
-            <p class="font-semibold text-slate-100">{{ lb[0].groupName }}</p>
+            <p class="font-semibold text-ip-primary">{{ lb[0].groupName }}</p>
             <p class="text-3xl font-bold mt-2 text-teal-400">{{ lb[0].groupScore | number:'1.0-0' }}</p>
             <p *ngIf="isMyParticipantGroup(lb[0].groupId)" class="text-xs text-teal-500/80 mt-1">Tu equipo</p>
           </div>
-          <span class="text-sm font-black text-slate-600 tracking-widest">VS</span>
+          <span class="text-sm font-black text-ip-muted tracking-widest">VS</span>
           <div class="text-center">
-            <p class="font-semibold text-slate-100">{{ lb[1].groupName }}</p>
+            <p class="font-semibold text-ip-primary">{{ lb[1].groupName }}</p>
             <p class="text-3xl font-bold mt-2 text-orange-400">{{ lb[1].groupScore | number:'1.0-0' }}</p>
             <p *ngIf="isMyParticipantGroup(lb[1].groupId)" class="text-xs text-teal-500/80 mt-1">Tu equipo</p>
           </div>
@@ -104,11 +104,11 @@ import { UserService } from '../user/services/user.service';
 
       <!-- Ranking grupal (RANKING / CHALLENGE entre grupos) -->
       <section *ngIf="detail.groupLeaderboard?.length && !isVersusGroup"
-        class="rounded-2xl bg-ip-surface border border-slate-800 overflow-hidden">
-        <h3 class="text-sm font-semibold text-slate-300 px-4 py-3 border-b border-slate-800">
+        class="rounded-2xl bg-ip-surface border border-ip-border overflow-hidden">
+        <h3 class="text-sm font-semibold text-ip-secondary px-4 py-3 border-b border-ip-border">
           Ranking por equipos
         </h3>
-        <p class="text-xs text-slate-500 px-4 py-2 border-b border-slate-800/50">
+        <p class="text-xs text-ip-primary0 px-4 py-2 border-b border-ip-border/50">
           Puntuación total de cada grupo (suma de la actividad de todos sus miembros).
         </p>
         <div class="divide-y divide-slate-800">
@@ -118,28 +118,28 @@ import { UserService } from '../user/services/user.service';
             [class.my-row]="isMyParticipantGroup(e.groupId)">
             <span class="w-8 text-center font-bold"
               [class.text-teal-400]="e.rank === 1"
-              [class.text-slate-500]="e.rank !== 1">#{{ e.rank }}</span>
+              [class.text-ip-primary0]="e.rank !== 1">#{{ e.rank }}</span>
             <div class="flex-1 min-w-0">
-              <p class="font-medium text-slate-100">
+              <p class="font-medium text-ip-primary">
                 {{ e.groupName }}
                 <span *ngIf="isMyParticipantGroup(e.groupId)" class="text-teal-500/80 text-xs ml-1">(tu equipo)</span>
               </p>
-              <p class="text-xs text-slate-500">{{ e.activeMembers }} miembros en el equipo</p>
+              <p class="text-xs text-ip-primary0">{{ e.activeMembers }} miembros en el equipo</p>
             </div>
             <span class="font-semibold tabular-nums"
               [class.text-teal-400]="e.rank === 1"
-              [class.text-slate-300]="e.rank !== 1">{{ e.groupScore | number:'1.0-1' }}</span>
+              [class.text-ip-secondary]="e.rank !== 1">{{ e.groupScore | number:'1.0-1' }}</span>
           </div>
         </div>
       </section>
 
       <!-- Scope GRUPO: ranking interno del grupo (todos los miembros) -->
       <section *ngIf="detail.memberLeaderboard?.length"
-        class="rounded-2xl bg-ip-surface border border-slate-800 overflow-hidden">
-        <h3 class="text-sm font-semibold text-slate-300 px-4 py-3 border-b border-slate-800">
+        class="rounded-2xl bg-ip-surface border border-ip-border overflow-hidden">
+        <h3 class="text-sm font-semibold text-ip-secondary px-4 py-3 border-b border-ip-border">
           Ranking interno del grupo
         </h3>
-        <p class="text-xs text-slate-500 px-4 py-2 border-b border-slate-800/50">
+        <p class="text-xs text-ip-primary0 px-4 py-2 border-b border-ip-border/50">
           Competencia dentro del mismo grupo: cada miembro contribuye con su actividad individual.
         </p>
         <div class="divide-y divide-slate-800">
@@ -149,17 +149,17 @@ import { UserService } from '../user/services/user.service';
             [class.my-row]="isCurrentUser(e.userId)">
             <span class="w-8 text-center font-bold"
               [class.text-teal-400]="e.rank === 1"
-              [class.text-slate-500]="e.rank !== 1">#{{ e.rank }}</span>
+              [class.text-ip-primary0]="e.rank !== 1">#{{ e.rank }}</span>
             <div class="flex-1 min-w-0">
-              <p class="font-medium text-slate-100">
+              <p class="font-medium text-ip-primary">
                 {{ e.fullName }}
                 <span *ngIf="isCurrentUser(e.userId)" class="text-teal-500/80 text-xs ml-1">(tú)</span>
               </p>
-              <p class="text-xs text-slate-500">{{ e.username }}</p>
+              <p class="text-xs text-ip-primary0">{{ e.username }}</p>
             </div>
             <span class="font-semibold tabular-nums"
               [class.text-teal-400]="e.rank === 1"
-              [class.text-slate-300]="e.rank !== 1">{{ e.score | number:'1.0-1' }}</span>
+              [class.text-ip-secondary]="e.rank !== 1">{{ e.score | number:'1.0-1' }}</span>
           </div>
         </div>
       </section>
@@ -167,30 +167,30 @@ import { UserService } from '../user/services/user.service';
       <!-- Ranking interno de tu equipo (competencias entre grupos) -->
       <section *ngIf="detail.internalRanking?.length"
         class="rounded-2xl bg-ip-surface border border-violet-500/20 overflow-hidden">
-        <h3 class="text-sm font-semibold text-violet-300 px-4 py-3 border-b border-slate-800">
+        <h3 class="text-sm font-semibold text-violet-300 px-4 py-3 border-b border-ip-border">
           Ranking interno de tu equipo
-          <span *ngIf="detail.myScore?.groupName" class="text-slate-400 font-normal"> — {{ detail.myScore?.groupName }}</span>
+          <span *ngIf="detail.myScore?.groupName" class="text-ip-muted font-normal"> — {{ detail.myScore?.groupName }}</span>
         </h3>
-        <p class="text-xs text-slate-500 px-4 py-2 border-b border-slate-800/50">
+        <p class="text-xs text-ip-primary0 px-4 py-2 border-b border-ip-border/50">
           Solo ves el ranking de los miembros de tu propio equipo. Los demás grupos no pueden ver tu ranking interno.
         </p>
         <div class="divide-y divide-slate-800">
           <div *ngFor="let e of detail.internalRanking"
             class="flex items-center gap-4 px-4 py-3"
             [class.my-row]="isCurrentUser(e.userId)">
-            <span class="w-8 text-center font-bold text-slate-500">#{{ e.position }}</span>
+            <span class="w-8 text-center font-bold text-ip-primary0">#{{ e.position }}</span>
             <div class="flex-1">
-              <p class="font-medium text-slate-100">
+              <p class="font-medium text-ip-primary">
                 {{ e.fullName }}
                 <span *ngIf="isCurrentUser(e.userId)" class="text-teal-500/80 text-xs ml-1">(tú)</span>
               </p>
             </div>
-            <span class="text-slate-300 tabular-nums">{{ e.score | number:'1.0-1' }}</span>
+            <span class="text-ip-secondary tabular-nums">{{ e.score | number:'1.0-1' }}</span>
           </div>
         </div>
       </section>
 
-      <p *ngIf="detail.lastCalculatedAt" class="text-[11px] text-slate-600 text-right">
+      <p *ngIf="detail.lastCalculatedAt" class="text-[11px] text-ip-muted text-right">
         Última actualización: {{ detail.lastCalculatedAt | date:'dd/MM/yyyy HH:mm' }}
       </p>
     </div>
@@ -285,7 +285,7 @@ export class GrupoRetoDetailComponent implements OnInit {
   statusClass(s: string): string {
     const base = 'text-[11px] font-semibold uppercase px-2.5 py-1 rounded-md';
     if (s === 'ACTIVE') return `${base} bg-teal-500/15 text-teal-400 border border-teal-500/25`;
-    if (s === 'FINISHED') return `${base} bg-slate-600/30 text-slate-300`;
-    return `${base} bg-slate-700/50 text-slate-400`;
+    if (s === 'FINISHED') return `${base} bg-slate-600/30 text-ip-secondary`;
+    return `${base} bg-ip-surface/50 text-ip-muted`;
   }
 }

@@ -246,7 +246,7 @@ export const ORG_HIERARCHY: Record<string, {
     .tree-root { display: flex; flex-direction: column; gap: 14px; }
  
     .org-card {
-      background: #171a1d;
+      background: rgb(var(--ip-surface));
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 14px; overflow: hidden;
       transition: border-color 0.2s;
@@ -380,7 +380,7 @@ export const ORG_HIERARCHY: Record<string, {
     .btn-tree-icon {
       width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
       border-radius: 6px; background: transparent;
-      border: 1px solid rgba(255,255,255,0.07);
+      border: 1px solid var(--ip-faint-border-color);
       color: #64748b; cursor: pointer; transition: all 0.15s;
     }
     .btn-tree-icon:hover { background: rgba(255,255,255,0.07); color: #94a3b8; }
