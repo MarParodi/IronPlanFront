@@ -38,27 +38,27 @@ import { filter } from 'rxjs/operators';
         </a>
       </nav>
 
-      <div class="rounded-2xl bg-[#171a1d] border border-slate-800 p-5 md:p-6">
+      <div class="rounded-2xl bg-ip-surface border border-slate-800 p-5 md:p-6">
         <section *ngIf="tab === 'resumen'" class="space-y-4">
           <h3 class="text-base font-semibold text-slate-200">Resumen</h3>
           <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="rounded-xl bg-[#111416] border border-slate-800/80 p-4">
+            <div class="rounded-xl bg-ip-page border border-slate-800/80 p-4">
               <dt class="text-[10px] uppercase tracking-wide text-slate-500 font-semibold">Organización</dt>
               <dd class="mt-1 text-sm text-slate-100">{{ detail.hierarchyPath.rootName || '—' }}</dd>
             </div>
-            <div class="rounded-xl bg-[#111416] border border-slate-800/80 p-4">
+            <div class="rounded-xl bg-ip-page border border-slate-800/80 p-4">
               <dt class="text-[10px] uppercase tracking-wide text-slate-500 font-semibold">Código</dt>
               <dd class="mt-1 text-sm text-slate-100 font-mono">{{ detail.groupCode }}</dd>
             </div>
-            <div class="rounded-xl bg-[#111416] border border-slate-800/80 p-4">
+            <div class="rounded-xl bg-ip-page border border-slate-800/80 p-4">
               <dt class="text-[10px] uppercase tracking-wide text-slate-500 font-semibold">Miembros</dt>
               <dd class="mt-1 text-sm text-slate-100">{{ detail.memberCount }}</dd>
             </div>
-            <div class="rounded-xl bg-[#111416] border border-slate-800/80 p-4">
+            <div class="rounded-xl bg-ip-page border border-slate-800/80 p-4">
               <dt class="text-[10px] uppercase tracking-wide text-slate-500 font-semibold">Retos activos</dt>
               <dd class="mt-1 text-sm text-slate-100">{{ detail.activeCompetitionsCount }}</dd>
             </div>
-            <div class="rounded-xl bg-[#111416] border border-slate-800/80 p-4">
+            <div class="rounded-xl bg-ip-page border border-slate-800/80 p-4">
               <dt class="text-[10px] uppercase tracking-wide text-slate-500 font-semibold">Estado</dt>
               <dd class="mt-1 text-sm" [class.text-teal-400]="detail.active" [class.text-slate-400]="!detail.active">
                 {{ detail.active ? 'Activo' : 'Inactivo' }}
@@ -76,7 +76,7 @@ import { filter } from 'rxjs/operators';
             </p>
           </div>
 
-          <div *ngIf="detail.canManage" class="rounded-xl bg-[#111416] border border-slate-800 p-4 space-y-3">
+          <div *ngIf="detail.canManage" class="rounded-xl bg-ip-page border border-slate-800 p-4 space-y-3">
             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Añadir miembro</p>
             <div class="flex flex-col sm:flex-row gap-3">
               <input [(ngModel)]="addIdentifier" type="text" class="member-input flex-1"
@@ -97,7 +97,7 @@ import { filter } from 'rxjs/operators';
           <div *ngIf="loadingMembers" class="text-sm text-slate-400 py-6 text-center">Cargando...</div>
           <div *ngIf="!loadingMembers && members.length" class="overflow-x-auto rounded-xl border border-slate-800">
             <table class="w-full text-sm text-left">
-              <thead class="bg-[#111416] text-slate-500 text-xs uppercase">
+              <thead class="bg-ip-page text-slate-500 text-xs uppercase">
                 <tr>
                   <th class="px-4 py-3">Nombre</th>
                   <th class="px-4 py-3">Usuario</th>
@@ -146,7 +146,7 @@ import { filter } from 'rxjs/operators';
           </div>
           <div *ngIf="loadingRetos" class="text-sm text-slate-400 py-6 text-center">Cargando...</div>
           <article *ngFor="let r of retos"
-            class="rounded-xl bg-[#111416] border border-slate-800 p-4 space-y-3 hover:border-slate-700 transition">
+            class="rounded-xl bg-ip-page border border-slate-800 p-4 space-y-3 hover:border-slate-700 transition">
             <div class="flex items-start justify-between gap-2">
               <div>
                 <h4 class="font-semibold text-slate-100">{{ r.name }}</h4>
@@ -218,7 +218,7 @@ import { filter } from 'rxjs/operators';
               </div>
             </div>
 
-            <div class="rounded-xl bg-[#111416] border border-slate-800 p-4 space-y-3">
+            <div class="rounded-xl bg-ip-page border border-slate-800 p-4 space-y-3">
               <h4 class="text-sm font-semibold text-slate-300">Actividad semanal (entrenamientos)</h4>
               <div *ngIf="!metrics.weeklyWorkouts.length" class="text-xs text-slate-500">Sin datos en el período.</div>
               <div *ngFor="let w of metrics.weeklyWorkouts" class="space-y-1">
@@ -233,7 +233,7 @@ import { filter } from 'rxjs/operators';
               </div>
             </div>
 
-            <div class="rounded-xl bg-[#111416] border border-slate-800 overflow-hidden">
+            <div class="rounded-xl bg-ip-page border border-slate-800 overflow-hidden">
               <h4 class="text-sm font-semibold text-slate-300 px-4 py-3 border-b border-slate-800">
                 Top participantes
               </h4>

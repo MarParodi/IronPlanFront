@@ -1,17 +1,24 @@
 <!-- IronPlan | Settings -->
-<div class="min-h-dvh text-white bg-gradient-to-b from-[#0F1113] to-[#2A2C2E]">
+<div class="min-h-dvh text-ip-primary bg-ip-gradient-alt">
   <!-- Contenido scroll -->
   <main class="pb-28">
     <!-- Título simple (sin header fijo) -->
     <div class="mx-auto w-full max-w-[420px] px-4">
-      <h1 class="pt-6 pb-5 text-center text-[28px] sm:text-[32px] font-semibold tracking-tight text-white/95">
+      <h1 class="pt-6 pb-5 text-center text-[28px] sm:text-[32px] font-semibold tracking-tight text-ip-primary">
         Configuración
       </h1>
     </div>
 
     <div class="mx-auto w-full max-w-[420px] px-4">
+      <!-- Apariencia -->
+      <section class="rounded-2xl border border-ip-border/60 bg-ip-surface/70 backdrop-blur-md shadow-xl p-5 mb-5">
+        <h2 class="text-sm font-semibold text-ip-primary mb-1">Apariencia</h2>
+        <p class="text-xs text-ip-muted mb-4">Elige cómo quieres ver la aplicación.</p>
+        <app-theme-toggle [fullWidth]="true" />
+      </section>
+
       <!-- Sección de perfil (foto) -->
-      <section class="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md shadow-xl shadow-black/30 p-5">
+      <section class="rounded-2xl border border-ip-border/60 bg-ip-surface/70 backdrop-blur-md shadow-xl p-5">
         <div class="flex flex-col items-center">
           <button type="button" class="relative group outline-none focus:ring-2 focus:ring-[#00B2B2]/70 rounded-full"
             (click)="fileInput.click()" (keydown.enter)="fileInput.click()" (keydown.space)="fileInput.click()"
@@ -46,14 +53,14 @@
       </section>
 
       <!-- Card de configuración -->
-      <section class="mt-5 rounded-2xl bg-[#1F1F1F]/70 border border-white/10 shadow-2xl shadow-black/40">
+      <section class="mt-5 rounded-2xl bg-ip-surface-elevated/70 border border-ip-border/60 shadow-2xl">
         <!-- 👇 FORM con los nuevos campos -->
         <form [formGroup]="profileForm" class="p-5 space-y-5">
           <!-- Username -->
           <div>
-            <label class="block text-sm text-[#C0C4C9] mb-2">Nombre de usuario</label>
-            <input type="text" formControlName="username" class="w-full rounded-xl border border-white/10 bg-black/30
-                     px-4 py-3 text-white placeholder-[#C0C4C9]/50 outline-none
+            <label class="block text-sm text-ip-muted mb-2">Nombre de usuario</label>
+            <input type="text" formControlName="username" class="w-full rounded-xl border border-ip-border/60 bg-ip-surface
+                     px-4 py-3 text-ip-primary placeholder-ip-muted/50 outline-none
                      focus:border-[#00B2B2]/90 focus:ring-2 focus:ring-[#00B2B2]/30 transition"
               placeholder="atleta_pro" autocomplete="username" />
             <p *ngIf="profileForm.get('username')?.invalid && profileForm.get('username')?.touched"

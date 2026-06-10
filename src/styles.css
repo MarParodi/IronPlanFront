@@ -3,8 +3,65 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: light;
+    --ip-page: 248 250 252;
+    --ip-page-from: 241 245 249;
+    --ip-page-via: 226 232 240;
+    --ip-page-to: 248 250 252;
+    --ip-surface: 255 255 255;
+    --ip-surface-elevated: 241 245 249;
+    --ip-header: 255 255 255;
+    --ip-footer: 241 245 249;
+    --ip-text-primary: 15 23 42;
+    --ip-text-secondary: 71 85 105;
+    --ip-text-muted: 100 116 139;
+    --ip-border: 226 232 240;
+    --ip-scrollbar-track: 226 232 240;
+    --ip-scrollbar-thumb: 148 163 184;
+    --ip-scrollbar-thumb-hover: 100 116 139;
+  }
+
+  .dark {
+    color-scheme: dark;
+    --ip-page: 17 20 22;
+    --ip-page-from: 13 15 17;
+    --ip-page-via: 17 19 24;
+    --ip-page-to: 13 15 17;
+    --ip-surface: 23 26 29;
+    --ip-surface-elevated: 31 31 31;
+    --ip-header: 13 15 17;
+    --ip-footer: 10 12 14;
+    --ip-text-primary: 241 245 249;
+    --ip-text-secondary: 148 163 184;
+    --ip-text-muted: 100 116 139;
+    --ip-border: 30 41 59;
+    --ip-scrollbar-track: 13 15 17;
+    --ip-scrollbar-thumb: 51 65 85;
+    --ip-scrollbar-thumb-hover: 71 85 105;
+  }
+
   body {
-    @apply bg-[#111416] text-slate-100 antialiased;
+    @apply bg-ip-page text-ip-primary antialiased transition-colors duration-200;
+  }
+}
+
+@layer utilities {
+  .bg-ip-gradient {
+    background-image: linear-gradient(
+      to bottom,
+      rgb(var(--ip-page-from)),
+      rgb(var(--ip-page-via)),
+      rgb(var(--ip-page-to))
+    );
+  }
+
+  .bg-ip-gradient-alt {
+    background-image: linear-gradient(
+      to bottom,
+      rgb(var(--ip-page-from)),
+      rgb(var(--ip-page-to))
+    );
   }
 }
 
@@ -31,21 +88,21 @@
   }
 }
 
-/* Scrollbar personalizada para tema oscuro */
+/* Scrollbar personalizada */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0d0f11;
+  background: rgb(var(--ip-scrollbar-track));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: rgb(var(--ip-scrollbar-thumb));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: rgb(var(--ip-scrollbar-thumb-hover));
 }

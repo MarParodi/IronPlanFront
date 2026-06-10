@@ -79,7 +79,7 @@ import { OrgCascadeFormComponent } from '../admin/org-cascade-form.component';
       <!-- Con grupos: lista normal -->
       <div *ngIf="!loading && groups.length > 0" class="space-y-4">
         <article *ngFor="let g of groups"
-          class="rounded-2xl bg-[#171a1d] border border-slate-800 p-5 hover:border-slate-700 transition-colors">
+          class="rounded-2xl bg-ip-surface border border-slate-800 p-5 hover:border-slate-700 transition-colors">
           <div class="flex flex-wrap items-center gap-2 mb-3">
             <span [class]="roleBadgeClass(g.role === 'ADMIN')">
               {{ g.role === 'ADMIN' ? 'Administrador' : 'Miembro' }}
@@ -119,7 +119,7 @@ import { OrgCascadeFormComponent } from '../admin/org-cascade-form.component';
         </article>
  
         <!-- Panel "¿Quieres más?" — unirse o crear -->
-        <div class="rounded-2xl border border-dashed border-slate-700 bg-[#171a1d]/50 p-5 space-y-3">
+        <div class="rounded-2xl border border-dashed border-slate-700 bg-ip-surface/50 p-5 space-y-3">
           <h4 class="text-sm font-semibold text-slate-200">¿Quieres unirte o crear otra organización?</h4>
           <div class="flex flex-wrap gap-3">
             <button type="button"

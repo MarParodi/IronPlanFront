@@ -1,15 +1,15 @@
 <!-- Loading -->
-<div *ngIf="loading" class="min-h-screen bg-[#111416] flex items-center justify-center text-slate-300">
+<div *ngIf="loading" class="min-h-screen bg-ip-page flex items-center justify-center text-slate-300">
   Cargando ejercicio...
 </div>
 
 <!-- Error -->
-<div *ngIf="!loading && errorMessage" class="min-h-screen bg-[#111416] flex items-center justify-center text-red-400">
+<div *ngIf="!loading && errorMessage" class="min-h-screen bg-ip-page flex items-center justify-center text-red-400">
   {{ errorMessage }}
 </div>
 
 <!-- Contenido principal -->
-<div *ngIf="!loading && data as d" class="min-h-screen bg-[#111416] text-slate-50 flex justify-center">
+<div *ngIf="!loading && data as d" class="min-h-screen bg-ip-page text-slate-50 flex justify-center">
   <div class="w-full max-w-md md:max-w-lg lg:max-w-xl flex flex-col pb-8">
 
     <!-- Header con timer -->
@@ -143,7 +143,7 @@
 
 <!-- Modal de Confirmación de Salida -->
 <div *ngIf="showExitModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" (click)="closeExitModal()">
-  <div class="w-full max-w-sm bg-gradient-to-b from-[#1a1f25] to-[#111416] rounded-2xl border border-slate-700/50 shadow-2xl overflow-hidden" (click)="$event.stopPropagation()">
+  <div class="w-full max-w-sm bg-gradient-to-b from-[#1a1f25] to-ip-page rounded-2xl border border-slate-700/50 shadow-2xl overflow-hidden" (click)="$event.stopPropagation()">
     
     <!-- Header -->
     <div class="p-5 text-center border-b border-slate-800/60">
@@ -205,7 +205,7 @@
 
 <!-- Modal de Recomendación Detallada -->
 <div *ngIf="showRecommendationModal && recommendation" class="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 bg-black/70 backdrop-blur-sm" (click)="closeRecommendationModal()">
-  <div class="w-full md:max-w-md bg-gradient-to-b from-[#1a1f25] to-[#111416] rounded-t-3xl md:rounded-2xl border-t md:border border-slate-700/50 shadow-2xl max-h-[85vh] overflow-y-auto" (click)="$event.stopPropagation()">
+  <div class="w-full md:max-w-md bg-gradient-to-b from-[#1a1f25] to-ip-page rounded-t-3xl md:rounded-2xl border-t md:border border-slate-700/50 shadow-2xl max-h-[85vh] overflow-y-auto" (click)="$event.stopPropagation()">
     <div class="flex justify-center pt-3 pb-2 md:hidden">
       <div class="w-10 h-1 bg-slate-600 rounded-full"></div>
     </div>

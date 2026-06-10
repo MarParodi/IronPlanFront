@@ -12,11 +12,12 @@ import {
   RegisterStep3Req,
   RegisterStep4Req,
 } from '../../models/auth.models';
+import { ThemeToggleComponent } from '../../../../core/components/theme-toggle/theme-toggle.component';
 
 @Component({
   standalone: true,
   selector: 'ip-register',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, ThemeToggleComponent],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
 })

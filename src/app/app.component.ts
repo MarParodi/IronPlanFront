@@ -7,6 +7,7 @@ import { AuthService } from './modules/auth/services/auth.service';
 import { FooterComponent } from './core/components/footer/footer.component';
 import { HeaderComponent } from './core/components/header/header.component';
 import { SpinnerComponent } from './features/components/spinner/spinner.component';
+import { ThemeService } from './core/services/theme.service';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -27,10 +28,12 @@ import { filter } from 'rxjs/operators';
 export class AppComponent {
   auth = inject(AuthService);
   router = inject(Router);
+  private themeService = inject(ThemeService);
   isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   isAuthRoute = false;
 
   constructor() {
+    this.themeService.init();
     // Detectar rutas de auth para ocultar header/footer
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)

@@ -1,5 +1,5 @@
 <!-- Loading -->
-<div *ngIf="loading" class="min-h-screen bg-[#111416] flex items-center justify-center text-slate-300">
+<div *ngIf="loading" class="min-h-screen bg-ip-page flex items-center justify-center text-slate-300">
   <div class="text-center">
     <div class="w-12 h-12 border-4 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
     <p>Cargando resumen...</p>
@@ -7,7 +7,7 @@
 </div>
 
 <!-- Error -->
-<div *ngIf="!loading && error" class="min-h-screen bg-[#111416] flex items-center justify-center text-red-400 px-4">
+<div *ngIf="!loading && error" class="min-h-screen bg-ip-page flex items-center justify-center text-red-400 px-4">
   <div class="text-center">
     <p class="text-lg mb-4">{{ error }}</p>
     <button
@@ -22,7 +22,7 @@
 <!-- Contenido principal -->
 <div
   *ngIf="!loading && summary as s"
-  class="min-h-screen bg-[#111416] text-slate-50 flex justify-center relative overflow-hidden"
+  class="min-h-screen bg-ip-page text-slate-50 flex justify-center relative overflow-hidden"
 >
   <!-- Confetti animation -->
   <div *ngIf="showConfetti" class="absolute inset-0 pointer-events-none overflow-hidden">
@@ -54,7 +54,7 @@
     </header>
 
     <!-- Tarjeta principal de stats -->
-    <section class="bg-[#171a1d] rounded-3xl p-5 md:p-6 shadow-[0_18px_60px_rgba(0,0,0,0.7)] border border-slate-800">
+    <section class="bg-ip-surface rounded-3xl p-5 md:p-6 shadow-[0_18px_60px_rgba(0,0,0,0.7)] border border-slate-800">
       
       <!-- Tiempo total -->
       <div class="text-center mb-6">
@@ -100,7 +100,7 @@
     </section>
 
     <!-- Comparación con sesión anterior -->
-    <section *ngIf="s.previousComparison" class="mt-5 bg-[#171a1d] rounded-2xl p-4 border border-slate-800">
+    <section *ngIf="s.previousComparison" class="mt-5 bg-ip-surface rounded-2xl p-4 border border-slate-800">
       <h3 class="text-xs text-slate-400 uppercase tracking-wide mb-3">
         Comparado con tu última sesión
       </h3>
