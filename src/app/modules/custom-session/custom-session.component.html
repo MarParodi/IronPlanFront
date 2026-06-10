@@ -6,22 +6,22 @@
       <!-- Header -->
       <header class="flex items-center justify-between py-4 sticky top-0 bg-ip-page/95 backdrop-blur-sm z-10">
         <button (click)="onBack()"
-          class="flex items-center gap-2 text-sm text-slate-300 hover:text-slate-100 transition">
+          class="flex items-center gap-2 text-sm text-ip-secondary hover:text-ip-primary transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
             stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
 
-        <span class="text-xs text-slate-500 uppercase tracking-wider">Sesión libre</span>
+        <span class="text-xs text-ip-muted uppercase tracking-wider">Sesión libre</span>
       </header>
 
       <!-- Título -->
       <div class="mt-2 mb-6">
-        <h1 class="text-2xl md:text-3xl font-black text-slate-50">
+        <h1 class="text-2xl md:text-3xl font-black text-ip-primary">
           Crear sesión personalizada
         </h1>
-        <p class="text-sm text-slate-400 mt-1">
+        <p class="text-sm text-ip-muted mt-1">
           Selecciona los ejercicios que quieres realizar hoy
         </p>
       </div>
@@ -30,14 +30,14 @@
       <div class="mb-6">
         <div class="relative">
           <svg xmlns="http://www.w3.org/2000/svg"
-            class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24"
+            class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ip-muted" fill="none" viewBox="0 0 24 24"
             stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
           </svg>
           <input type="text" [ngModel]="searchQuery()" (ngModelChange)="onSearchChange($event)"
-            placeholder="Buscar ejercicio..." class="w-full bg-[#1a1f23] border border-slate-700/50 rounded-xl
-                     pl-12 pr-4 py-3 text-sm text-slate-100 placeholder:text-slate-500
+            placeholder="Buscar ejercicio..." class="w-full bg-ip-surface border border-ip-border/50 rounded-xl
+                     pl-12 pr-4 py-3 text-sm text-ip-primary placeholder:text-ip-muted
                      focus:outline-none focus:border-teal-500/50 transition">
         </div>
       </div>
@@ -52,17 +52,17 @@
         <!-- Ejercicios -->
         <ng-container *ngIf="!loadingCatalog()">
           <div *ngFor="let exercise of catalogExercises(); trackBy: trackByExerciseId" (click)="openConfigModal(exercise)"
-            class="bg-[#1a1f23] rounded-xl p-4 border transition-all cursor-pointer group"
+            class="bg-ip-surface rounded-xl p-4 border transition-all cursor-pointer group"
             [ngClass]="{
               'border-teal-500/50 bg-teal-500/10': isExerciseSelected(exercise.id),
-              'border-slate-700/50 hover:border-slate-600': !isExerciseSelected(exercise.id)
+              'border-ip-border/50 hover:border-ip-border': !isExerciseSelected(exercise.id)
             }">
             <div class="flex items-center gap-3">
               <!-- Icono check o plus -->
               <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
                 [ngClass]="{
                   'bg-teal-500 text-slate-900': isExerciseSelected(exercise.id),
-                  'bg-slate-800 text-slate-400 group-hover:bg-slate-700': !isExerciseSelected(exercise.id)
+                  'bg-slate-800 text-ip-muted group-hover:bg-slate-700': !isExerciseSelected(exercise.id)
                 }">
                 <svg *ngIf="isExerciseSelected(exercise.id)" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
                   fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -76,16 +76,16 @@
 
               <!-- Info del ejercicio -->
               <div class="flex-1 min-w-0">
-                <p class="font-semibold text-sm text-slate-100 truncate">
+                <p class="font-semibold text-sm text-ip-primary truncate">
                   {{ exercise.name }}
                 </p>
-                <p class="text-xs text-slate-400 mt-0.5">
+                <p class="text-xs text-ip-muted mt-0.5">
                   {{ exercise.primaryMuscle }}
                 </p>
               </div>
 
               <!-- Flecha -->
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-500 group-hover:text-slate-400"
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-ip-muted group-hover:text-ip-muted"
                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
               </svg>
@@ -94,7 +94,7 @@
 
           <!-- Sin resultados -->
           <div *ngIf="catalogExercises().length === 0" class="text-center py-12">
-            <p class="text-slate-500 text-sm">No se encontraron ejercicios</p>
+            <p class="text-ip-muted text-sm">No se encontraron ejercicios</p>
           </div>
         </ng-container>
       </div>
@@ -106,11 +106,11 @@
       <div class="max-w-2xl mx-auto">
         <!-- Mini resumen -->
         <div class="flex items-center justify-between mb-3 text-sm">
-          <span class="text-slate-400">
+          <span class="text-ip-muted">
             {{ selectedExercises().length }} ejercicio{{ selectedExercises().length > 1 ? 's' : '' }} ·
             {{ totalSeries() }} series
           </span>
-          <span class="text-slate-500">~{{ estimatedMinutes() }} min</span>
+          <span class="text-ip-muted">~{{ estimatedMinutes() }} min</span>
         </div>
 
         <!-- Botón continuar -->
@@ -132,7 +132,7 @@
       <!-- Header -->
       <header class="flex items-center justify-between py-4 sticky top-0 bg-ip-page/95 backdrop-blur-sm z-10">
         <button (click)="onBack()"
-          class="flex items-center gap-2 text-sm text-slate-300 hover:text-slate-100 transition">
+          class="flex items-center gap-2 text-sm text-ip-secondary hover:text-ip-primary transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
             stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -140,60 +140,60 @@
           <span>Agregar más</span>
         </button>
 
-        <span class="text-xs text-slate-500 uppercase tracking-wider">Revisar</span>
+        <span class="text-xs text-ip-muted uppercase tracking-wider">Revisar</span>
       </header>
 
       <!-- Nombre de la sesión -->
       <div class="mt-2 mb-6">
-        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+        <label class="block text-xs font-semibold text-ip-muted uppercase tracking-wider mb-2">
           Nombre de la sesión (opcional)
         </label>
         <input type="text" 
           [ngModel]="sessionName()" 
           (ngModelChange)="sessionName.set($event)"
           placeholder="Ej: Upper Body, Pierna, Full Body..."
-          class="w-full bg-[#1a1f23] border border-slate-700/50 rounded-xl px-4 py-3 text-lg font-bold text-slate-100
-                 placeholder:text-slate-500 placeholder:font-normal
+          class="w-full bg-ip-surface border border-ip-border/50 rounded-xl px-4 py-3 text-lg font-bold text-ip-primary
+                 placeholder:text-ip-muted placeholder:font-normal
                  focus:outline-none focus:border-teal-500/50 transition">
-        <p class="text-xs text-slate-500 mt-2">
+        <p class="text-xs text-ip-muted mt-2">
           Si no agregas un nombre, se mostrará como "Entrenamiento"
         </p>
       </div>
 
       <!-- Stats -->
       <div class="grid grid-cols-3 gap-3 mb-6">
-        <div class="bg-[#1a1f23] rounded-xl p-4 text-center border border-slate-700/50">
-          <p class="text-2xl font-bold text-slate-100">{{ selectedExercises().length }}</p>
-          <p class="text-xs text-slate-400 mt-1">Ejercicios</p>
+        <div class="bg-ip-surface rounded-xl p-4 text-center border border-ip-border/50">
+          <p class="text-2xl font-bold text-ip-primary">{{ selectedExercises().length }}</p>
+          <p class="text-xs text-ip-muted mt-1">Ejercicios</p>
         </div>
-        <div class="bg-[#1a1f23] rounded-xl p-4 text-center border border-slate-700/50">
+        <div class="bg-ip-surface rounded-xl p-4 text-center border border-ip-border/50">
           <p class="text-2xl font-bold text-amber-400">{{ totalSeries() }}</p>
-          <p class="text-xs text-slate-400 mt-1">Series</p>
+          <p class="text-xs text-ip-muted mt-1">Series</p>
         </div>
-        <div class="bg-[#1a1f23] rounded-xl p-4 text-center border border-slate-700/50">
+        <div class="bg-ip-surface rounded-xl p-4 text-center border border-ip-border/50">
           <p class="text-2xl font-bold text-teal-400">~{{ estimatedMinutes() }}</p>
-          <p class="text-xs text-slate-400 mt-1">Minutos</p>
+          <p class="text-xs text-ip-muted mt-1">Minutos</p>
         </div>
       </div>
 
       <!-- Lista de ejercicios -->
       <div class="space-y-3">
         <div *ngFor="let ex of selectedExercises(); index as i; trackBy: trackByTempId"
-          class="bg-[#1a1f23] rounded-xl p-4 border border-slate-700/50">
+          class="bg-ip-surface rounded-xl p-4 border border-ip-border/50">
 
           <div class="flex items-start gap-3">
             <!-- Orden y controles -->
             <div class="flex flex-col items-center gap-1">
               <button (click)="moveExerciseUp(i)" [disabled]="i === 0"
-                class="p-1 rounded text-slate-500 hover:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed">
+                class="p-1 rounded text-ip-muted hover:text-ip-secondary disabled:opacity-30 disabled:cursor-not-allowed">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
                 </svg>
               </button>
-              <span class="text-xs text-slate-500 font-mono">{{ i + 1 }}</span>
+              <span class="text-xs text-ip-muted font-mono">{{ i + 1 }}</span>
               <button (click)="moveExerciseDown(i)" [disabled]="i === selectedExercises().length - 1"
-                class="p-1 rounded text-slate-500 hover:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed">
+                class="p-1 rounded text-ip-muted hover:text-ip-secondary disabled:opacity-30 disabled:cursor-not-allowed">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
@@ -203,8 +203,8 @@
 
             <!-- Info -->
             <div class="flex-1 min-w-0">
-              <p class="font-semibold text-sm text-slate-100">{{ ex.exerciseName }}</p>
-              <p class="text-xs text-slate-400 mt-0.5">{{ ex.primaryMuscle }}</p>
+              <p class="font-semibold text-sm text-ip-primary">{{ ex.exerciseName }}</p>
+              <p class="text-xs text-ip-muted mt-0.5">{{ ex.primaryMuscle }}</p>
 
               <!-- Badges -->
               <div class="flex flex-wrap gap-2 mt-2">
@@ -213,11 +213,11 @@
                   {{ ex.sets }} series
                 </span>
                 <span
-                  class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-700 text-slate-200">
+                  class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-ip-surface text-ip-primary">
                   {{ ex.repsMin }}-{{ ex.repsMax }} reps
                 </span>
                 <span
-                  class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-700 text-slate-200">
+                  class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-ip-surface text-ip-primary">
                   RIR {{ ex.rir }}
                 </span>
               </div>
@@ -226,7 +226,7 @@
             <!-- Acciones -->
             <div class="flex items-center gap-2">
               <button (click)="editExercise(ex)"
-                class="p-2 rounded-lg text-slate-400 hover:text-teal-400 hover:bg-slate-800/50 transition">
+                class="p-2 rounded-lg text-ip-muted hover:text-teal-400 hover:bg-ip-surface/50 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round"
@@ -234,7 +234,7 @@
                 </svg>
               </button>
               <button (click)="removeExercise(ex.tempId)"
-                class="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800/50 transition">
+                class="p-2 rounded-lg text-ip-muted hover:text-rose-400 hover:bg-ip-surface/50 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round"
@@ -270,11 +270,11 @@
 <!-- ==================== MODAL: CONFIGURAR EJERCICIO ==================== -->
 <ng-container *ngIf="showConfigModal() && exerciseToConfig() as exercise">
   <!-- Backdrop -->
-  <div class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" (click)="closeConfigModal()"></div>
+  <div class="fixed inset-0 z-50 bg-ip-surface-elevated/90 backdrop-blur-sm" (click)="closeConfigModal()"></div>
 
   <!-- Modal -->
   <div class="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
-    <div class="w-full md:max-w-md bg-ip-surface rounded-t-3xl md:rounded-2xl border-t md:border border-slate-700/50
+    <div class="w-full md:max-w-md bg-ip-surface rounded-t-3xl md:rounded-2xl border-t md:border border-ip-border/50
                 shadow-[0_-20px_60px_rgba(0,0,0,0.5)] md:shadow-2xl max-h-[85vh] overflow-y-auto"
       (click)="$event.stopPropagation()">
 
@@ -284,15 +284,15 @@
       </div>
 
       <!-- Header -->
-      <div class="px-5 pt-4 pb-3 border-b border-slate-800/60">
+      <div class="px-5 pt-4 pb-3 border-b border-ip-border/60">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-xs text-slate-400 uppercase tracking-wider">Configurar ejercicio</p>
-            <h3 class="text-lg font-bold text-slate-100 mt-1">{{ exercise.name }}</h3>
-            <p class="text-xs text-slate-400">{{ exercise.primaryMuscle }}</p>
+            <p class="text-xs text-ip-muted uppercase tracking-wider">Configurar ejercicio</p>
+            <h3 class="text-lg font-bold text-ip-primary mt-1">{{ exercise.name }}</h3>
+            <p class="text-xs text-ip-muted">{{ exercise.primaryMuscle }}</p>
           </div>
           <button (click)="closeConfigModal()"
-            class="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition">
+            class="p-2 rounded-lg text-ip-muted hover:text-ip-primary hover:bg-ip-surface/50 transition">
             ✕
           </button>
         </div>
@@ -302,17 +302,17 @@
       <div class="p-5 space-y-5">
         <!-- Series -->
         <div>
-          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Series</label>
+          <label class="block text-xs font-semibold text-ip-muted uppercase tracking-wider mb-2">Series</label>
           <div class="flex items-center gap-3">
             <button (click)="configSets.set(Math.max(1, configSets() - 1))"
-              class="w-10 h-10 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center justify-center">
+              class="w-10 h-10 rounded-xl bg-slate-800 text-ip-secondary hover:bg-ip-surface transition flex items-center justify-center">
               −
             </button>
             <input type="number" [ngModel]="configSets()" (ngModelChange)="configSets.set($event)" min="1" max="10"
-              class="flex-1 bg-[#0f1516] border border-slate-700 rounded-xl px-4 py-3 text-center text-lg font-bold
+              class="flex-1 bg-ip-surface border border-ip-border rounded-xl px-4 py-3 text-center text-lg font-bold
                      focus:outline-none focus:border-teal-500/50">
             <button (click)="configSets.set(Math.min(10, configSets() + 1))"
-              class="w-10 h-10 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center justify-center">
+              class="w-10 h-10 rounded-xl bg-slate-800 text-ip-secondary hover:bg-ip-surface transition flex items-center justify-center">
               +
             </button>
           </div>
@@ -321,22 +321,22 @@
         <!-- Reps Min/Max -->
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Reps mín</label>
+            <label class="block text-xs font-semibold text-ip-muted uppercase tracking-wider mb-2">Reps mín</label>
             <input type="number" [ngModel]="configRepsMin()" (ngModelChange)="configRepsMin.set($event)" min="1"
-              class="w-full bg-[#0f1516] border border-slate-700 rounded-xl px-4 py-3 text-center
+              class="w-full bg-ip-surface border border-ip-border rounded-xl px-4 py-3 text-center
                      focus:outline-none focus:border-teal-500/50">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Reps máx</label>
+            <label class="block text-xs font-semibold text-ip-muted uppercase tracking-wider mb-2">Reps máx</label>
             <input type="number" [ngModel]="configRepsMax()" (ngModelChange)="configRepsMax.set($event)" min="1"
-              class="w-full bg-[#0f1516] border border-slate-700 rounded-xl px-4 py-3 text-center
+              class="w-full bg-ip-surface border border-ip-border rounded-xl px-4 py-3 text-center
                      focus:outline-none focus:border-teal-500/50">
           </div>
         </div>
 
         <!-- RIR -->
         <div>
-          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+          <label class="block text-xs font-semibold text-ip-muted uppercase tracking-wider mb-2">
             RIR (Repeticiones en reserva)
           </label>
           <div class="flex gap-2">
@@ -344,7 +344,7 @@
               class="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
               [ngClass]="{
                 'bg-teal-500 text-slate-900': configRir() === rir,
-                'bg-slate-800 text-slate-300 hover:bg-slate-700': configRir() !== rir
+                'bg-slate-800 text-ip-secondary hover:bg-slate-700': configRir() !== rir
               }">
               {{ rir }}
             </button>
@@ -353,7 +353,7 @@
 
         <!-- Descanso -->
         <div>
-          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+          <label class="block text-xs font-semibold text-ip-muted uppercase tracking-wider mb-2">
             Descanso (minutos)
           </label>
           <div class="flex gap-2">
@@ -361,7 +361,7 @@
               class="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
               [ngClass]="{
                 'bg-teal-500 text-slate-900': configRestMinutes() === rest,
-                'bg-slate-800 text-slate-300 hover:bg-slate-700': configRestMinutes() !== rest
+                'bg-slate-800 text-ip-secondary hover:bg-slate-700': configRestMinutes() !== rest
               }">
               {{ rest }}′
             </button>
@@ -370,7 +370,7 @@
       </div>
 
       <!-- Footer -->
-      <div class="p-5 border-t border-slate-800/60">
+      <div class="p-5 border-t border-ip-border/60">
         <button (click)="confirmAddExercise()"
           class="w-full py-4 rounded-xl bg-teal-500 text-slate-900 font-bold text-sm uppercase tracking-wide
                  hover:bg-teal-400 active:scale-[0.98] transition-all">

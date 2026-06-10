@@ -13,13 +13,13 @@ import { filter } from 'rxjs/operators';
     <div class="min-h-screen bg-ip-page text-ip-primary">
       <div class="max-w-6xl mx-auto px-4 py-6 space-y-6" [class.max-w-none]="isAdministrar" [class.space-y-4]="isAdministrar">
         <header class="space-y-2">
-          <h1 class="text-2xl md:text-3xl font-bold text-slate-50">Grupos</h1>
-          <p class="text-sm md:text-base text-slate-400">
+          <h1 class="text-2xl md:text-3xl font-bold text-ip-primary">Grupos</h1>
+          <p class="text-sm md:text-base text-ip-muted">
             Organizaciones, equipos y retos grupales
           </p>
         </header>
 
-        <nav class="flex gap-2 border-b border-slate-800/80">
+        <nav class="flex gap-2 border-b border-ip-border/80">
           <a routerLink="/grupos/mis-grupos" routerLinkActive="tab-active" [routerLinkActiveOptions]="{ exact: true }" class="grupos-tab">
             Mis grupos
           </a>

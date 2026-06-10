@@ -85,7 +85,7 @@ import { UserService } from '../user/services/user.service';
     .join-card {
       width: 100%;
       max-width: 480px;
-      background: #171a1d;
+      background: rgb(var(--ip-surface));
       border: 1px solid rgb(30 41 59);
       border-radius: 16px;
       padding: 32px;
@@ -126,7 +126,7 @@ import { UserService } from '../user/services/user.service';
     .join-input {
       width: 100%;
       box-sizing: border-box;
-      background: #0d0f11;
+      background: rgb(var(--ip-header));
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 10px;
       padding: 12px 14px;

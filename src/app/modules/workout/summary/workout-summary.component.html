@@ -1,5 +1,5 @@
 <!-- Loading -->
-<div *ngIf="loading" class="min-h-screen bg-ip-page flex items-center justify-center text-slate-300">
+<div *ngIf="loading" class="min-h-screen bg-ip-page flex items-center justify-center text-ip-secondary">
   <div class="text-center">
     <div class="w-12 h-12 border-4 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
     <p>Cargando resumen...</p>
@@ -12,7 +12,7 @@
     <p class="text-lg mb-4">{{ error }}</p>
     <button
       (click)="onGoHome()"
-      class="px-6 py-2 bg-slate-700 hover:bg-slate-600 rounded-xl text-white transition"
+      class="px-6 py-2 bg-ip-surface hover:bg-slate-600 rounded-xl text-ip-primary transition"
     >
       Volver al inicio
     </button>
@@ -22,7 +22,7 @@
 <!-- Contenido principal -->
 <div
   *ngIf="!loading && summary as s"
-  class="min-h-screen bg-ip-page text-slate-50 flex justify-center relative overflow-hidden"
+  class="min-h-screen bg-ip-page text-ip-primary flex justify-center relative overflow-hidden"
 >
   <!-- Confetti animation -->
   <div *ngIf="showConfetti" class="absolute inset-0 pointer-events-none overflow-hidden">
@@ -47,18 +47,18 @@
       <h1 class="text-2xl md:text-3xl font-bold text-emerald-400">
         ¡Sesión Completada!
       </h1>
-      <p class="text-slate-400 mt-2">
+      <p class="text-ip-muted mt-2">
         {{ s.sessionTitle }}
         <span *ngIf="s.sessionIcon">{{ s.sessionIcon }}</span>
       </p>
     </header>
 
     <!-- Tarjeta principal de stats -->
-    <section class="bg-ip-surface rounded-3xl p-5 md:p-6 shadow-[0_18px_60px_rgba(0,0,0,0.7)] border border-slate-800">
+    <section class="bg-ip-surface rounded-3xl p-5 md:p-6 shadow-[0_18px_60px_rgba(0,0,0,0.7)] border border-ip-border">
       
       <!-- Tiempo total -->
       <div class="text-center mb-6">
-        <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">Tiempo total</p>
+        <p class="text-xs text-ip-muted uppercase tracking-wide mb-1">Tiempo total</p>
         <p class="text-4xl md:text-5xl font-bold tabular-nums text-emerald-400">
           {{ s.durationFormatted }}
         </p>
@@ -67,19 +67,19 @@
       <!-- Grid de stats -->
       <div class="grid grid-cols-2 gap-4 mb-6">
         <!-- Ejercicios -->
-        <div class="bg-[#0f1214] rounded-2xl p-4 text-center">
-          <p class="text-2xl md:text-3xl font-bold text-white">
+        <div class="bg-ip-input rounded-2xl p-4 text-center">
+          <p class="text-2xl md:text-3xl font-bold text-ip-primary">
             {{ s.completedExercises }}/{{ s.totalExercises }}
           </p>
-          <p class="text-xs text-slate-400 mt-1">Ejercicios</p>
+          <p class="text-xs text-ip-muted mt-1">Ejercicios</p>
         </div>
 
         <!-- Series -->
-        <div class="bg-[#0f1214] rounded-2xl p-4 text-center">
-          <p class="text-2xl md:text-3xl font-bold text-white">
+        <div class="bg-ip-input rounded-2xl p-4 text-center">
+          <p class="text-2xl md:text-3xl font-bold text-ip-primary">
             {{ s.completedSeries }}/{{ s.totalSeries }}
           </p>
-          <p class="text-xs text-slate-400 mt-1">Series</p>
+          <p class="text-xs text-ip-muted mt-1">Series</p>
         </div>
       </div>
 
@@ -91,8 +91,8 @@
             <p class="text-3xl font-bold text-amber-400">+{{ s.xpEarned }} XP</p>
           </div>
           <div class="text-right">
-            <p class="text-xs text-slate-400 mb-1">Total</p>
-            <p class="text-lg font-semibold text-white">{{ s.totalUserXp }} XP</p>
+            <p class="text-xs text-ip-muted mb-1">Total</p>
+            <p class="text-lg font-semibold text-ip-primary">{{ s.totalUserXp }} XP</p>
             <p class="text-xs text-amber-300">{{ s.userRank.replace('_', ' ') }}</p>
           </div>
         </div>
@@ -100,8 +100,8 @@
     </section>
 
     <!-- Comparación con sesión anterior -->
-    <section *ngIf="s.previousComparison" class="mt-5 bg-ip-surface rounded-2xl p-4 border border-slate-800">
-      <h3 class="text-xs text-slate-400 uppercase tracking-wide mb-3">
+    <section *ngIf="s.previousComparison" class="mt-5 bg-ip-surface rounded-2xl p-4 border border-ip-border">
+      <h3 class="text-xs text-ip-muted uppercase tracking-wide mb-3">
         Comparado con tu última sesión
       </h3>
       
@@ -117,22 +117,22 @@
                [class.text-rose-400]="!durationImproved">
               {{ formatDurationDiff(s.previousComparison.durationDifferenceSeconds) }}
             </p>
-            <p class="text-xs text-slate-500">Tiempo</p>
+            <p class="text-xs text-ip-muted">Tiempo</p>
           </div>
         </div>
 
         <!-- XP -->
         <div class="flex items-center gap-2">
-          <span class="text-lg" [class.text-emerald-400]="xpImproved" [class.text-slate-400]="!xpImproved">
+          <span class="text-lg" [class.text-emerald-400]="xpImproved" [class.text-ip-muted]="!xpImproved">
             {{ xpImproved ? '🔥' : '➖' }}
           </span>
           <div class="text-right">
             <p class="text-sm font-semibold"
                [class.text-emerald-400]="xpImproved"
-               [class.text-slate-400]="!xpImproved">
+               [class.text-ip-muted]="!xpImproved">
               {{ s.previousComparison.xpDifference > 0 ? '+' : '' }}{{ s.previousComparison.xpDifference }} XP
             </p>
-            <p class="text-xs text-slate-500">Diferencia</p>
+            <p class="text-xs text-ip-muted">Diferencia</p>
           </div>
         </div>
       </div>
@@ -140,8 +140,8 @@
 
     <!-- Músculos trabajados -->
     <section *ngIf="s.muscles" class="mt-5 text-center">
-      <p class="text-xs text-slate-400 uppercase tracking-wide mb-2">Músculos trabajados</p>
-      <p class="text-sm text-slate-200">{{ s.muscles }}</p>
+      <p class="text-xs text-ip-muted uppercase tracking-wide mb-2">Músculos trabajados</p>
+      <p class="text-sm text-ip-primary">{{ s.muscles }}</p>
     </section>
 
     <!-- Botones de acción -->
@@ -159,7 +159,7 @@
 
       <li>
             <a routerLink="/crear"
-              class="text-sm text-slate-400 hover:text-teal-400 transition-colors flex items-center gap-2 group">
+              class="text-sm text-ip-muted hover:text-teal-400 transition-colors flex items-center gap-2 group">
               <span class="w-1 h-1 bg-slate-600 rounded-full group-hover:bg-teal-400 transition-colors"></span>
               Ver mi progreso
             </a>

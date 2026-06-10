@@ -13,63 +13,63 @@
       <p class="text-sm md:text-base font-medium text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-cyan-300 to-teal-400">
         Transforma tu entrenamiento
       </p>
-      <p class="text-xs md:text-sm text-slate-400 font-light tracking-wide">
+      <p class="text-xs md:text-sm text-ip-muted font-light tracking-wide">
         Domina tu progreso
       </p>
     </div>
   </div>
 
   <section
-    class="w-full max-w-lg md:max-w-md bg-[#1b1f22]/95 border border-white/5 rounded-2xl
+    class="w-full max-w-lg md:max-w-md bg-ip-surface/95 border border-ip-border/40 rounded-2xl
            shadow-[0_18px_50px_rgba(0,0,0,0.7)] backdrop-blur-sm
            px-4 py-5 md:px-6 md:py-6 space-y-4"
   >
     <div class="flex items-start justify-between gap-3">
       <div>
         <h1 class="text-2xl font-semibold">Crear Cuenta</h1>
-        <p class="text-xs text-slate-400 mt-1">Paso {{ step() }} de 4</p>
+        <p class="text-xs text-ip-muted mt-1">Paso {{ step() }} de 4</p>
       </div>
       <a routerLink="/login" class="text-xs text-teal-300 font-semibold hover:underline whitespace-nowrap">Ya tengo cuenta</a>
     </div>
 
     <!-- Progress -->
     <div class="grid grid-cols-4 gap-2">
-      <div class="h-1.5 rounded-full" [ngClass]="step() >= 1 ? 'bg-teal-400' : 'bg-white/10'"></div>
-      <div class="h-1.5 rounded-full" [ngClass]="step() >= 2 ? 'bg-teal-400' : 'bg-white/10'"></div>
-      <div class="h-1.5 rounded-full" [ngClass]="step() >= 3 ? 'bg-teal-400' : 'bg-white/10'"></div>
-      <div class="h-1.5 rounded-full" [ngClass]="step() >= 4 ? 'bg-teal-400' : 'bg-white/10'"></div>
+      <div class="h-1.5 rounded-full" [ngClass]="step() >= 1 ? 'bg-teal-400' : 'bg-ip-border/40'"></div>
+      <div class="h-1.5 rounded-full" [ngClass]="step() >= 2 ? 'bg-teal-400' : 'bg-ip-border/40'"></div>
+      <div class="h-1.5 rounded-full" [ngClass]="step() >= 3 ? 'bg-teal-400' : 'bg-ip-border/40'"></div>
+      <div class="h-1.5 rounded-full" [ngClass]="step() >= 4 ? 'bg-teal-400' : 'bg-ip-border/40'"></div>
     </div>
 
     <!-- Paso 1 -->
     <div *ngIf="step() === 1" class="space-y-3">
       <label class="block space-y-1">
-        <span class="text-sm font-medium text-slate-200">Nombre</span>
-        <input [(ngModel)]="form1.firstName" name="firstName" type="text" class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm" />
+        <span class="text-sm font-medium text-ip-primary">Nombre</span>
+        <input [(ngModel)]="form1.firstName" name="firstName" type="text" class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm" />
       </label>
 
       <label class="block space-y-1">
-        <span class="text-sm font-medium text-slate-200">Apellido</span>
-        <input [(ngModel)]="form1.lastName" name="lastName" type="text" class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm" />
+        <span class="text-sm font-medium text-ip-primary">Apellido</span>
+        <input [(ngModel)]="form1.lastName" name="lastName" type="text" class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm" />
       </label>
 
       <label class="block space-y-1">
-        <span class="text-sm font-medium text-slate-200">Nombre de usuario</span>
-        <input [(ngModel)]="form1.username" name="username" type="text" class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm" />
+        <span class="text-sm font-medium text-ip-primary">Nombre de usuario</span>
+        <input [(ngModel)]="form1.username" name="username" type="text" class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm" />
       </label>
 
       <label class="block space-y-1">
-        <span class="text-sm font-medium text-slate-200">Email</span>
-        <input [(ngModel)]="form1.email" name="email" type="email" class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm" />
+        <span class="text-sm font-medium text-ip-primary">Email</span>
+        <input [(ngModel)]="form1.email" name="email" type="email" class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm" />
       </label>
 
       <label class="block space-y-1">
-        <span class="text-sm font-medium text-slate-200">Contraseña</span>
-        <input [(ngModel)]="form1.password" name="password" type="password" class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm" />
+        <span class="text-sm font-medium text-ip-primary">Contraseña</span>
+        <input [(ngModel)]="form1.password" name="password" type="password" class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm" />
       </label>
 
       <label class="block space-y-1">
-        <span class="text-sm font-medium text-slate-200">Confirmar contraseña</span>
-        <input [(ngModel)]="form1.confirmPassword" name="confirmPassword" type="password" class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm" />
+        <span class="text-sm font-medium text-ip-primary">Confirmar contraseña</span>
+        <input [(ngModel)]="form1.confirmPassword" name="confirmPassword" type="password" class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm" />
       </label>
 
       <button
@@ -84,45 +84,45 @@
     <!-- Paso 2 -->
     <div *ngIf="step() === 2" class="space-y-3">
       <label class="block space-y-1">
-        <span class="text-sm font-medium text-slate-200">Fecha de nacimiento</span>
-        <input [(ngModel)]="form2.birthday" name="birthday" type="date" class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm" />
+        <span class="text-sm font-medium text-ip-primary">Fecha de nacimiento</span>
+        <input [(ngModel)]="form2.birthday" name="birthday" type="date" class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm" />
       </label>
 
       <label class="block space-y-1">
-        <span class="text-sm font-medium text-slate-200">Género</span>
-        <select [(ngModel)]="form2.gender" name="gender" class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm">
+        <span class="text-sm font-medium text-ip-primary">Género</span>
+        <select [(ngModel)]="form2.gender" name="gender" class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm">
           <option *ngFor="let g of genders" [ngValue]="g.value">{{ g.label }}</option>
         </select>
       </label>
 
       <div class="grid grid-cols-2 gap-3">
         <label class="block space-y-1">
-          <span class="text-sm font-medium text-slate-200">Peso (kg)</span>
-          <input [(ngModel)]="form2.weight" name="weight" type="number" min="1" class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm" />
+          <span class="text-sm font-medium text-ip-primary">Peso (kg)</span>
+          <input [(ngModel)]="form2.weight" name="weight" type="number" min="1" class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm" />
         </label>
         <label class="block space-y-1">
-          <span class="text-sm font-medium text-slate-200">Altura (cm)</span>
-          <input [(ngModel)]="form2.height" name="height" type="number" min="1" class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm" />
+          <span class="text-sm font-medium text-ip-primary">Altura (cm)</span>
+          <input [(ngModel)]="form2.height" name="height" type="number" min="1" class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm" />
         </label>
       </div>
 
       <label class="block space-y-1">
-        <span class="text-sm font-medium text-slate-200">Nivel</span>
-        <select [(ngModel)]="form2.level" name="level" class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm">
+        <span class="text-sm font-medium text-ip-primary">Nivel</span>
+        <select [(ngModel)]="form2.level" name="level" class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm">
           <option *ngFor="let l of levels" [ngValue]="l.value">{{ l.label }}</option>
         </select>
       </label>
 
       <label class="block space-y-1">
-        <span class="text-sm font-medium text-slate-200">Objetivo</span>
-        <select [(ngModel)]="form2.goal" name="goal" class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm">
+        <span class="text-sm font-medium text-ip-primary">Objetivo</span>
+        <select [(ngModel)]="form2.goal" name="goal" class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm">
           <option *ngFor="let o of goals" [ngValue]="o.value">{{ o.label }}</option>
         </select>
       </label>
 
       <div class="space-y-2">
         <div class="flex items-baseline justify-between">
-          <span class="text-sm font-medium text-slate-200">
+          <span class="text-sm font-medium text-ip-primary">
             Días de entrenamiento: <strong>{{ form2.trainDays }}</strong>
           </span>
         </div>
@@ -137,14 +137,14 @@
           aria-label="Días de entrenamiento por semana"
           [style.--p]="trainDaysPercent"
         />
-        <div class="flex justify-between text-[11px] text-slate-400 mt-1">
+        <div class="flex justify-between text-[11px] text-ip-muted mt-1">
           <span>1 día</span>
           <span>7 días</span>
         </div>
       </div>
 
       <div class="flex gap-2 pt-1">
-        <button (click)="back()" class="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-100 font-semibold text-sm hover:bg-white/10 transition">
+        <button (click)="back()" class="flex-1 py-3 rounded-xl bg-ip-border/20 border border-ip-border/60 text-ip-primary font-semibold text-sm hover:bg-ip-border/40 transition">
           Atrás
         </button>
         <button
@@ -159,14 +159,14 @@
 
     <!-- Paso 3 -->
 <div *ngIf="step() === 3" class="space-y-3">
-  <p class="text-xs text-slate-400">
+  <p class="text-xs text-ip-muted">
     Este paso es <span class="font-semibold text-teal-300">opcional</span>.
     Si tienes un código de invitación de tu organización ingrésalo aquí.
     Si no, puedes omitirlo y continuar como usuario individual.
   </p>
  
   <label class="block space-y-1">
-    <span class="text-sm font-medium text-slate-200">Código de invitación</span>
+    <span class="text-sm font-medium text-ip-primary">Código de invitación</span>
     <div class="relative">
       <input
       [(ngModel)]="form3.organizationCode"
@@ -180,7 +180,7 @@
         'border-teal-400': codeVerified(),
         'text-teal-300': codeVerified()
       }"
-      class="w-full bg-[#0f1214] border border-white/10 rounded-lg px-3 py-2 outline-none text-sm uppercase tracking-widest transition-colors"
+      class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm uppercase tracking-widest transition-colors"
     />
       <!-- Ícono check cuando está verificado -->
       <div *ngIf="codeVerified()"
@@ -229,7 +229,7 @@
  
   <div class="flex gap-2 pt-1">
     <button (click)="back()"
-            class="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-100 font-semibold text-sm hover:bg-white/10 transition">
+            class="flex-1 py-3 rounded-xl bg-ip-border/20 border border-ip-border/60 text-ip-primary font-semibold text-sm hover:bg-ip-border/40 transition">
       Atrás
     </button>
     <button
@@ -247,21 +247,21 @@
 
     <!-- Paso 4 -->
     <div *ngIf="step() === 4" class="space-y-3">
-      <label class="flex items-start gap-2 text-sm text-slate-200">
+      <label class="flex items-start gap-2 text-sm text-ip-primary">
         <input type="checkbox" [(ngModel)]="form4.acceptedTerms" name="acceptedTerms" class="mt-1" />
         <span>Acepto los términos y condiciones</span>
       </label>
-      <label class="flex items-start gap-2 text-sm text-slate-200">
+      <label class="flex items-start gap-2 text-sm text-ip-primary">
         <input type="checkbox" [(ngModel)]="form4.acceptedPrivacy" name="acceptedPrivacy" class="mt-1" />
         <span>Acepto el aviso de privacidad</span>
       </label>
-      <label class="flex items-start gap-2 text-sm text-slate-200">
+      <label class="flex items-start gap-2 text-sm text-ip-primary">
         <input type="checkbox" [(ngModel)]="form4.consentProgramMetrics" name="consentProgramMetrics" class="mt-1" />
         <span>Consiento el uso de datos para métricas del programa</span>
       </label>
 
       <div class="flex gap-2 pt-1">
-        <button (click)="back()" class="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-100 font-semibold text-sm hover:bg-white/10 transition">
+        <button (click)="back()" class="flex-1 py-3 rounded-xl bg-ip-border/20 border border-ip-border/60 text-ip-primary font-semibold text-sm hover:bg-ip-border/40 transition">
           Atrás
         </button>
         <button

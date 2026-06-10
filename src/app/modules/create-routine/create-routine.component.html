@@ -1,16 +1,16 @@
 <div class="min-h-screen bg-ip-gradient">
 
   <!-- Header -->
-  <header class="sticky top-0 z-40 bg-ip-header/95 backdrop-blur-md border-b border-slate-800/40">
+  <header class="sticky top-0 z-40 bg-ip-header/95 backdrop-blur-md border-b border-ip-border/40">
     <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
       <button (click)="goBack()" 
-              class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-800/50 hover:bg-slate-700/60 transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              class="w-10 h-10 flex items-center justify-center rounded-full bg-ip-surface/50 hover:bg-slate-700/60 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-ip-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
         </svg>
       </button>
       
-      <h1 class="text-lg font-semibold text-white">Crear Rutina</h1>
+      <h1 class="text-lg font-semibold text-ip-primary">Crear Rutina</h1>
       
       <div class="w-10"></div>
     </div>
@@ -23,7 +23,7 @@
         <div class="flex items-center justify-center w-10 h-10 rounded-full font-semibold text-sm transition-all"
              [ngClass]="{
                'bg-teal-500 text-white': currentStep >= step,
-               'bg-slate-700/60 text-slate-400': currentStep < step
+               'bg-slate-700/60 text-ip-muted': currentStep < step
              }">
           <span *ngIf="currentStep <= step">{{ step }}</span>
           <svg *ngIf="currentStep > step" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -36,7 +36,7 @@
     </div>
 
     <!-- Step Labels -->
-    <div class="flex justify-between text-xs text-slate-500 mb-6 -mt-2 px-1">
+    <div class="flex justify-between text-xs text-ip-muted mb-6 -mt-2 px-1">
       <span [ngClass]="currentStep >= 1 ? 'text-teal-400' : ''">Info</span>
       <span [ngClass]="currentStep >= 2 ? 'text-teal-400' : ''">Bloques</span>
       <span [ngClass]="currentStep >= 3 ? 'text-teal-400' : ''">Sesiones</span>
@@ -53,36 +53,36 @@
       
       <!-- Nombre -->
       <div>
-        <label class="block text-sm font-medium text-slate-300 mb-2">Nombre de la rutina *</label>
+        <label class="block text-sm font-medium text-ip-secondary mb-2">Nombre de la rutina *</label>
         <input type="text" [(ngModel)]="routineName" 
                placeholder="Ej: Push Pull Legs Hipertrofia"
-               class="w-full px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/30 transition-all" />
+               class="w-full px-4 py-3 bg-ip-surface/50 border border-ip-border/50 rounded-xl text-ip-primary placeholder-slate-500 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/30 transition-all" />
       </div>
 
       <!-- Descripción corta -->
       <div>
-        <label class="block text-sm font-medium text-slate-300 mb-2">Descripción corta *</label>
+        <label class="block text-sm font-medium text-ip-secondary mb-2">Descripción corta *</label>
         <textarea [(ngModel)]="routineDescription"
                   placeholder="Describe brevemente tu rutina..."
                   rows="2"
-                  class="w-full px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/30 transition-all resize-none"></textarea>
+                  class="w-full px-4 py-3 bg-ip-surface/50 border border-ip-border/50 rounded-xl text-ip-primary placeholder-slate-500 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/30 transition-all resize-none"></textarea>
       </div>
 
       <!-- Descripción larga -->
       <div>
-        <label class="block text-sm font-medium text-slate-300 mb-2">Descripción detallada (opcional)</label>
+        <label class="block text-sm font-medium text-ip-secondary mb-2">Descripción detallada (opcional)</label>
         <textarea [(ngModel)]="routineLongDescription"
                   placeholder="Agrega más detalles, consejos, etc..."
                   rows="4"
-                  class="w-full px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/30 transition-all resize-none"></textarea>
+                  class="w-full px-4 py-3 bg-ip-surface/50 border border-ip-border/50 rounded-xl text-ip-primary placeholder-slate-500 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/30 transition-all resize-none"></textarea>
       </div>
 
       <!-- ===================== Portada (Cloudinary) ===================== -->
-<div class="bg-ip-surface border border-slate-700/40 rounded-2xl p-4">
+<div class="bg-ip-surface border border-ip-border/40 rounded-2xl p-4">
   <div class="flex items-center justify-between">
     <div>
-      <h3 class="text-sm font-semibold text-slate-200">Portada de la rutina</h3>
-      <p class="text-xs text-slate-400 mt-1">
+      <h3 class="text-sm font-semibold text-ip-primary">Portada de la rutina</h3>
+      <p class="text-xs text-ip-muted mt-1">
         Sube una imagen.
       </p>
     </div>
@@ -99,7 +99,7 @@
       />
       <ng-template #noCover>
         <div class="routine-cover__empty">
-          <span class="text-xs text-slate-500">Sin imagen</span>
+          <span class="text-xs text-ip-muted">Sin imagen</span>
         </div>
       </ng-template>
 
@@ -140,7 +140,7 @@
         </button>
       </div>
 
-      <p class="text-xs text-slate-500 mt-3">
+      <p class="text-xs text-ip-muted mt-3">
         Recomendado: JPG/PNG, formato horizontal (tipo portada).
       </p>
 
@@ -159,14 +159,14 @@
 
       <!-- Objetivo -->
       <div>
-        <label class="block text-sm font-medium text-slate-300 mb-3">Objetivo *</label>
+        <label class="block text-sm font-medium text-ip-secondary mb-3">Objetivo *</label>
         <div class="grid grid-cols-3 gap-3">
           <button *ngFor="let goal of goals"
                   (click)="selectedGoal = goal.value"
                   class="p-4 rounded-xl border transition-all text-center"
                   [ngClass]="selectedGoal === goal.value 
                     ? 'bg-teal-500/20 border-teal-500/50 text-teal-400' 
-                    : 'bg-slate-800/40 border-slate-700/40 text-slate-300 hover:border-slate-600'">
+                    : 'bg-ip-surface/40 border-ip-border/40 text-ip-secondary hover:border-ip-border'">
             <span class="text-2xl block mb-1">{{ goal.icon }}</span>
             <span class="text-sm font-medium">{{ goal.label }}</span>
           </button>
@@ -175,14 +175,14 @@
 
       <!-- Nivel -->
       <div>
-        <label class="block text-sm font-medium text-slate-300 mb-3">Nivel sugerido *</label>
+        <label class="block text-sm font-medium text-ip-secondary mb-3">Nivel sugerido *</label>
         <div class="grid grid-cols-3 gap-3">
           <button *ngFor="let level of levels"
                   (click)="selectedLevel = level.value"
                   class="p-3 rounded-xl border transition-all text-center"
                   [ngClass]="selectedLevel === level.value 
                     ? 'bg-teal-500/20 border-teal-500/50 text-teal-400' 
-                    : 'bg-slate-800/40 border-slate-700/40 text-slate-300 hover:border-slate-600'">
+                    : 'bg-ip-surface/40 border-ip-border/40 text-ip-secondary hover:border-ip-border'">
             <span class="text-sm font-medium">{{ level.label }}</span>
           </button>
         </div>
@@ -190,14 +190,14 @@
 
       <!-- Género -->
       <div>
-        <label class="block text-sm font-medium text-slate-300 mb-3">Diseñada para</label>
+        <label class="block text-sm font-medium text-ip-secondary mb-3">Diseñada para</label>
         <div class="grid grid-cols-3 gap-3">
           <button *ngFor="let gender of genders"
                   (click)="selectedGender = gender.value"
                   class="p-4 rounded-xl border transition-all text-center"
                   [ngClass]="selectedGender === gender.value 
                     ? 'bg-pink-500/20 border-pink-500/50 text-pink-400' 
-                    : 'bg-slate-800/40 border-slate-700/40 text-slate-300 hover:border-slate-600'">
+                    : 'bg-ip-surface/40 border-ip-border/40 text-ip-secondary hover:border-ip-border'">
             <span class="text-2xl block mb-1">{{ gender.icon }}</span>
             <span class="text-sm font-medium">{{ gender.label }}</span>
           </button>
@@ -207,23 +207,23 @@
       <!-- Días por semana y duración -->
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-slate-300 mb-2">Días por semana</label>
+          <label class="block text-sm font-medium text-ip-secondary mb-2">Días por semana</label>
           <select [(ngModel)]="daysPerWeek"
-                  class="w-full px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white focus:outline-none focus:border-teal-500/50 transition-all">
+                  class="w-full px-4 py-3 bg-ip-surface/50 border border-ip-border/50 rounded-xl text-ip-primary focus:outline-none focus:border-teal-500/50 transition-all">
             <option *ngFor="let d of [1,2,3,4,5,6,7]" [value]="d">{{ d }} días</option>
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-slate-300 mb-2">Duración total (semanas)</label>
+          <label class="block text-sm font-medium text-ip-secondary mb-2">Duración total (semanas)</label>
           <select [(ngModel)]="durationWeeks" (ngModelChange)="onDurationWeeksChange()"
-                  class="w-full px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white focus:outline-none focus:border-teal-500/50 transition-all">
+                  class="w-full px-4 py-3 bg-ip-surface/50 border border-ip-border/50 rounded-xl text-ip-primary focus:outline-none focus:border-teal-500/50 transition-all">
             <option *ngFor="let w of [1,2,3,4,6,8,9,10,12,16,20,24]" [value]="w">{{ w }} semanas</option>
           </select>
         </div>
       </div>
 
       <!-- Público -->
-      <div class="flex items-center gap-3 p-4 bg-slate-800/30 border border-slate-700/30 rounded-xl">
+      <div class="flex items-center gap-3 p-4 bg-slate-800/30 border border-ip-border/30 rounded-xl">
         <button (click)="isPublic = !isPublic"
                 class="w-12 h-7 rounded-full transition-colors relative"
                 [ngClass]="isPublic ? 'bg-teal-500' : 'bg-slate-600'">
@@ -231,8 +231,8 @@
                 [ngClass]="isPublic ? 'left-6' : 'left-1'"></span>
         </button>
         <div>
-          <p class="text-sm font-medium text-white">Compartir con la comunidad</p>
-          <p class="text-xs text-slate-500">Otros usuarios podrán ver y usar tu rutina</p>
+          <p class="text-sm font-medium text-ip-primary">Compartir con la comunidad</p>
+          <p class="text-xs text-ip-muted">Otros usuarios podrán ver y usar tu rutina</p>
         </div>
       </div>
     </div>
@@ -241,22 +241,22 @@
     <div *ngIf="currentStep === 2" class="space-y-6 animate-[fadeIn_0.3s_ease-out]">
       
       <div class="text-center mb-6">
-        <p class="text-slate-400 text-sm">Divide tu rutina en bloques o fases (mesociclos)</p>
-        <p class="text-slate-500 text-xs mt-1">
+        <p class="text-ip-muted text-sm">Divide tu rutina en bloques o fases (mesociclos)</p>
+        <p class="text-ip-muted text-xs mt-1">
           Duración total: <span class="text-teal-400 font-semibold">{{ durationWeeks }} semanas</span>
         </p>
       </div>
 
       <!-- Resumen de semanas -->
-      <div class="p-4 bg-slate-800/30 border border-slate-700/30 rounded-xl">
+      <div class="p-4 bg-slate-800/30 border border-ip-border/30 rounded-xl">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm text-slate-400">Semanas asignadas</span>
+          <span class="text-sm text-ip-muted">Semanas asignadas</span>
           <span class="text-sm font-semibold" 
                 [ngClass]="getTotalBlockWeeks() === durationWeeks ? 'text-teal-400' : getTotalBlockWeeks() > durationWeeks ? 'text-rose-400' : 'text-amber-400'">
             {{ getTotalBlockWeeks() }} / {{ durationWeeks }}
           </span>
         </div>
-        <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+        <div class="h-2 bg-ip-surface rounded-full overflow-hidden">
           <div class="h-full rounded-full transition-all duration-300"
                [ngClass]="getTotalBlockWeeks() === durationWeeks ? 'bg-teal-500' : getTotalBlockWeeks() > durationWeeks ? 'bg-rose-500' : 'bg-amber-500'"
                [style.width.%]="(getTotalBlockWeeks() / durationWeeks) * 100"></div>
@@ -279,7 +279,7 @@
              class="p-4 rounded-xl border cursor-pointer transition-all"
              [ngClass]="currentBlockIndex === i 
                ? 'bg-teal-500/10 border-teal-500/50' 
-               : 'bg-slate-800/40 border-slate-700/40 hover:border-slate-600'">
+               : 'bg-ip-surface/40 border-ip-border/40 hover:border-ip-border'">
           
           <div class="flex items-start justify-between">
             <div class="flex-1">
@@ -290,16 +290,16 @@
                 <input type="text" [(ngModel)]="block.name"
                        (click)="$event.stopPropagation()"
                        placeholder="Nombre del bloque"
-                       class="flex-1 px-3 py-1.5 bg-transparent border-b border-slate-600 text-white font-medium focus:outline-none focus:border-teal-500 transition-all" />
+                       class="flex-1 px-3 py-1.5 bg-transparent border-b border-ip-border text-white font-medium focus:outline-none focus:border-teal-500 transition-all" />
               </div>
               
               <div class="flex items-center gap-4 mt-3">
                 <div class="flex items-center gap-2">
-                  <label class="text-xs text-slate-500">Duración:</label>
+                  <label class="text-xs text-ip-muted">Duración:</label>
                   <select [(ngModel)]="block.durationWeeks" 
                           (ngModelChange)="onBlockDurationChange(block)"
                           (click)="$event.stopPropagation()"
-                          class="px-2 py-1 bg-slate-700/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-teal-500 transition-all">
+                          class="px-2 py-1 bg-ip-surface/50 border border-ip-border rounded-lg text-ip-primary text-sm focus:outline-none focus:border-teal-500 transition-all">
                     <option *ngFor="let w of [1,2,3,4,5,6,7,8,9,10,11,12]" [value]="w">{{ w }} sem</option>
                   </select>
                 </div>
@@ -307,13 +307,13 @@
                 <input type="text" [(ngModel)]="block.description"
                        (click)="$event.stopPropagation()"
                        placeholder="Descripción (opcional)"
-                       class="flex-1 px-3 py-1.5 bg-slate-900/30 border border-slate-700/50 rounded-lg text-slate-300 text-sm placeholder-slate-600 focus:outline-none focus:border-teal-500/50 transition-all" />
+                       class="flex-1 px-3 py-1.5 bg-slate-900/30 border border-ip-border/50 rounded-lg text-ip-secondary text-sm placeholder-slate-600 focus:outline-none focus:border-teal-500/50 transition-all" />
               </div>
             </div>
             
             <button *ngIf="blocks.length > 1"
                     (click)="removeBlock(i); $event.stopPropagation()"
-                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-700/40 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors ml-3">
+                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-ip-surface/40 hover:bg-rose-500/20 text-ip-muted hover:text-rose-400 transition-colors ml-3">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
               </svg>
@@ -328,8 +328,8 @@
               class="w-full p-4 rounded-xl border border-dashed transition-all flex items-center justify-center gap-2
                      disabled:opacity-40 disabled:cursor-not-allowed"
               [ngClass]="getRemainingWeeks() > 0 
-                ? 'border-slate-600 text-slate-400 hover:border-teal-500/50 hover:text-teal-400 hover:bg-teal-500/5' 
-                : 'border-slate-700 text-slate-600'">
+                ? 'border-ip-border text-ip-muted hover:border-teal-500/50 hover:text-teal-400 hover:bg-teal-500/5' 
+                : 'border-ip-border text-ip-muted'">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
@@ -337,8 +337,8 @@
       </button>
 
       <!-- Info -->
-      <div class="p-4 bg-slate-800/20 border border-slate-700/20 rounded-xl">
-        <p class="text-xs text-slate-500 leading-relaxed">
+      <div class="p-4 bg-slate-800/20 border border-ip-border/20 rounded-xl">
+        <p class="text-xs text-ip-muted leading-relaxed">
           <span class="text-teal-400 font-medium">💡 Tip:</span> 
           Los bloques te permiten organizar tu rutina en fases. Por ejemplo: 
           "Fase de Fuerza" (4 sem), "Fase de Hipertrofia" (4 sem), "Deload" (1 sem).
@@ -350,8 +350,8 @@
     <div *ngIf="currentStep === 3" class="space-y-6 animate-[fadeIn_0.3s_ease-out]">
       
       <div class="text-center mb-6">
-        <p class="text-slate-400 text-sm">Crea las sesiones de entrenamiento para cada bloque</p>
-        <p class="text-slate-500 text-xs mt-1">
+        <p class="text-ip-muted text-sm">Crea las sesiones de entrenamiento para cada bloque</p>
+        <p class="text-ip-muted text-xs mt-1">
           Máximo <span class="text-teal-400 font-semibold">{{ daysPerWeek }} sesiones</span> por bloque (días por semana)
         </p>
       </div>
@@ -363,19 +363,19 @@
                 class="px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2"
                 [ngClass]="currentBlockIndex === i 
                   ? 'bg-teal-500 text-white' 
-                  : 'bg-slate-800/50 border border-slate-700/50 text-slate-300 hover:border-teal-500/30'">
+                  : 'bg-ip-surface/50 border border-ip-border/50 text-ip-secondary hover:border-teal-500/30'">
           <span>{{ block.name }}</span>
           <span class="text-xs opacity-70">({{ block.sessions.length }}/{{ daysPerWeek }})</span>
         </button>
       </div>
 
       <!-- Sesiones del bloque actual -->
-      <div *ngIf="currentBlock" class="p-4 bg-slate-800/30 border border-slate-700/30 rounded-xl">
+      <div *ngIf="currentBlock" class="p-4 bg-slate-800/30 border border-ip-border/30 rounded-xl">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-sm font-semibold text-teal-400">Sesiones de {{ currentBlock.name }}</h3>
           <span class="text-xs px-2 py-1 rounded-full"
                 [ngClass]="canAddSessionToCurrentBlock() 
-                  ? 'bg-slate-700/50 text-slate-400' 
+                  ? 'bg-ip-surface/50 text-ip-muted' 
                   : 'bg-teal-500/20 text-teal-400'">
             {{ currentBlock.sessions.length }}/{{ daysPerWeek }} sesiones
           </span>
@@ -388,12 +388,12 @@
                   class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
                   [ngClass]="currentSessionIndex === i 
                     ? 'bg-amber-500 text-slate-900' 
-                    : 'bg-slate-700/50 border border-slate-600 text-slate-300 hover:border-amber-500/30'">
+                    : 'bg-ip-surface/50 border border-ip-border text-ip-secondary hover:border-amber-500/30'">
             <span>{{ session.icon }}</span>
             <span>{{ session.title || 'Sesión ' + (i + 1) }}</span>
             <button *ngIf="currentBlock.sessions.length > 1" 
                     (click)="removeSession(i); $event.stopPropagation()"
-                    class="w-4 h-4 flex items-center justify-center rounded-full bg-slate-600/60 hover:bg-rose-500/30 text-slate-400 hover:text-rose-400 transition-colors ml-1">
+                    class="w-4 h-4 flex items-center justify-center rounded-full bg-slate-600/60 hover:bg-rose-500/30 text-ip-muted hover:text-rose-400 transition-colors ml-1">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
               </svg>
@@ -406,8 +406,8 @@
                   class="px-3 py-1.5 rounded-lg text-sm font-medium border border-dashed transition-all flex items-center gap-1
                          disabled:opacity-40 disabled:cursor-not-allowed"
                   [ngClass]="canAddSessionToCurrentBlock() 
-                    ? 'bg-slate-800/30 border-slate-600 text-slate-400 hover:border-teal-500/50 hover:text-teal-400' 
-                    : 'bg-slate-800/20 border-slate-700 text-slate-600'">
+                    ? 'bg-slate-800/30 border-ip-border text-ip-muted hover:border-teal-500/50 hover:text-teal-400' 
+                    : 'bg-slate-800/20 border-ip-border text-ip-muted'">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
@@ -424,36 +424,36 @@
         </div>
 
         <!-- Formulario de sesión actual -->
-        <div *ngIf="currentSession" class="p-4 bg-slate-900/40 border border-slate-700/40 rounded-xl space-y-4">
-          <h4 class="text-sm font-semibold text-white">Sesión {{ currentSessionIndex + 1 }}</h4>
+        <div *ngIf="currentSession" class="p-4 bg-ip-surface-elevated/40 border border-ip-border/40 rounded-xl space-y-4">
+          <h4 class="text-sm font-semibold text-ip-primary">Sesión {{ currentSessionIndex + 1 }}</h4>
           
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Nombre de la sesión *</label>
+            <label class="block text-xs font-medium text-ip-muted mb-1.5">Nombre de la sesión *</label>
             <input type="text" [(ngModel)]="currentSession.title"
                    placeholder="Ej: Tirón, Empuje, Pierna..."
-                   class="w-full px-3 py-2.5 bg-slate-800/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-teal-500/50 transition-all" />
+                   class="w-full px-3 py-2.5 bg-ip-surface/50 border border-ip-border/50 rounded-lg text-ip-primary placeholder-slate-500 focus:outline-none focus:border-teal-500/50 transition-all" />
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Icono</label>
+              <label class="block text-xs font-medium text-ip-muted mb-1.5">Icono</label>
               <input type="text" [(ngModel)]="currentSession.icon" maxlength="4"
-                     class="w-full px-3 py-2.5 bg-slate-800/50 border border-slate-700/50 rounded-lg text-white text-center text-xl focus:outline-none focus:border-teal-500/50 transition-all" />
+                     class="w-full px-3 py-2.5 bg-ip-surface/50 border border-ip-border/50 rounded-lg text-ip-primary text-center text-xl focus:outline-none focus:border-teal-500/50 transition-all" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1.5">Músculos</label>
+              <label class="block text-xs font-medium text-ip-muted mb-1.5">Músculos</label>
               <input type="text" [(ngModel)]="currentSession.muscles"
                      placeholder="Espalda, Bíceps..."
-                     class="w-full px-3 py-2.5 bg-slate-800/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-teal-500/50 transition-all" />
+                     class="w-full px-3 py-2.5 bg-ip-surface/50 border border-ip-border/50 rounded-lg text-ip-primary placeholder-slate-500 focus:outline-none focus:border-teal-500/50 transition-all" />
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-slate-400 mb-1.5">Descripción (opcional)</label>
+            <label class="block text-xs font-medium text-ip-muted mb-1.5">Descripción (opcional)</label>
             <textarea [(ngModel)]="currentSession.description"
                       placeholder="Notas sobre esta sesión..."
                       rows="2"
-                      class="w-full px-3 py-2.5 bg-slate-800/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-teal-500/50 transition-all resize-none"></textarea>
+                      class="w-full px-3 py-2.5 bg-ip-surface/50 border border-ip-border/50 rounded-lg text-ip-primary placeholder-slate-500 focus:outline-none focus:border-teal-500/50 transition-all resize-none"></textarea>
           </div>
         </div>
       </div>
@@ -463,20 +463,20 @@
     <div *ngIf="currentStep === 4" class="space-y-6 animate-[fadeIn_0.3s_ease-out]">
       
       <div class="text-center mb-6">
-        <p class="text-slate-400 text-sm">Agrega ejercicios a cada sesión</p>
+        <p class="text-ip-muted text-sm">Agrega ejercicios a cada sesión</p>
       </div>
 
       <!-- Selector de sesión (todas las sesiones de todos los bloques) -->
       <div class="space-y-3 mb-6">
         <div *ngFor="let block of blocks; let bIdx = index">
-          <p class="text-xs text-slate-500 font-medium mb-2">{{ block.name }}</p>
+          <p class="text-xs text-ip-muted font-medium mb-2">{{ block.name }}</p>
           <div class="flex flex-wrap gap-2">
             <button *ngFor="let session of block.sessions; let sIdx = index"
                     (click)="selectSession(bIdx, sIdx)"
                     class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
                     [ngClass]="currentBlockIndex === bIdx && currentSessionIndex === sIdx 
                       ? 'bg-teal-500 text-white' 
-                      : 'bg-slate-800/50 border border-slate-700/50 text-slate-300 hover:border-teal-500/30'">
+                      : 'bg-ip-surface/50 border border-ip-border/50 text-ip-secondary hover:border-teal-500/30'">
               <span>{{ session.icon }}</span>
               <span>{{ session.title || 'Sesión ' + (sIdx + 1) }}</span>
               <span class="text-xs opacity-70">({{ session.exercises.length }})</span>
@@ -489,14 +489,14 @@
       <div *ngIf="currentSession" class="space-y-4">
         
         <div *ngFor="let exercise of currentSession.exercises; let exIndex = index"
-             class="p-4 bg-slate-800/40 border border-slate-700/40 rounded-xl">
+             class="p-4 bg-ip-surface/40 border border-ip-border/40 rounded-xl">
           
           <div class="flex items-start justify-between mb-4">
             <span class="w-8 h-8 flex items-center justify-center bg-teal-500/20 text-teal-400 rounded-lg font-semibold text-sm">
               {{ exIndex + 1 }}
             </span>
             <button (click)="removeExerciseFromSession(exIndex)"
-                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-700/40 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors">
+                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-ip-surface/40 hover:bg-rose-500/20 text-ip-muted hover:text-rose-400 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
               </svg>
@@ -505,7 +505,7 @@
 
           <!-- Selector de ejercicio -->
           <div class="mb-4">
-            <label class="block text-xs font-medium text-slate-400 mb-2">Ejercicio</label>
+            <label class="block text-xs font-medium text-ip-muted mb-2">Ejercicio</label>
             <div class="relative">
               <input type="text" 
                      [value]="exercise.exerciseName"
@@ -513,19 +513,19 @@
                      (focus)="openDropdown(exercise.id)"
                      (blur)="closeDropdown()"
                      placeholder="Buscar ejercicio..."
-                     class="w-full px-4 py-3 bg-slate-900/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-teal-500/50 transition-all" />
+                     class="w-full px-4 py-3 bg-ip-input/50 border border-ip-border/50 rounded-xl text-ip-primary placeholder-slate-500 focus:outline-none focus:border-teal-500/50 transition-all" />
               
               <!-- Dropdown de ejercicios -->
               <div *ngIf="isDropdownOpen(exercise.id)"
-                   class="absolute z-20 top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-slate-800 border border-slate-700 rounded-xl shadow-xl">
+                   class="absolute z-20 top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-slate-800 border border-ip-border rounded-xl shadow-xl">
                 <button *ngFor="let ex of filteredExercises | slice:0:10"
                         type="button"
                         (mousedown)="selectExercise(exercise, ex)"
-                        class="w-full px-4 py-3 text-left hover:bg-slate-700/50 transition-colors border-b border-slate-700/30 last:border-0">
-                  <p class="text-sm font-medium text-white">{{ ex.name }}</p>
-                  <p class="text-xs text-slate-500">{{ ex.muscleGroup }}</p>
+                        class="w-full px-4 py-3 text-left hover:bg-ip-surface/50 transition-colors border-b border-ip-border/30 last:border-0">
+                  <p class="text-sm font-medium text-ip-primary">{{ ex.name }}</p>
+                  <p class="text-xs text-ip-muted">{{ ex.muscleGroup }}</p>
                 </button>
-                <div *ngIf="filteredExercises.length === 0" class="px-4 py-3 text-sm text-slate-500">
+                <div *ngIf="filteredExercises.length === 0" class="px-4 py-3 text-sm text-ip-muted">
                   No se encontraron ejercicios
                 </div>
               </div>
@@ -535,31 +535,31 @@
           <!-- Parámetros del ejercicio -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Series</label>
+              <label class="block text-xs font-medium text-ip-muted mb-1">Series</label>
               <input type="number" [(ngModel)]="exercise.sets" min="1" max="20"
-                     class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700/50 rounded-lg text-white text-center focus:outline-none focus:border-teal-500/50 transition-all" />
+                     class="w-full px-3 py-2 bg-ip-input/50 border border-ip-border/50 rounded-lg text-ip-primary text-center focus:outline-none focus:border-teal-500/50 transition-all" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Reps mín</label>
+              <label class="block text-xs font-medium text-ip-muted mb-1">Reps mín</label>
               <input type="number" [(ngModel)]="exercise.repsMin" min="1"
-                     class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700/50 rounded-lg text-white text-center focus:outline-none focus:border-teal-500/50 transition-all" />
+                     class="w-full px-3 py-2 bg-ip-input/50 border border-ip-border/50 rounded-lg text-ip-primary text-center focus:outline-none focus:border-teal-500/50 transition-all" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Reps máx</label>
+              <label class="block text-xs font-medium text-ip-muted mb-1">Reps máx</label>
               <input type="number" [(ngModel)]="exercise.repsMax" min="1"
-                     class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700/50 rounded-lg text-white text-center focus:outline-none focus:border-teal-500/50 transition-all" />
+                     class="w-full px-3 py-2 bg-ip-input/50 border border-ip-border/50 rounded-lg text-ip-primary text-center focus:outline-none focus:border-teal-500/50 transition-all" />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">RIR</label>
+              <label class="block text-xs font-medium text-ip-muted mb-1">RIR</label>
               <input type="number" [(ngModel)]="exercise.rir" min="0" max="5"
-                     class="w-full px-3 py-2 bg-slate-900/50 border border-slate-700/50 rounded-lg text-white text-center focus:outline-none focus:border-teal-500/50 transition-all" />
+                     class="w-full px-3 py-2 bg-ip-input/50 border border-ip-border/50 rounded-lg text-ip-primary text-center focus:outline-none focus:border-teal-500/50 transition-all" />
             </div>
           </div>
         </div>
 
         <!-- Botón agregar ejercicio -->
         <button (click)="addExerciseToSession()"
-                class="w-full p-4 rounded-xl border border-dashed border-slate-600 text-slate-400 hover:border-teal-500/50 hover:text-teal-400 hover:bg-teal-500/5 transition-all flex items-center justify-center gap-2">
+                class="w-full p-4 rounded-xl border border-dashed border-ip-border text-ip-muted hover:border-teal-500/50 hover:text-teal-400 hover:bg-teal-500/5 transition-all flex items-center justify-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
@@ -569,9 +569,9 @@
     </div>
 
     <!-- Navigation Buttons -->
-    <div class="flex items-center justify-between mt-8 pt-6 border-t border-slate-800/60">
+    <div class="flex items-center justify-between mt-8 pt-6 border-t border-ip-border/60">
       <button *ngIf="currentStep > 1" (click)="prevStep()"
-              class="px-6 py-3 bg-slate-800/50 border border-slate-700/50 text-slate-300 rounded-xl font-medium hover:bg-slate-700/50 transition-all flex items-center gap-2">
+              class="px-6 py-3 bg-ip-surface/50 border border-ip-border/50 text-ip-secondary rounded-xl font-medium hover:bg-ip-surface/50 transition-all flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
         </svg>

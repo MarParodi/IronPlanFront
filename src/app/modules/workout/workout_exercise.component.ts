@@ -165,7 +165,7 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   }
 
   getRecommendationColor(): string {
-    if (!this.recommendation) return 'text-slate-400';
+    if (!this.recommendation) return 'text-ip-muted';
     return this.progressService.getRecommendationColor(this.recommendation.type);
   }
 

@@ -3,17 +3,17 @@
 
     <!-- HEADER DE LA SECCIÓN -->
 <div class="space-y-2">
-  <h1 class="text-2xl md:text-3xl font-bold text-slate-50">
+  <h1 class="text-2xl md:text-3xl font-bold text-ip-primary">
     Explorar Rutinas
   </h1>
-  <p class="text-sm md:text-base text-slate-400">
+  <p class="text-sm md:text-base text-ip-muted">
     Encuentra la rutina perfecta para alcanzar tus objetivos
   </p>
 </div>
 
 <!-- Mi organización + Competencias — card unificado -->
 <div *ngIf="userGroupName"
-     class="rounded-2xl bg-ip-surface border border-slate-800 overflow-hidden">
+     class="rounded-2xl bg-ip-surface border border-ip-border overflow-hidden">
 
   <!-- Info del grupo -->
   <div class="flex items-start gap-3 px-4 pt-4 pb-3">
@@ -25,11 +25,11 @@
       </svg>
     </div>
     <div class="min-w-0 flex-1">
-      <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-wide">
+      <p class="text-[10px] text-ip-muted font-semibold uppercase tracking-wide">
         MI ORGANIZACIÓN · {{ userOrgRoot }}
       </p>
       <p *ngIf="userOrgMiddle"
-         class="text-sm font-semibold text-slate-200 truncate mt-0.5">
+         class="text-sm font-semibold text-ip-primary truncate mt-0.5">
         {{ userOrgMiddle }}
       </p>
       <p class="text-xs text-teal-400 font-medium mt-0.5">{{ userGroupName }}</p>
@@ -38,15 +38,15 @@
 
   <!-- Competencias activas dentro del mismo card -->
   <ng-container *ngIf="!loadingCompetitions && activeCompetitions.length > 0">
-    <div class="h-px bg-slate-800/60 mx-4"></div>
+    <div class="h-px bg-ip-surface/60 mx-4"></div>
     <div class="px-4 py-3 space-y-2">
-      <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-wide">
+      <p class="text-[10px] text-ip-muted font-semibold uppercase tracking-wide">
         Mis competencias activas
       </p>
       <div class="space-y-2">
         <div *ngFor="let c of activeCompetitions"
              class="flex items-center gap-3 px-3 py-2.5 rounded-xl
-                    bg-slate-800/40 hover:bg-slate-800/70
+                    bg-ip-surface/40 hover:bg-ip-surface/70
                     transition-all cursor-pointer"
              (click)="openCompetition(c)">
           <span class="text-[10px] font-bold px-2 py-1 rounded-md flex-shrink-0"
@@ -58,8 +58,8 @@
             {{ getCompetitionTypeLabel(c.competitionType) }}
           </span>
           <div class="flex-1 min-w-0">
-            <p class="text-sm text-slate-200 font-semibold truncate">{{ c.name }}</p>
-            <p class="text-xs text-slate-500">
+            <p class="text-sm text-ip-primary font-semibold truncate">{{ c.name }}</p>
+            <p class="text-xs text-ip-muted">
               {{ getMetricLabel(c.metricType) }}
               <span *ngIf="c.endDate"> · hasta {{ c.endDate | date:'dd/MM/yy' }}</span>
               <span *ngIf="!c.endDate"> · permanente</span>
@@ -82,21 +82,21 @@
       <div class="relative flex items-center">
         <!-- Icono de búsqueda -->
         <svg xmlns="http://www.w3.org/2000/svg"
-          class="absolute left-4 w-5 h-5 text-slate-500 pointer-events-none transition-colors"
+          class="absolute left-4 w-5 h-5 text-ip-muted pointer-events-none transition-colors"
           [class.text-teal-400]="searchFocused" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
 
         <!-- Input de búsqueda -->
         <input type="text" [value]="searchQuery" (input)="onSearchInput($event)" (focus)="searchFocused = true"
-          (blur)="searchFocused = false" placeholder="Buscar rutinas por nombre o descripción..." class="w-full pl-12 pr-12 py-3.5 bg-ip-header border border-slate-700/80 rounded-xl
-                 text-sm md:text-base text-slate-100 placeholder:text-slate-500
+          (blur)="searchFocused = false" placeholder="Buscar rutinas por nombre o descripción..." class="w-full pl-12 pr-12 py-3.5 bg-ip-header border border-ip-border/80 rounded-xl
+                 text-sm md:text-base text-ip-primary placeholder:text-ip-muted
                  focus:outline-none focus:border-teal-400/70 focus:ring-2 focus:ring-teal-400/20
                  transition-all duration-200" />
 
         <!-- Botón limpiar búsqueda -->
         <button *ngIf="searchQuery" (click)="clearSearch()"
-          class="absolute right-4 p-1 text-slate-500 hover:text-slate-300 transition-colors">
+          class="absolute right-4 p-1 text-ip-muted hover:text-ip-secondary transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
             stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -105,7 +105,7 @@
       </div>
 
       <!-- Indicador de búsqueda activa -->
-      <div *ngIf="searchQuery" class="mt-2 flex items-center gap-2 text-xs text-slate-400">
+      <div *ngIf="searchQuery" class="mt-2 flex items-center gap-2 text-xs text-ip-muted">
         <span class="w-2 h-2 bg-teal-400 rounded-full animate-pulse"></span>
         Buscando: "{{ searchQuery }}"
         <span *ngIf="!loading && filteredCards.length > 0">
@@ -116,7 +116,7 @@
 
     <!-- FILTROS POR OBJETIVO -->
     <div class="space-y-3">
-      <div class="flex items-center gap-2 text-sm text-slate-400">
+      <div class="flex items-center gap-2 text-sm text-ip-muted">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
           stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -129,7 +129,7 @@
         <!-- Botón "Todos" -->
         <button (click)="onSelectGoal(null)" [ngClass]="goalFilter === null
             ? 'bg-slate-100 text-slate-900 shadow-md border-transparent'
-            : 'bg-transparent text-slate-300 border-slate-600 hover:border-slate-400 hover:text-slate-100'"
+            : 'bg-transparent text-ip-secondary border-ip-border hover:border-slate-400 hover:text-ip-primary'"
           class="px-4 py-2 rounded-full text-xs md:text-sm font-medium border transition-all duration-200">
           Todos
         </button>
@@ -137,7 +137,7 @@
         <!-- Botón Fuerza -->
         <button (click)="onSelectGoal('FUERZA')" [ngClass]="goalFilter === 'FUERZA'
             ? 'bg-teal-400 text-slate-950 shadow-md shadow-teal-400/25 border-transparent'
-            : 'bg-[#0f1214] text-slate-200 border-slate-700 hover:border-teal-300/70 hover:text-teal-300'"
+            : 'bg-ip-input text-ip-primary border-ip-border hover:border-teal-300/70 hover:text-teal-300'"
           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-medium border transition-all duration-200">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
             stroke-width="2">
@@ -149,7 +149,7 @@
         <!-- Botón Hipertrofia -->
         <button (click)="onSelectGoal('HIPERTROFIA')" [ngClass]="goalFilter === 'HIPERTROFIA'
             ? 'bg-teal-400 text-slate-950 shadow-md shadow-teal-400/25 border-transparent'
-            : 'bg-[#0f1214] text-slate-200 border-slate-700 hover:border-teal-300/70 hover:text-teal-300'"
+            : 'bg-ip-input text-ip-primary border-ip-border hover:border-teal-300/70 hover:text-teal-300'"
           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-medium border transition-all duration-200">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
             stroke-width="2">
@@ -162,7 +162,7 @@
         <!-- Botón Resistencia -->
         <button (click)="onSelectGoal('RESISTENCIA')" [ngClass]="goalFilter === 'RESISTENCIA'
             ? 'bg-teal-400 text-slate-950 shadow-md shadow-teal-400/25 border-transparent'
-            : 'bg-[#0f1214] text-slate-200 border-slate-700 hover:border-teal-300/70 hover:text-teal-300'"
+            : 'bg-ip-input text-ip-primary border-ip-border hover:border-teal-300/70 hover:text-teal-300'"
           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-medium border transition-all duration-200">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
             stroke-width="2">
@@ -175,7 +175,7 @@
 
     <!-- FILTROS POR DÍAS DE ENTRENAMIENTO -->
     <div class="space-y-3">
-      <div class="flex items-center gap-2 text-sm text-slate-400">
+      <div class="flex items-center gap-2 text-sm text-ip-muted">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
           stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -188,7 +188,7 @@
         <!-- Botón "Todos" -->
         <button (click)="onSelectDays(null)" [ngClass]="daysFilter === null
             ? 'bg-slate-100 text-slate-900 shadow-md border-transparent'
-            : 'bg-transparent text-slate-300 border-slate-600 hover:border-slate-400 hover:text-slate-100'"
+            : 'bg-transparent text-ip-secondary border-ip-border hover:border-slate-400 hover:text-ip-primary'"
           class="px-4 py-2 rounded-full text-xs md:text-sm font-medium border transition-all duration-200">
           Todos
         </button>
@@ -196,7 +196,7 @@
         <!-- Botones de días -->
         <button *ngFor="let d of daysOptions" (click)="onSelectDays(d)" [ngClass]="daysFilter === d
             ? 'bg-violet-400 text-slate-950 shadow-md shadow-violet-400/25 border-transparent'
-            : 'bg-[#0f1214] text-slate-200 border-slate-700 hover:border-violet-300/70 hover:text-violet-300'"
+            : 'bg-ip-input text-ip-primary border-ip-border hover:border-violet-300/70 hover:text-violet-300'"
           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-medium border transition-all duration-200">
           <span class="font-bold">{{ d }}</span>
         </button>
@@ -205,7 +205,7 @@
 
     <!-- FILTROS POR GÉNERO -->
     <div class="space-y-3">
-      <div class="flex items-center gap-2 text-sm text-slate-400">
+      <div class="flex items-center gap-2 text-sm text-ip-muted">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
           stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -218,7 +218,7 @@
         <!-- Botón "Todos" -->
         <button (click)="onSelectGender(null)" [ngClass]="genderFilter === null
             ? 'bg-slate-100 text-slate-900 shadow-md border-transparent'
-            : 'bg-transparent text-slate-300 border-slate-600 hover:border-slate-400 hover:text-slate-100'"
+            : 'bg-transparent text-ip-secondary border-ip-border hover:border-slate-400 hover:text-ip-primary'"
           class="px-4 py-2 rounded-full text-xs md:text-sm font-medium border transition-all duration-200">
           Todos
         </button>
@@ -226,7 +226,7 @@
         <!-- Botones de género -->
         <button *ngFor="let g of genders" (click)="onSelectGender(g.key)" [ngClass]="genderFilter === g.key
             ? 'bg-pink-400 text-slate-950 shadow-md shadow-pink-400/25 border-transparent'
-            : 'bg-[#0f1214] text-slate-200 border-slate-700 hover:border-pink-300/70 hover:text-pink-300'"
+            : 'bg-ip-input text-ip-primary border-ip-border hover:border-pink-300/70 hover:text-pink-300'"
           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-medium border transition-all duration-200">
           <span>{{ g.icon }}</span>
           <span>{{ g.label }}</span>
@@ -235,8 +235,8 @@
     </div>
 
     <!-- ORDENAR + CONTADOR -->
-    <div class="flex flex-wrap items-center justify-between gap-3 py-2 border-y border-slate-800/60">
-      <div class="flex items-center gap-2 text-sm text-slate-400">
+    <div class="flex flex-wrap items-center justify-between gap-3 py-2 border-y border-ip-border/60">
+      <div class="flex items-center gap-2 text-sm text-ip-muted">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
           stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
@@ -245,7 +245,7 @@
       </div>
 
       <div class="flex items-center gap-4">
-        <select (change)="onSortChange($any($event.target).value)" class="bg-[#0f1214] border border-slate-700 rounded-lg px-3 py-2 text-xs md:text-sm text-slate-100 
+        <select (change)="onSortChange($any($event.target).value)" class="bg-ip-input border border-ip-border rounded-lg px-3 py-2 text-xs md:text-sm text-ip-primary 
                  focus:outline-none focus:ring-2 focus:ring-teal-400/60 focus:border-teal-300 cursor-pointer">
           <option value="id,desc">Más recientes</option>
           <option value="usageCount,desc">Más populares</option>
@@ -254,7 +254,7 @@
         </select>
 
         <!-- Contador de resultados -->
-        <span *ngIf="!loading" class="text-xs text-slate-500 hidden sm:inline">
+        <span *ngIf="!loading" class="text-xs text-ip-muted hidden sm:inline">
           {{ filteredCards.length }} rutina{{ filteredCards.length !== 1 ? 's' : '' }}
         </span>
       </div>
@@ -264,7 +264,7 @@
     <div *ngIf="loading" class="py-12">
       <div class="flex flex-col items-center gap-4">
         <div class="w-10 h-10 border-3 border-teal-400 border-t-transparent rounded-full animate-spin"></div>
-        <p class="text-sm text-slate-400">Cargando rutinas...</p>
+        <p class="text-sm text-ip-muted">Cargando rutinas...</p>
       </div>
     </div>
 
@@ -281,16 +281,16 @@
     <!-- ESTADO: SIN RESULTADOS -->
     <div *ngIf="!loading && !errorMsg && filteredCards.length === 0" class="py-16">
       <div class="flex flex-col items-center gap-4 text-center">
-        <div class="w-16 h-16 rounded-full bg-slate-800/50 flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-slate-500" fill="none" viewBox="0 0 24 24"
+        <div class="w-16 h-16 rounded-full bg-ip-surface/50 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-ip-muted" fill="none" viewBox="0 0 24 24"
             stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
         <div class="space-y-1">
-          <p class="text-slate-300 font-medium">No se encontraron rutinas</p>
-          <p class="text-sm text-slate-500">Intenta con otros filtros o términos de búsqueda</p>
+          <p class="text-ip-secondary font-medium">No se encontraron rutinas</p>
+          <p class="text-sm text-ip-muted">Intenta con otros filtros o términos de búsqueda</p>
         </div>
         <button (click)="onSelectGoal(null); onSelectDays(null); onSelectGender(null); clearSearch()"
           class="mt-2 px-4 py-2 text-sm text-teal-400 hover:text-teal-300 transition-colors">
@@ -303,7 +303,7 @@
     <div *ngIf="!loading && !errorMsg && filteredCards.length > 0">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
 
-        <div *ngFor="let c of filteredCards; trackBy: trackByCard" class="group bg-ip-surface border border-slate-800 rounded-2xl overflow-hidden
+        <div *ngFor="let c of filteredCards; trackBy: trackByCard" class="group bg-ip-surface border border-ip-border rounded-2xl overflow-hidden
                  shadow-[0_8px_30px_rgba(0,0,0,0.4)]
                  hover:border-teal-400/50 hover:shadow-[0_12px_40px_rgba(45,212,191,0.15)]
                  transition-all duration-300">
@@ -316,7 +316,7 @@
 
 
             <!-- Overlay gradient -->
-            <div class="absolute inset-0 bg-gradient-to-t from-[#171a1d] via-transparent to-transparent"></div>
+            <div class="absolute inset-0 bg-ip-overlay-fade"></div>
 
             <!-- Badge de acceso -->
             <div class="absolute top-3 left-3">
@@ -355,13 +355,13 @@
             <!-- Contador de usos (corazón) -->
             <div class="absolute top-3 right-3">
               <div
-                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/40 backdrop-blur-sm border border-white/10">
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ip-surface/60 backdrop-blur-sm border border-ip-border/60">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-rose-400" fill="currentColor"
                   viewBox="0 0 24 24">
                   <path
                     d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
-                <span class="text-xs font-medium text-slate-200">{{ formatUsageCount(c.usageCount) }}</span>
+                <span class="text-xs font-medium text-ip-primary">{{ formatUsageCount(c.usageCount) }}</span>
               </div>
             </div>
           </div>
@@ -371,14 +371,14 @@
             <!-- Título y objetivo -->
             <div class="space-y-1">
               <h3
-                class="text-base md:text-lg font-semibold text-slate-50 group-hover:text-teal-300 transition-colors line-clamp-1">
+                class="text-base md:text-lg font-semibold text-ip-primary group-hover:text-teal-300 transition-colors line-clamp-1">
                 {{ c.name }}
               </h3>
 
               <!-- Badges del objetivo y género -->
               <div class="flex items-center gap-2 flex-wrap">
                 <span
-                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-800/80 text-slate-300 border border-slate-700/80">
+                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-800/80 text-ip-secondary border border-ip-border/80">
                   {{ c.goal | titlecase }}
                 </span>
                 <!-- Badge de género -->
@@ -398,13 +398,13 @@
             </div>
 
             <!-- Descripción -->
-            <p class="text-sm text-slate-400 line-clamp-2 leading-relaxed">
+            <p class="text-sm text-ip-muted line-clamp-2 leading-relaxed">
               {{ c.description }}
             </p>
 
             <!-- Botón -->
-            <button (click)="onDetails(c)" class="w-full mt-2 px-4 py-2.5 rounded-xl bg-slate-800/80 text-slate-200 text-sm font-medium
-                     border border-slate-700/80
+            <button (click)="onDetails(c)" class="w-full mt-2 px-4 py-2.5 rounded-xl bg-slate-800/80 text-ip-primary text-sm font-medium
+                     border border-ip-border/80
                      hover:bg-teal-400 hover:text-slate-950 hover:border-teal-400
                      active:scale-[0.98] transition-all duration-200
                      flex items-center justify-center gap-2">
@@ -422,7 +422,7 @@
 
     <!-- PAGINACIÓN -->
     <div *ngIf="totalPages > 1" class="flex items-center justify-center gap-2 md:gap-4 pt-6">
-      <button (click)="onPageChange(page - 1)" [disabled]="page === 0" class="inline-flex items-center gap-1 px-4 py-2 rounded-lg border border-slate-700 bg-[#0f1214] text-sm text-slate-300
+      <button (click)="onPageChange(page - 1)" [disabled]="page === 0" class="inline-flex items-center gap-1 px-4 py-2 rounded-lg border border-ip-border bg-ip-input text-sm text-ip-secondary
                disabled:opacity-40 disabled:cursor-not-allowed 
                hover:border-teal-400/60 hover:text-teal-400 transition-all">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -436,13 +436,13 @@
       <div class="flex items-center gap-1">
         <button *ngFor="let p of getPageNumbers()" (click)="onPageChange(p)" [ngClass]="p === page 
             ? 'bg-teal-400 text-slate-950 border-teal-400' 
-            : 'bg-[#0f1214] text-slate-400 border-slate-700 hover:border-slate-500'"
+            : 'bg-ip-input text-ip-muted border-ip-border hover:border-slate-500'"
           class="w-9 h-9 rounded-lg border text-sm font-medium transition-all">
           {{ p + 1 }}
         </button>
       </div>
 
-      <button (click)="onPageChange(page + 1)" [disabled]="page + 1 >= totalPages" class="inline-flex items-center gap-1 px-4 py-2 rounded-lg border border-slate-700 bg-[#0f1214] text-sm text-slate-300
+      <button (click)="onPageChange(page + 1)" [disabled]="page + 1 >= totalPages" class="inline-flex items-center gap-1 px-4 py-2 rounded-lg border border-ip-border bg-ip-input text-sm text-ip-secondary
                disabled:opacity-40 disabled:cursor-not-allowed 
                hover:border-teal-400/60 hover:text-teal-400 transition-all">
         <span class="hidden sm:inline">Siguiente</span>
@@ -455,13 +455,13 @@
 
     <!-- MODAL DETALLE DE RUTINA -->
     <div *ngIf="detailOpen"
-      class="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/80 backdrop-blur-sm px-4 pb-4 md:pb-0">
+      class="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-ip-backdrop backdrop-blur-sm px-4 pb-4 md:pb-0">
 
       <!-- Cerrar al dar click en el fondo -->
       <div class="absolute inset-0" (click)="closeDetail()"></div>
 
       <!-- Contenedor del modal -->
-      <div class="relative w-full max-w-lg bg-ip-surface text-slate-100 rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden
+      <div class="relative w-full max-w-lg bg-ip-surface text-ip-primary rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden
                animate-[slideUp_0.3s_ease-out]">
 
         <!-- Header con imagen -->
@@ -469,11 +469,11 @@
           <img *ngIf="selectedRoutine.img" [src]="selectedRoutine.img" alt="{{ selectedRoutine.name }}"
             class="w-full h-full object-cover opacity-70" />
 
-          <div class="absolute inset-0 bg-gradient-to-t from-[#171a1d] via-[#171a1d]/50 to-transparent"></div>
+          <div class="absolute inset-0 bg-ip-overlay-fade-soft"></div>
 
           <!-- Botón Cerrar -->
           <button type="button" (click)="closeDetail()"
-            class="absolute right-4 top-4 w-8 h-8 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-slate-300 hover:text-white hover:bg-black/60 transition-all">
+            class="absolute right-4 top-4 w-8 h-8 flex items-center justify-center rounded-full bg-ip-surface/60 backdrop-blur-sm text-ip-secondary hover:text-ip-primary hover:bg-black/60 transition-all">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -486,8 +486,8 @@
           <div *ngIf="detailLoading" class="space-y-4">
             <div class="h-6 w-48 bg-slate-700/60 rounded-lg animate-pulse"></div>
             <div class="space-y-2">
-              <div class="h-4 w-full bg-slate-700/40 rounded animate-pulse"></div>
-              <div class="h-4 w-3/4 bg-slate-700/40 rounded animate-pulse"></div>
+              <div class="h-4 w-full bg-ip-surface/40 rounded animate-pulse"></div>
+              <div class="h-4 w-3/4 bg-ip-surface/40 rounded animate-pulse"></div>
             </div>
             <div class="h-12 w-full bg-slate-700/60 rounded-xl mt-4 animate-pulse"></div>
           </div>
@@ -507,26 +507,26 @@
           <ng-container *ngIf="!detailLoading && !detailError && selectedRoutine as r">
 
             <!-- Título -->
-            <h2 class="text-xl md:text-2xl font-bold text-slate-50 mb-4">
+            <h2 class="text-xl md:text-2xl font-bold text-ip-primary mb-4">
               {{ r.name }}
             </h2>
 
             <!-- Info grid -->
             <div class="grid grid-cols-2 gap-3 mb-4">
-              <div class="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50">
-                <p class="text-xs text-slate-500 mb-1">Objetivo</p>
-                <p class="text-sm font-medium text-slate-200">{{ r.goal | titlecase }}</p>
+              <div class="bg-ip-surface/50 rounded-xl p-3 border border-ip-border/50">
+                <p class="text-xs text-ip-muted mb-1">Objetivo</p>
+                <p class="text-sm font-medium text-ip-primary">{{ r.goal | titlecase }}</p>
               </div>
-              <div class="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50">
-                <p class="text-xs text-slate-500 mb-1">Nivel</p>
-                <p class="text-sm font-medium text-slate-200">{{ r.suggestedLevel || 'Intermedio' }}</p>
+              <div class="bg-ip-surface/50 rounded-xl p-3 border border-ip-border/50">
+                <p class="text-xs text-ip-muted mb-1">Nivel</p>
+                <p class="text-sm font-medium text-ip-primary">{{ r.suggestedLevel || 'Intermedio' }}</p>
               </div>
             </div>
 
             <!-- Descripción -->
             <div class="mb-5">
-              <p class="text-xs text-slate-500 mb-2">Descripción</p>
-              <p class="text-sm text-slate-300 leading-relaxed">
+              <p class="text-xs text-ip-muted mb-2">Descripción</p>
+              <p class="text-sm text-ip-secondary leading-relaxed">
                 {{ r.description }}
               </p>
             </div>
@@ -570,25 +570,25 @@
 </div>
 <!-- MODAL DESBLOQUEO XP -->
 <div *ngIf="xpModalOpen"
-  class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+  class="fixed inset-0 z-[60] flex items-center justify-center bg-ip-backdrop backdrop-blur-sm px-4">
 
   <div class="absolute inset-0" (click)="closeXpModal()"></div>
 
-  <div class="relative w-full max-w-md bg-ip-surface rounded-2xl border border-slate-800 shadow-2xl overflow-hidden">
+  <div class="relative w-full max-w-md bg-ip-surface rounded-2xl border border-ip-border shadow-2xl overflow-hidden">
     <div class="p-5">
-      <h3 class="text-lg font-bold text-slate-50">Desbloquear rutina</h3>
+      <h3 class="text-lg font-bold text-ip-primary">Desbloquear rutina</h3>
 
-      <p class="mt-2 text-sm text-slate-300">
+      <p class="mt-2 text-sm text-ip-secondary">
         ¿Deseas desbloquear <span class="font-semibold">{{ pendingRoutine?.name }}</span> con XP?
       </p>
 
       <div class="mt-4 grid grid-cols-2 gap-3">
-        <div class="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50">
-          <p class="text-xs text-slate-500">Tu XP</p>
-          <p class="text-base font-semibold text-slate-100">{{ userXp }}</p>
+        <div class="bg-ip-surface/50 rounded-xl p-3 border border-ip-border/50">
+          <p class="text-xs text-ip-muted">Tu XP</p>
+          <p class="text-base font-semibold text-ip-primary">{{ userXp }}</p>
         </div>
-        <div class="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50">
-          <p class="text-xs text-slate-500">Costo</p>
+        <div class="bg-ip-surface/50 rounded-xl p-3 border border-ip-border/50">
+          <p class="text-xs text-ip-muted">Costo</p>
           <p class="text-base font-semibold text-amber-300">
             {{ pendingRoutine?.xpCost ?? '---' }}
           </p>
@@ -602,7 +602,7 @@
 
       <div class="mt-5 flex gap-3">
         <button (click)="closeXpModal()" [disabled]="xpUnlocking"
-          class="flex-1 px-4 py-2.5 rounded-xl bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 transition disabled:opacity-50">
+          class="flex-1 px-4 py-2.5 rounded-xl bg-slate-800 text-ip-primary border border-ip-border hover:bg-ip-surface transition disabled:opacity-50">
           Cancelar
         </button>
 

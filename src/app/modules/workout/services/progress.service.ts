@@ -123,7 +123,7 @@ export class ProgressService {
       case 'FIRST_TIME':
         return 'text-violet-400';
       default:
-        return 'text-slate-400';
+        return 'text-ip-muted';
     }
   }
 

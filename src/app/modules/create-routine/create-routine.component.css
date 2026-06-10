@@ -43,7 +43,7 @@ select {
 
 select option {
   background-color: #1e293b;
-  color: white;
+  color: rgb(var(--ip-text-primary));
 }
 
 /* ===================== Cover uploader ===================== */

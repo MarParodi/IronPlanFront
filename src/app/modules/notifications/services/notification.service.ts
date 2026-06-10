@@ -145,7 +145,7 @@ export class NotificationService {
       case 'INFO': return 'text-blue-400';
       case 'WARNING': return 'text-amber-400';
       case 'ERROR': return 'text-rose-400';
-      default: return 'text-slate-400';
+      default: return 'text-ip-muted';
     }
   }
 
