@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from './services/user.service';
 import { Router } from '@angular/router';
+import { ThemeToggleComponent } from '../../core/components/theme-toggle/theme-toggle.component';
 
 // Ajusta estos tipos si ya los tienes en otro archivo
 export type Level = 'NOVATO' | 'INTERMEDIO' | 'AVANZADO';
@@ -14,7 +15,7 @@ export type TrainDays = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, ThemeToggleComponent],
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.css'],
 })

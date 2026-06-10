@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-[#111416] text-slate-100">
+<div class="min-h-screen bg-ip-page text-ip-primary">
   <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
 
     <!-- HEADER DE LA SECCIÓN -->
@@ -13,7 +13,7 @@
 
 <!-- Mi organización + Competencias — card unificado -->
 <div *ngIf="userGroupName"
-     class="rounded-2xl bg-[#171a1d] border border-slate-800 overflow-hidden">
+     class="rounded-2xl bg-ip-surface border border-slate-800 overflow-hidden">
 
   <!-- Info del grupo -->
   <div class="flex items-start gap-3 px-4 pt-4 pb-3">
@@ -89,7 +89,7 @@
 
         <!-- Input de búsqueda -->
         <input type="text" [value]="searchQuery" (input)="onSearchInput($event)" (focus)="searchFocused = true"
-          (blur)="searchFocused = false" placeholder="Buscar rutinas por nombre o descripción..." class="w-full pl-12 pr-12 py-3.5 bg-[#0d0f11] border border-slate-700/80 rounded-xl
+          (blur)="searchFocused = false" placeholder="Buscar rutinas por nombre o descripción..." class="w-full pl-12 pr-12 py-3.5 bg-ip-header border border-slate-700/80 rounded-xl
                  text-sm md:text-base text-slate-100 placeholder:text-slate-500
                  focus:outline-none focus:border-teal-400/70 focus:ring-2 focus:ring-teal-400/20
                  transition-all duration-200" />
@@ -303,7 +303,7 @@
     <div *ngIf="!loading && !errorMsg && filteredCards.length > 0">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
 
-        <div *ngFor="let c of filteredCards; trackBy: trackByCard" class="group bg-[#171a1d] border border-slate-800 rounded-2xl overflow-hidden
+        <div *ngFor="let c of filteredCards; trackBy: trackByCard" class="group bg-ip-surface border border-slate-800 rounded-2xl overflow-hidden
                  shadow-[0_8px_30px_rgba(0,0,0,0.4)]
                  hover:border-teal-400/50 hover:shadow-[0_12px_40px_rgba(45,212,191,0.15)]
                  transition-all duration-300">
@@ -461,7 +461,7 @@
       <div class="absolute inset-0" (click)="closeDetail()"></div>
 
       <!-- Contenedor del modal -->
-      <div class="relative w-full max-w-lg bg-[#171a1d] text-slate-100 rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden
+      <div class="relative w-full max-w-lg bg-ip-surface text-slate-100 rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden
                animate-[slideUp_0.3s_ease-out]">
 
         <!-- Header con imagen -->
@@ -574,7 +574,7 @@
 
   <div class="absolute inset-0" (click)="closeXpModal()"></div>
 
-  <div class="relative w-full max-w-md bg-[#171a1d] rounded-2xl border border-slate-800 shadow-2xl overflow-hidden">
+  <div class="relative w-full max-w-md bg-ip-surface rounded-2xl border border-slate-800 shadow-2xl overflow-hidden">
     <div class="p-5">
       <h3 class="text-lg font-bold text-slate-50">Desbloquear rutina</h3>
 

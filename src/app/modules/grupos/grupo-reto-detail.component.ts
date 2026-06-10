@@ -63,20 +63,20 @@ import { UserService } from '../user/services/user.service';
 
       <div *ngIf="detail.myScore" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <div *ngIf="!detail.myScore.isMemberCompetition && detail.myScore.groupRank"
-          class="rounded-xl bg-[#111416] border border-slate-800 p-4">
+          class="rounded-xl bg-ip-page border border-slate-800 p-4">
           <p class="text-[10px] uppercase text-slate-500 font-semibold">Tu equipo</p>
           <p class="text-xl font-bold text-teal-400">#{{ detail.myScore.groupRank }}</p>
           <p class="text-xs text-slate-400">{{ detail.myScore.groupScore | number:'1.0-1' }} pts</p>
           <p *ngIf="detail.myScore.groupName" class="text-[11px] text-slate-500 mt-1 truncate">{{ detail.myScore.groupName }}</p>
         </div>
         <div *ngIf="detail.myScore.isMemberCompetition && detail.myScore.memberRank"
-          class="rounded-xl bg-[#111416] border border-slate-800 p-4">
+          class="rounded-xl bg-ip-page border border-slate-800 p-4">
           <p class="text-[10px] uppercase text-slate-500 font-semibold">Tu posición</p>
           <p class="text-xl font-bold text-teal-400">#{{ detail.myScore.memberRank }}</p>
           <p class="text-xs text-slate-400">{{ detail.myScore.individualScore | number:'1.0-1' }} pts</p>
         </div>
         <div *ngIf="detail.myScore.internalRank && !detail.myScore.isMemberCompetition"
-          class="rounded-xl bg-[#111416] border border-slate-800 p-4">
+          class="rounded-xl bg-ip-page border border-slate-800 p-4">
           <p class="text-[10px] uppercase text-slate-500 font-semibold">Dentro del equipo</p>
           <p class="text-xl font-bold text-slate-200">#{{ detail.myScore.internalRank }}</p>
           <p class="text-xs text-slate-400">{{ detail.myScore.individualScore | number:'1.0-1' }} pts</p>
@@ -85,7 +85,7 @@ import { UserService } from '../user/services/user.service';
 
       <!-- VERSUS: enfrentamiento directo entre 2 grupos -->
       <section *ngIf="isVersusGroup && detail.groupLeaderboard?.length === 2"
-        class="rounded-2xl bg-[#171a1d] border border-slate-800 overflow-hidden">
+        class="rounded-2xl bg-ip-surface border border-slate-800 overflow-hidden">
         <h3 class="text-sm font-semibold text-slate-300 px-4 py-3 border-b border-slate-800">Enfrentamiento</h3>
         <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 p-6" *ngIf="detail.groupLeaderboard as lb">
           <div class="text-center">
@@ -104,7 +104,7 @@ import { UserService } from '../user/services/user.service';
 
       <!-- Ranking grupal (RANKING / CHALLENGE entre grupos) -->
       <section *ngIf="detail.groupLeaderboard?.length && !isVersusGroup"
-        class="rounded-2xl bg-[#171a1d] border border-slate-800 overflow-hidden">
+        class="rounded-2xl bg-ip-surface border border-slate-800 overflow-hidden">
         <h3 class="text-sm font-semibold text-slate-300 px-4 py-3 border-b border-slate-800">
           Ranking por equipos
         </h3>
@@ -135,7 +135,7 @@ import { UserService } from '../user/services/user.service';
 
       <!-- Scope GRUPO: ranking interno del grupo (todos los miembros) -->
       <section *ngIf="detail.memberLeaderboard?.length"
-        class="rounded-2xl bg-[#171a1d] border border-slate-800 overflow-hidden">
+        class="rounded-2xl bg-ip-surface border border-slate-800 overflow-hidden">
         <h3 class="text-sm font-semibold text-slate-300 px-4 py-3 border-b border-slate-800">
           Ranking interno del grupo
         </h3>
@@ -166,7 +166,7 @@ import { UserService } from '../user/services/user.service';
 
       <!-- Ranking interno de tu equipo (competencias entre grupos) -->
       <section *ngIf="detail.internalRanking?.length"
-        class="rounded-2xl bg-[#171a1d] border border-violet-500/20 overflow-hidden">
+        class="rounded-2xl bg-ip-surface border border-violet-500/20 overflow-hidden">
         <h3 class="text-sm font-semibold text-violet-300 px-4 py-3 border-b border-slate-800">
           Ranking interno de tu equipo
           <span *ngIf="detail.myScore?.groupName" class="text-slate-400 font-normal"> — {{ detail.myScore?.groupName }}</span>

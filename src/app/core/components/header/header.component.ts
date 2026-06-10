@@ -10,6 +10,7 @@ import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { AuthService } from '../../../modules/auth/services/auth.service';
 import { UserService } from '../../../modules/user/services/user.service';
 import { NotificationService } from '../../../modules/notifications/services/notification.service';
+import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -17,7 +18,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterModule, CommonModule],
+  imports: [RouterModule, CommonModule, ThemeToggleComponent],
   templateUrl: './header.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

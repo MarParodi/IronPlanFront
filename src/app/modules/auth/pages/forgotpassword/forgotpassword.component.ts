@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ThemeToggleComponent } from '../../../../core/components/theme-toggle/theme-toggle.component';
 
 @Component({
   standalone: true,
   selector: 'ip-forgotpassword',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, ThemeToggleComponent],
   templateUrl: './forgotpassword.component.html',
   styleUrls: ['./forgotpassword.component.css'],
 })

@@ -10,7 +10,7 @@ import { filter } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, RouterModule, RouterOutlet],
   template: `
-    <div class="min-h-screen bg-[#111416] text-slate-100">
+    <div class="min-h-screen bg-ip-page text-ip-primary">
       <div class="max-w-6xl mx-auto px-4 py-6 space-y-6" [class.max-w-none]="isAdministrar" [class.space-y-4]="isAdministrar">
         <header class="space-y-2">
           <h1 class="text-2xl md:text-3xl font-bold text-slate-50">Grupos</h1>
