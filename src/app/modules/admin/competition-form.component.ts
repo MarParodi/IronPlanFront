@@ -711,11 +711,20 @@ export class CompetitionFormComponent implements OnInit {
     if (!this.currentParentId) {
       this.errorMsg = 'Navega la jerarquía y selecciona los participantes'; return;
     }
-    if (this.selectedParticipants.length < 2) {
+    if (!this.isMemberCompetition && this.selectedParticipants.length < 2) {
       this.errorMsg = 'Selecciona al menos 2 participantes'; return;
     }
-    if (this.form.competitionType === 'VERSUS' && this.selectedParticipants.length !== 2) {
-      this.errorMsg = 'VERSUS requiere exactamente 2 participantes'; return;
+    if (this.isMemberCompetition && this.selectedParticipants.length === 1) {
+      this.errorMsg = 'Selecciona al menos 2 miembros o deja vacío para inscribir a todos'; return;
+    }
+    if (this.form.competitionType === 'VERSUS') {
+      const count = this.selectedParticipants.length;
+      if (this.isMemberCompetition && count === 0) {
+        this.errorMsg = 'Versus requiere elegir exactamente 2 miembros'; return;
+      }
+      if (count !== 2) {
+        this.errorMsg = 'VERSUS requiere exactamente 2 participantes'; return;
+      }
     }
  
     this.saving = true;
@@ -731,7 +740,9 @@ export class CompetitionFormComponent implements OnInit {
     };
 
     if (this.isMemberCompetition) {
-      payload.participantUserIds = this.selectedParticipants.map(p => p.id);
+      if (this.selectedParticipants.length > 0) {
+        payload.participantUserIds = this.selectedParticipants.map(p => p.id);
+      }
     } else {
       payload.participantGroupIds = this.selectedParticipants.map(p => p.id);
     }
