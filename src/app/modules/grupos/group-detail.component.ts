@@ -140,18 +140,66 @@ import { filter } from 'rxjs/operators';
         <section *ngIf="tab === 'retos'" class="space-y-4">
           <div>
             <h3 class="text-base font-semibold text-ip-primary">Retos</h3>
-            <p class="text-xs text-ip-primary0 mt-1">
-              Rankings y ganadores según entrenamientos, sesiones o minutos activos del período del reto.
+            <p class="text-xs text-ip-muted mt-1">
+              Compite con otros miembros del mismo grupo por entrenamientos, sesiones o minutos activos.
             </p>
           </div>
+
+          <div *ngIf="detail.canManage && detail.groupType === 'GRUPO'"
+            class="rounded-xl bg-ip-page border border-ip-border p-4 space-y-3">
+            <p class="text-xs font-semibold uppercase tracking-wide text-ip-muted">Nuevo reto interno</p>
+            <input [(ngModel)]="retoForm.name" type="text" class="member-input w-full"
+              placeholder="Nombre del reto" [disabled]="creatingReto" />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <select [(ngModel)]="retoForm.competitionType" class="member-input" [disabled]="creatingReto">
+                <option value="CHALLENGE">Reto (con fecha fin)</option>
+                <option value="RANKING">Ranking permanente</option>
+                <option value="VERSUS">Versus (2 personas)</option>
+              </select>
+              <select [(ngModel)]="retoForm.metricType" class="member-input" [disabled]="creatingReto">
+                <option value="WORKOUTS_COUNT">Entrenamientos</option>
+                <option value="SESSIONS">Sesiones</option>
+                <option value="ACTIVE_MINUTES">Minutos activos</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input [(ngModel)]="retoForm.startDate" type="date" class="member-input" [disabled]="creatingReto" />
+              <input *ngIf="retoForm.competitionType === 'CHALLENGE'" [(ngModel)]="retoForm.endDate" type="date"
+                class="member-input" [disabled]="creatingReto" />
+            </div>
+            <label class="flex items-center gap-2 text-sm text-ip-secondary cursor-pointer">
+              <input type="checkbox" [(ngModel)]="retoAllMembers" [disabled]="creatingReto" />
+              Inscribir a todos los miembros activos
+            </label>
+            <div *ngIf="!retoAllMembers" class="space-y-2 max-h-40 overflow-y-auto">
+              <p class="text-xs text-ip-muted">Selecciona participantes (mínimo 2):</p>
+              <label *ngFor="let m of members" class="flex items-center gap-2 text-sm text-ip-secondary">
+                <input type="checkbox" [checked]="isRetoParticipant(m.userId)"
+                  (change)="toggleRetoParticipant(m.userId)" [disabled]="creatingReto" />
+                {{ m.fullName }}
+              </label>
+              <p *ngIf="!members.length" class="text-xs text-ip-muted">Carga la pestaña Miembros primero o crea el reto con todos.</p>
+            </div>
+            <p *ngIf="retosError" class="text-sm text-red-300">{{ retosError }}</p>
+            <p *ngIf="retosSuccess" class="text-sm text-teal-300">{{ retosSuccess }}</p>
+            <button type="button" class="btn-add" (click)="onCreateReto()" [disabled]="creatingReto">
+              {{ creatingReto ? 'Creando...' : 'Crear y activar reto' }}
+            </button>
+          </div>
+          <p *ngIf="detail.canManage && detail.groupType !== 'GRUPO'" class="text-xs text-ip-muted">
+            Los retos entre miembros del mismo grupo solo pueden crearse en un grupo hoja (tipo GRUPO).
+          </p>
+
           <div *ngIf="loadingRetos" class="text-sm text-ip-muted py-6 text-center">Cargando...</div>
           <article *ngFor="let r of retos"
             class="rounded-xl bg-ip-page border border-ip-border p-4 space-y-3 hover:border-ip-border transition">
             <div class="flex items-start justify-between gap-2">
               <div>
                 <h4 class="font-semibold text-ip-primary">{{ r.name }}</h4>
-                <p class="text-xs text-ip-primary0 mt-1">
-                  {{ retoTypeLabel(r.competitionType) }} · {{ r.metricLabel || r.metricType }}
+                <p class="text-xs text-ip-muted mt-1">
+                  {{ retoTypeLabel(r.competitionType) }}
+                  <span *ngIf="r.isMemberCompetition"> · Interno del grupo</span>
+                  · {{ r.metricLabel || r.metricType }}
                   · {{ r.participantCount }} participantes
                 </p>
               </div>
@@ -362,6 +410,18 @@ export class GroupDetailComponent implements OnInit {
   tab = 'resumen';
   loadingMembers = false;
   loadingRetos = false;
+  creatingReto = false;
+  retosError = '';
+  retosSuccess = '';
+  retoAllMembers = true;
+  retoSelectedUserIds: number[] = [];
+  retoForm = {
+    name: '',
+    competitionType: 'CHALLENGE' as 'RANKING' | 'CHALLENGE' | 'VERSUS',
+    metricType: 'WORKOUTS_COUNT' as 'SESSIONS' | 'ACTIVE_MINUTES' | 'WORKOUTS_COUNT',
+    startDate: new Date().toISOString().slice(0, 10),
+    endDate: '',
+  };
   groupId = 0;
 
   addIdentifier = '';
@@ -580,6 +640,76 @@ export class GroupDetailComponent implements OnInit {
         next: (r) => { this.retos = r; this.loadingRetos = false; },
         error: () => { this.loadingRetos = false; }
       });
+      if (this.detail?.canManage) {
+        this.loadMembers(force);
+      }
     }
+  }
+
+  isRetoParticipant(userId: number): boolean {
+    return this.retoSelectedUserIds.includes(userId);
+  }
+
+  toggleRetoParticipant(userId: number) {
+    if (this.retoSelectedUserIds.includes(userId)) {
+      this.retoSelectedUserIds = this.retoSelectedUserIds.filter(id => id !== userId);
+    } else {
+      this.retoSelectedUserIds = [...this.retoSelectedUserIds, userId];
+    }
+  }
+
+  onCreateReto() {
+    this.retosError = '';
+    this.retosSuccess = '';
+    const name = this.retoForm.name.trim();
+    if (!name) { this.retosError = 'El nombre es obligatorio'; return; }
+    if (!this.retoForm.startDate) { this.retosError = 'Indica la fecha de inicio'; return; }
+    if (this.retoForm.competitionType === 'CHALLENGE' && !this.retoForm.endDate) {
+      this.retosError = 'Un reto con fecha fin requiere la fecha de término'; return;
+    }
+    if (!this.retoAllMembers) {
+      if (this.retoSelectedUserIds.length < 2) {
+        this.retosError = 'Selecciona al menos 2 miembros o usa "todos los miembros"'; return;
+      }
+      if (this.retoForm.competitionType === 'VERSUS' && this.retoSelectedUserIds.length !== 2) {
+        this.retosError = 'Versus requiere exactamente 2 participantes'; return;
+      }
+    }
+
+    this.creatingReto = true;
+    const payload = {
+      name,
+      competitionType: this.retoForm.competitionType,
+      metricType: this.retoForm.metricType,
+      startDate: this.retoForm.startDate,
+      endDate: this.retoForm.competitionType === 'CHALLENGE' ? this.retoForm.endDate : undefined,
+      participantUserIds: this.retoAllMembers ? undefined : this.retoSelectedUserIds,
+    };
+
+    this.gruposService.createReto(this.groupId, payload).subscribe({
+      next: (created) => {
+        this.gruposService.activateReto(this.groupId, created.id).subscribe({
+          next: () => {
+            this.creatingReto = false;
+            this.retosSuccess = 'Reto creado y activado';
+            this.retoForm.name = '';
+            this.retoSelectedUserIds = [];
+            this.loadTabData(true);
+            this.gruposService.getResumen(this.groupId).subscribe({
+              next: (d) => { if (this.detail) this.detail.activeCompetitionsCount = d.activeCompetitionsCount; }
+            });
+          },
+          error: (err) => {
+            this.creatingReto = false;
+            this.retosError = this.apiError(err, 'Reto creado pero no se pudo activar');
+            this.loadTabData(true);
+          }
+        });
+      },
+      error: (err) => {
+        this.creatingReto = false;
+        this.retosError = this.apiError(err, 'No se pudo crear el reto');
+      }
+    });
   }
 }

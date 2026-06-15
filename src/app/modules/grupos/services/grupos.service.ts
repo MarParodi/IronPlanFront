@@ -123,6 +123,23 @@ export class GruposService {
   getRetoDetail(groupId: number, competitionId: number): Observable<CompetitionDetailView> {
     return this.http.get<CompetitionDetailView>(`${this.base}/${groupId}/retos/${competitionId}`);
   }
+
+  createReto(groupId: number, body: CreateRetoRequest): Observable<RetoSummary & { id: number; status: string }> {
+    return this.http.post<RetoSummary & { id: number; status: string }>(`${this.base}/${groupId}/retos`, body);
+  }
+
+  activateReto(groupId: number, competitionId: number): Observable<{ id: number; status: string }> {
+    return this.http.post<{ id: number; status: string }>(`${this.base}/${groupId}/retos/${competitionId}/activate`, {});
+  }
+}
+
+export interface CreateRetoRequest {
+  name: string;
+  competitionType: 'RANKING' | 'CHALLENGE' | 'VERSUS';
+  metricType: 'SESSIONS' | 'ACTIVE_MINUTES' | 'WORKOUTS_COUNT';
+  startDate: string;
+  endDate?: string;
+  participantUserIds?: number[];
 }
 
 export interface WinnerInfo {
