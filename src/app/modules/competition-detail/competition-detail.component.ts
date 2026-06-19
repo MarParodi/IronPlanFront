@@ -8,7 +8,6 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HomeService } from '../home/services/home.services';
-import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-competition-detail',
@@ -283,24 +282,43 @@ import { forkJoin } from 'rxjs';
         </div>
       </div>
 
-      <!-- Ranking interno del grupo (scope GRUPO) -->
+      <!-- Ranking de miembros con filtro por nivel -->
       <div
-        *ngIf="myScore?.isMemberCompetition && memberLeaderboard.length > 0"
+        *ngIf="myScore?.isMemberCompetition"
         class="rounded-xl border border-ip-border bg-ip-surface overflow-hidden">
 
         <div class="px-5 py-4 border-b border-slate-900">
           <p class="text-xs font-semibold uppercase tracking-wider text-ip-muted">
-            Ranking interno del grupo
+            Ranking de miembros
           </p>
           <p class="text-[11px] text-ip-primary0 mt-1">
-            Competencia entre miembros del mismo grupo.
+            Competencia individual{{ competition?.participantMode === 'ORGANIZATION_MEMBERS' ? ' org-wide' : '' }}.
           </p>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <button
+              *ngFor="let tab of memberLevelTabs"
+              (click)="setMemberLevelFilter(tab.value)"
+              class="px-3 py-1.5 rounded-lg text-xs font-semibold border transition"
+              [ngClass]="memberLevelFilter === tab.value
+                ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30'
+                : 'bg-ip-surface text-ip-muted border-ip-border hover:text-ip-primary'">
+              {{ tab.label }}
+            </button>
+          </div>
         </div>
 
-        <div class="divide-y divide-slate-900">
+        <div *ngIf="loadingMemberLeaderboard" class="px-5 py-8 text-center text-sm text-ip-muted">
+          Cargando ranking...
+        </div>
+
+        <div *ngIf="!loadingMemberLeaderboard && memberLeaderboard.length === 0" class="px-5 py-8 text-center text-sm text-ip-muted">
+          Sin datos para este filtro.
+        </div>
+
+        <div *ngIf="!loadingMemberLeaderboard && memberLeaderboard.length > 0" class="divide-y divide-slate-900">
           <div
             *ngFor="let entry of memberLeaderboard"
-            class="grid grid-cols-[70px_1fr_120px] items-center px-5 py-3"
+            class="grid grid-cols-[70px_1fr_100px_80px] items-center px-5 py-3"
             [ngClass]="{ 'bg-cyan-500/5': isCurrentUser(entry.userId) }">
             <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold"
               [ngClass]="{
@@ -313,6 +331,7 @@ import { forkJoin } from 'rxjs';
               {{ entry.fullName }}
               <span *ngIf="isCurrentUser(entry.userId)" class="text-cyan-500/70 text-xs ml-1">(tú)</span>
             </p>
+            <span class="text-xs text-ip-muted capitalize">{{ getLevelLabel(entry.level) }}</span>
             <span class="text-right text-sm font-semibold text-ip-secondary">
               {{ entry.score | number:'1.0-0' }}
             </span>
@@ -513,6 +532,15 @@ export class CompetitionDetailComponent implements OnInit {
   memberLeaderboard: any[] = [];
   internalRanking: any[] = [];
   loading = true;
+  loadingMemberLeaderboard = false;
+  memberLevelFilter: string | null = null;
+  memberLevelTabs = [
+    { label: 'Todos', value: null as string | null },
+    { label: 'Novato', value: 'NOVATO' },
+    { label: 'Intermedio', value: 'INTERMEDIO' },
+    { label: 'Avanzado', value: 'AVANZADO' },
+  ];
+  private competitionId = 0;
   myGroupId: number | null = null;
 
   ngOnInit(): void {
@@ -538,6 +566,7 @@ export class CompetitionDetailComponent implements OnInit {
   loadCompetition(id: number): void {
 
     this.loading = true;
+    this.competitionId = id;
 
     this.homeService.getCompetitionDetail(id).subscribe({
 
@@ -551,6 +580,10 @@ export class CompetitionDetailComponent implements OnInit {
 
         this.loading = false;
         this.cdr.markForCheck();
+
+        if (this.myScore?.isMemberCompetition) {
+          this.loadMemberLeaderboard();
+        }
       },
 
       error: () => {
@@ -558,6 +591,39 @@ export class CompetitionDetailComponent implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  setMemberLevelFilter(level: string | null): void {
+    this.memberLevelFilter = level;
+    this.loadMemberLeaderboard();
+  }
+
+  loadMemberLeaderboard(): void {
+    if (!this.competitionId) return;
+
+    this.loadingMemberLeaderboard = true;
+    this.homeService
+      .getMemberLeaderboard(this.competitionId, this.memberLevelFilter ?? undefined)
+      .subscribe({
+        next: (entries) => {
+          this.memberLeaderboard = entries ?? [];
+          this.loadingMemberLeaderboard = false;
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.loadingMemberLeaderboard = false;
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
+  getLevelLabel(level?: string): string {
+    const labels: Record<string, string> = {
+      NOVATO: 'Novato',
+      INTERMEDIO: 'Intermedio',
+      AVANZADO: 'Avanzado',
+    };
+    return level ? labels[level] ?? level : '—';
   }
 
   goBack(): void {

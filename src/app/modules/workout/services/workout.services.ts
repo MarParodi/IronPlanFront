@@ -6,7 +6,8 @@ import { environment } from '../../../../environments/environment';
 import {
   WorkoutExerciseDetailResponse,
   WorkoutSetRequest,
-  ReorderNextExercisesRequest
+  ReorderNextExercisesRequest,
+  AddExerciseToSessionRequest,
 } from '../models/workout.models';
 import { WorkoutSessionSummaryResponse } from '../models/workout-summary.model';
 import { Observable } from 'rxjs';
@@ -89,6 +90,28 @@ export class WorkoutService {
    */
   finishSession(sessionId: number): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/workouts/${sessionId}/finish`, {});
+  }
+
+  addExercise(sessionId: number, body: AddExerciseToSessionRequest): Observable<number> {
+    return this.http.post<number>(`${this.baseUrl}/workouts/${sessionId}/exercises`, body);
+  }
+
+  removeExercise(sessionId: number, workoutExerciseId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/workouts/${sessionId}/exercises/${workoutExerciseId}`);
+  }
+
+  addPlannedSet(sessionId: number, workoutExerciseId: number): Observable<number> {
+    return this.http.post<number>(
+      `${this.baseUrl}/workouts/${sessionId}/exercises/${workoutExerciseId}/sets/add`,
+      {}
+    );
+  }
+
+  removePlannedSet(sessionId: number, workoutExerciseId: number): Observable<number> {
+    return this.http.post<number>(
+      `${this.baseUrl}/workouts/${sessionId}/exercises/${workoutExerciseId}/sets/remove`,
+      {}
+    );
   }
 
 }

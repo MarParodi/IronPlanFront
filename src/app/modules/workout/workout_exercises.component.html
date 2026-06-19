@@ -96,7 +96,22 @@
 
     <!-- Registro de series -->
     <section class="px-4 mt-5">
-      <h3 class="font-semibold text-sm md:text-base mb-1">Registro de series</h3>
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="font-semibold text-sm md:text-base">Registro de series</h3>
+        <button type="button" (click)="toggleWeightUnit()"
+          class="px-3 py-1 rounded-full text-[11px] font-semibold border border-ip-border bg-ip-input text-ip-muted">
+          {{ weightUnit === 'KG' ? 'kg' : 'lb' }}
+        </button>
+      </div>
+
+      <div *ngIf="restTimerActive" class="mb-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 flex items-center justify-between">
+        <div>
+          <p class="text-xs text-amber-300 font-semibold">Descanso entre series</p>
+          <p class="text-2xl font-bold tabular-nums text-amber-200">{{ restTimerLabel }}</p>
+        </div>
+        <button type="button" (click)="skipRestTimer()" class="text-xs px-3 py-1.5 rounded-lg border border-amber-500/30 text-amber-200">Saltar</button>
+      </div>
+
       <p class="text-[11px] md:text-xs text-ip-muted mb-3">
         Marca cada serie como hecha (✔) para que se tome en cuenta en tu entrenamiento.
       </p>
@@ -104,13 +119,34 @@
         <div *ngFor="let s of currentSets; index as i" class="grid grid-cols-[auto_1fr_1fr_auto] items-center gap-2 md:gap-3">
           <span class="text-ip-muted">Serie {{ i + 1 }}</span>
           <input type="number" class="w-full bg-ip-input border border-ip-border rounded-2xl px-3 py-2 text-xs md:text-sm focus:outline-none focus:border-emerald-400" placeholder="Reps" [(ngModel)]="currentSets[i].reps">
-          <input type="number" class="w-full bg-ip-input border border-ip-border rounded-2xl px-3 py-2 text-xs md:text-sm focus:outline-none focus:border-emerald-400" placeholder="kg" [(ngModel)]="currentSets[i].weightKg">
+          <input type="number" class="w-full bg-ip-input border border-ip-border rounded-2xl px-3 py-2 text-xs md:text-sm focus:outline-none focus:border-emerald-400" [placeholder]="weightPlaceholder" [ngModel]="displayWeights[i]" (ngModelChange)="onWeightInput(i, $event)">
           <button type="button" class="w-8 h-8 md:w-9 md:h-9 rounded-xl border flex items-center justify-center transition" [ngClass]="currentSets[i].completed ? 'border-emerald-400 bg-emerald-400/20' : 'border-ip-border'" (click)="onToggleSetCompleted(i)">
             <span *ngIf="currentSets[i].completed">✔</span>
           </button>
         </div>
       </div>
+
+      <div class="flex gap-2 mt-3">
+        <button type="button" (click)="onRemoveSet()" [disabled]="mutatingSets || currentSets.length <= 1"
+          class="flex-1 py-2 rounded-xl border border-ip-border text-ip-muted text-xs font-semibold disabled:opacity-40">− Serie</button>
+        <button type="button" (click)="onAddSet()" [disabled]="mutatingSets"
+          class="flex-1 py-2 rounded-xl border border-emerald-500/30 text-emerald-300 text-xs font-semibold disabled:opacity-40">+ Serie</button>
+      </div>
+
       <p *ngIf="d.previousSet" class="mt-3 text-[11px] md:text-xs text-ip-muted">Serie anterior: {{ d.previousSet.reps }} reps × {{ d.previousSet.weightKg }} kg</p>
+    </section>
+
+    <!-- Agregar ejercicio -->
+    <section class="px-4 mt-4">
+      <h3 class="font-semibold text-sm md:text-base mb-2">Agregar ejercicio</h3>
+      <div class="flex gap-2">
+        <input type="number" [(ngModel)]="newExerciseId" placeholder="ID del ejercicio"
+          class="flex-1 bg-ip-input border border-ip-border rounded-2xl px-3 py-2 text-xs md:text-sm focus:outline-none focus:border-emerald-400" />
+        <button type="button" (click)="onAddExercise()" [disabled]="addingExercise || !newExerciseId"
+          class="px-4 py-2 rounded-2xl bg-ip-surface border border-emerald-500/30 text-emerald-300 text-xs font-semibold disabled:opacity-40">
+          {{ addingExercise ? '...' : 'Agregar' }}
+        </button>
+      </div>
     </section>
 
     <!-- Notas -->

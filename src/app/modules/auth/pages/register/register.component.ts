@@ -7,6 +7,7 @@ import {
   Gender,
   Goal,
   Level,
+  PersonalObjective,
   RegisterStep1Req,
   RegisterStep2Req,
   RegisterStep3Req,
@@ -55,6 +56,16 @@ get trainDaysPercent(): string {
     { label: 'Resistencia', value: 'RESISTENCIA' },
   ];
 
+  personalObjectives: { label: string; value: PersonalObjective }[] = [
+    { label: 'OBJ-1 · Bajar de peso', value: 'BAJAR_PESO' },
+    { label: 'OBJ-2 · Recomposición corporal', value: 'RECOMPOSICION' },
+    { label: 'OBJ-3 · Ganar músculo', value: 'GANAR_MUSCULO' },
+    { label: 'OBJ-4 · Progresión de fuerza', value: 'FUERZA' },
+    { label: 'OBJ-5 · Mejorar constancia', value: 'CONSTANCIA' },
+    { label: 'OBJ-6 · Rendimiento cardiovascular', value: 'CARDIO' },
+    { label: 'OBJ-7 · Otro', value: 'OTRO' },
+  ];
+
   form1: RegisterStep1Req = {
     firstName: '',
     lastName: '',
@@ -72,6 +83,8 @@ get trainDaysPercent(): string {
     level: 'NOVATO',
     trainDays: 3,
     goal: 'HIPERTROFIA',
+    personalObjective: 'GANAR_MUSCULO',
+    personalObjectiveOther: null,
   };
 
   form3: Omit<RegisterStep3Req, 'onboardingToken'> = {
@@ -156,10 +169,22 @@ get trainDaysPercent(): string {
       this.error.set('Selecciona días de entrenamiento entre 1 y 7.');
       return;
     }
+    if (!this.form2.personalObjective) {
+      this.error.set('Selecciona tu objetivo personal.');
+      return;
+    }
+    if (this.form2.personalObjective === 'OTRO' && !this.form2.personalObjectiveOther?.trim()) {
+      this.error.set('Describe tu objetivo personal.');
+      return;
+    }
 
     const payload: RegisterStep2Req = {
       onboardingToken: token,
       ...this.form2,
+      personalObjectiveOther:
+        this.form2.personalObjective === 'OTRO'
+          ? this.form2.personalObjectiveOther?.trim() || null
+          : null,
     };
 
     this.loading.set(true);

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import {
   NotificationDto,
@@ -57,7 +57,11 @@ export class NotificationService {
     return this.http.get<NotificationCountResponse>(
       `${this.baseUrl}/notifications/count`
     ).pipe(
-      tap(response => this.unreadCountSubject.next(response.unreadCount))
+      tap(response => this.unreadCountSubject.next(response.unreadCount)),
+      catchError(() => {
+        this.unreadCountSubject.next(0);
+        return of({ unreadCount: 0 });
+      })
     );
   }
 

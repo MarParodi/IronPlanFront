@@ -45,6 +45,12 @@ export interface GroupMember {
   profilePictureUrl?: string;
 }
 
+export interface ObjectiveDistributionPoint {
+  objective: string;
+  label: string;
+  count: number;
+}
+
 export interface GroupMetrics {
   periodDays: number;
   periodStart: string;
@@ -59,6 +65,7 @@ export interface GroupMetrics {
   avgWorkoutsPerActiveMember: number;
   weeklyWorkouts: WeeklyMetricPoint[];
   topParticipants: ParticipantMetricRank[];
+  objectiveDistribution?: ObjectiveDistributionPoint[];
 }
 
 export interface WeeklyMetricPoint {

@@ -1,8 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef, AfterViewChecked, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProgressService } from '../../workout/services/progress.service';
 import { ProgressSummary, WeeklyStats, ExercisePr } from '../../workout/models/progress.models';
+import { Chart } from 'chart.js';
+import { destroyChart, renderBarChart } from '../../../core/utils/bar-chart.util';
 
 @Component({
   selector: 'app-stats',
@@ -12,13 +14,15 @@ import { ProgressSummary, WeeklyStats, ExercisePr } from '../../workout/models/p
   styleUrls: ['./stats.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StatsComponent implements OnInit {
+export class StatsComponent implements OnInit, AfterViewChecked, OnDestroy {
+  @ViewChild('volumeChartCanvas') volumeChartCanvas?: ElementRef<HTMLCanvasElement>;
+
   summary: ProgressSummary | null = null;
   loading = true;
   error: string | null = null;
-
-  // Tab activa
   activeTab: 'overview' | 'weekly' | 'exercises' = 'overview';
+  private volumeChart?: Chart;
+  private volumeChartRenderedFor?: string;
 
   constructor(
     private progressService: ProgressService,
@@ -51,7 +55,39 @@ export class StatsComponent implements OnInit {
 
   setTab(tab: 'overview' | 'weekly' | 'exercises'): void {
     this.activeTab = tab;
+    if (tab !== 'weekly') {
+      destroyChart(this.volumeChart);
+      this.volumeChart = undefined;
+      this.volumeChartRenderedFor = undefined;
+    }
     this.cdr.markForCheck();
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.activeTab === 'weekly') {
+      this.renderVolumeChartIfReady();
+    }
+  }
+
+  ngOnDestroy(): void {
+    destroyChart(this.volumeChart);
+  }
+
+  private renderVolumeChartIfReady(): void {
+    const weeks = this.summary?.weeklyHistory;
+    if (!weeks?.length || !this.volumeChartCanvas?.nativeElement) return;
+
+    const key = weeks.map((w) => `${w.weekStart}-${w.totalVolumeKg}`).join('|');
+    if (this.volumeChartRenderedFor === key) return;
+
+    destroyChart(this.volumeChart);
+    this.volumeChart = renderBarChart(
+      this.volumeChartCanvas.nativeElement,
+      weeks.slice().reverse().map((w) => this.getWeekLabel(w)),
+      weeks.slice().reverse().map((w) => w.totalVolumeKg),
+      { label: 'Volumen (kg)', color: 'rgba(20, 184, 166, 0.85)' }
+    );
+    this.volumeChartRenderedFor = key;
   }
 
   goBack(): void {

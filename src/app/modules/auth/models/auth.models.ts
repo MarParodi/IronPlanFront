@@ -5,6 +5,15 @@ export interface AuthReq {
 export type Gender = 'MASCULINO' | 'FEMENINO' | 'OTRO';
 export type Level = 'NOVATO' | 'INTERMEDIO' | 'AVANZADO';
 export type Goal = 'HIPERTROFIA' | 'FUERZA' | 'RESISTENCIA';
+export type PersonalObjective =
+  | 'BAJAR_PESO'
+  | 'RECOMPOSICION'
+  | 'GANAR_MUSCULO'
+  | 'FUERZA'
+  | 'CONSTANCIA'
+  | 'CARDIO'
+  | 'OTRO';
+export type WeightUnit = 'KG' | 'LB';
 
 export interface RegisterReq {
   email: string;
@@ -40,6 +49,35 @@ export interface RegisterStep2Req {
   level: Level;
   trainDays: number;
   goal: Goal;
+  personalObjective: PersonalObjective;
+  personalObjectiveOther?: string | null;
+}
+
+export interface MeResponse {
+  id: number;
+  email: string;
+  username: string;
+  role: 'USER' | 'ADMIN';
+  birthday: string;
+  xpPoints: number;
+  level: Level;
+  trainDays: number;
+  gender: Gender;
+  createdAt: string;
+  profilePictureUrl: string | null;
+  weight: number | null;
+  height: number | null;
+  goal: Goal | null;
+  personalObjective: PersonalObjective | null;
+  personalObjectiveOther: string | null;
+  weightUnit: WeightUnit;
+  organizationalGroupId: number | null;
+  organizationalGroupName: string | null;
+  ancestorGroupIds: number[];
+  organizationRootName: string | null;
+  organizationMiddlePath: string | null;
+  canManageOrganization: boolean;
+  hasOrganizationAccess: boolean;
 }
 
 export interface RegisterStep3Req {

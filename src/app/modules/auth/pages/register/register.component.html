@@ -114,7 +114,19 @@
       </label>
 
       <label class="block space-y-1">
-        <span class="text-sm font-medium text-ip-primary">Objetivo</span>
+        <span class="text-sm font-medium text-ip-primary">Objetivo personal</span>
+        <select [(ngModel)]="form2.personalObjective" name="personalObjective" class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm">
+          <option *ngFor="let o of personalObjectives" [ngValue]="o.value">{{ o.label }}</option>
+        </select>
+      </label>
+
+      <label *ngIf="form2.personalObjective === 'OTRO'" class="block space-y-1">
+        <span class="text-sm font-medium text-ip-primary">Describe tu objetivo</span>
+        <input [(ngModel)]="form2.personalObjectiveOther" name="personalObjectiveOther" type="text" placeholder="Ej: Preparar un triatlón" class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm" />
+      </label>
+
+      <label class="block space-y-1">
+        <span class="text-sm font-medium text-ip-primary">Tipo de rutina</span>
         <select [(ngModel)]="form2.goal" name="goal" class="w-full bg-ip-input border border-ip-border/60 rounded-lg px-3 py-2 outline-none text-sm">
           <option *ngFor="let o of goals" [ngValue]="o.value">{{ o.label }}</option>
         </select>

@@ -4,15 +4,17 @@ import {
   Component,
   inject,
   OnInit,
-  OnDestroy
+  OnDestroy,
+  PLATFORM_ID
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { AuthService } from '../../../modules/auth/services/auth.service';
 import { UserService } from '../../../modules/user/services/user.service';
 import { NotificationService } from '../../../modules/notifications/services/notification.service';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
-import { filter, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { filter, takeUntil, startWith } from 'rxjs/operators';
+import { Subject, interval } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -29,6 +31,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private _cdr = inject(ChangeDetectorRef);
   private _notificationSvc = inject(NotificationService);
   private _destroy$ = new Subject<void>();
+  private _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   mobileMenuOpen = false;
   isLoginPage = false;
@@ -37,10 +40,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   showMisGrupos = false;
 
   ngOnInit(): void {
-    if (this._authSvc.isLoggedIn) {
+    if (this._isBrowser && this._authSvc.isLoggedIn) {
       this._userSvc.getMe().subscribe({
         next: () => {
           this.showMisGrupos = true;
+          this._cdr.markForCheck();
+        },
+        error: () => {
+          this.showMisGrupos = false;
           this._cdr.markForCheck();
         }
       });
@@ -61,8 +68,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this._cdr.markForCheck();
       });
 
-    // Cargar el contador inicial
-    this._notificationSvc.refreshUnreadCount();
+    // Cargar el contador inicial y refrescar cada 60s (solo en navegador)
+    if (this._isBrowser && this._authSvc.isLoggedIn) {
+      interval(60_000)
+        .pipe(startWith(0), takeUntil(this._destroy$))
+        .subscribe(() => this._notificationSvc.refreshUnreadCount());
+    }
   }
 
   ngOnDestroy(): void {

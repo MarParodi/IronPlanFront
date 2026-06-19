@@ -65,3 +65,10 @@ export interface WorkoutSetRequest {
 export interface ReorderNextExercisesRequest {
   workoutExerciseIds: number[];
 }
+
+export interface AddExerciseToSessionRequest {
+  exerciseId: number;
+  plannedSets?: number;
+  plannedRepsMin?: number;
+  plannedRepsMax?: number;
+}
