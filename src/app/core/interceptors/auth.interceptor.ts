@@ -1,5 +1,6 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../modules/auth/services/auth.service';
 import { catchError, throwError } from 'rxjs';
@@ -7,6 +8,7 @@ import { catchError, throwError } from 'rxjs';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const router = inject(Router);
+  const isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   const token = auth.token;
   const authReq = token
@@ -15,7 +17,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((err: HttpErrorResponse) => {
-      if (err.status === 401) {
+      // Spring Security devuelve 403 cuando no hay sesión válida (no solo 401)
+      if (isBrowser && (err.status === 401 || err.status === 403) && token) {
         auth.logout();
         router.navigate(['/login']);
       }

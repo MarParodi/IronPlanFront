@@ -4,13 +4,13 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from './services/user.service';
 import { Router } from '@angular/router';
 import { ThemeToggleComponent } from '../../core/components/theme-toggle/theme-toggle.component';
-
-// Ajusta estos tipos si ya los tienes en otro archivo
-export type Level = 'NOVATO' | 'INTERMEDIO' | 'AVANZADO';
-// Si en tu backend trainDays es enum, normalmente viaja como string.
-// Pero como tú ya lo estás tratando como 1-7 para el porcentaje,
-// lo manejamos como number en el form.
-export type TrainDays = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+import { MeResponse, UserUpdatePayload } from './models/user.models';
+import {
+  Goal,
+  Level,
+  PersonalObjective,
+  WeightUnit,
+} from '../auth/models/auth.models';
 
 @Component({
   selector: 'app-settings',
@@ -30,17 +30,36 @@ export class SettingsComponent implements OnInit {
 
   imagePreview: string | null = null;
   selectedFile: File | null = null;
-  user: any;
+  user: MeResponse | null = null;
 
-  // Enum Level (para tu select)
   levels: { label: string; value: Level }[] = [
     { label: 'Principiante', value: 'NOVATO' },
     { label: 'Intermedio', value: 'INTERMEDIO' },
     { label: 'Avanzado', value: 'AVANZADO' },
   ];
 
-  // Opciones para trainDays (1–7)
-  trainDaysOptions: { label: string; value: TrainDays }[] = [
+  goals: { label: string; value: Goal }[] = [
+    { label: 'Hipertrofia', value: 'HIPERTROFIA' },
+    { label: 'Fuerza', value: 'FUERZA' },
+    { label: 'Resistencia', value: 'RESISTENCIA' },
+  ];
+
+  personalObjectives: { label: string; value: PersonalObjective }[] = [
+    { label: 'Bajar de peso', value: 'BAJAR_PESO' },
+    { label: 'Recomposición corporal', value: 'RECOMPOSICION' },
+    { label: 'Ganar músculo', value: 'GANAR_MUSCULO' },
+    { label: 'Progresión de fuerza', value: 'FUERZA' },
+    { label: 'Mejorar constancia', value: 'CONSTANCIA' },
+    { label: 'Rendimiento cardiovascular', value: 'CARDIO' },
+    { label: 'Otro', value: 'OTRO' },
+  ];
+
+  weightUnits: { label: string; value: WeightUnit }[] = [
+    { label: 'Kilogramos (kg)', value: 'KG' },
+    { label: 'Libras (lb)', value: 'LB' },
+  ];
+
+  trainDaysOptions: { label: string; value: number }[] = [
     { label: '1 día', value: 1 },
     { label: '2 días', value: 2 },
     { label: '3 días', value: 3 },
@@ -56,9 +75,13 @@ export class SettingsComponent implements OnInit {
     password: [''], // opcional: si viene vacío, no lo mandamos
     email: ['', [Validators.required, Validators.email]],
     level: ['NOVATO' as Level, [Validators.required]],
-    trainDays: [3 as TrainDays, [Validators.required, Validators.min(1), Validators.max(7)]],
+    trainDays: [3, [Validators.required, Validators.min(1), Validators.max(7)]],
     weight: [null as number | null, [Validators.min(20), Validators.max(400)]],
     height: [null as number | null, [Validators.min(80), Validators.max(250)]],
+    goal: ['HIPERTROFIA' as Goal, [Validators.required]],
+    personalObjective: ['GANAR_MUSCULO' as PersonalObjective, [Validators.required]],
+    personalObjectiveOther: [''],
+    weightUnit: ['KG' as WeightUnit, [Validators.required]],
 
     currentPassword: [''],
     newPassword: [''],
@@ -127,9 +150,13 @@ export class SettingsComponent implements OnInit {
           username: userData.username ?? '',
           email: userData.email ?? '',
           level: (userData.level ?? 'NOVATO') as Level,
-          trainDays: (userData.trainDays ?? 3) as TrainDays,
+          trainDays: userData.trainDays ?? 3,
           weight: userData.weight ?? null,
           height: userData.height ?? null,
+          goal: (userData.goal ?? 'HIPERTROFIA') as Goal,
+          personalObjective: (userData.personalObjective ?? 'GANAR_MUSCULO') as PersonalObjective,
+          personalObjectiveOther: userData.personalObjectiveOther ?? '',
+          weightUnit: (userData.weightUnit ?? 'KG') as WeightUnit,
         });
 
         // Clave: dejamos el form como “sin cambios”
@@ -167,13 +194,18 @@ export class SettingsComponent implements OnInit {
   const v = this.profileForm.getRawValue();
 
   // Payload limpio (solo lo que el backend espera)
-  const payload: any = {
-    username: v.username,
-    email: v.email,
-    level: v.level,
-    trainDays: v.trainDays,
+  const payload: UserUpdatePayload = {
+    username: v.username ?? undefined,
+    email: v.email ?? undefined,
+    level: v.level ?? undefined,
+    trainDays: v.trainDays ?? undefined,
     weight: v.weight,
     height: v.height,
+    goal: v.goal ?? undefined,
+    personalObjective: v.personalObjective ?? undefined,
+    personalObjectiveOther:
+      v.personalObjective === 'OTRO' ? v.personalObjectiveOther?.trim() || null : null,
+    weightUnit: v.weightUnit ?? undefined,
   };
 
   // Solo manda cambio de password si el usuario lo intenta
@@ -181,14 +213,13 @@ export class SettingsComponent implements OnInit {
     !!(v.currentPassword?.trim() || v.newPassword?.trim() || v.confirmPassword?.trim());
 
   if (wantsPasswordChange) {
-    payload.currentPassword = v.currentPassword;
-    payload.newPassword = v.newPassword;
+    payload.currentPassword = v.currentPassword?.trim() || undefined;
+    payload.newPassword = v.newPassword?.trim() || undefined;
   }
 
   this.userService.updateProfile(payload).subscribe({
     next: (response) => {
-      // Actualiza user local
-      this.user = { ...this.user, ...response, ...payload };
+      this.user = response;
 
       const finalizeSuccess = () => {
         // Limpia campos de password (no deben contar como cambios)
@@ -222,8 +253,7 @@ export class SettingsComponent implements OnInit {
               uploadResponse.profilePictureUrl || uploadResponse.profile_picture_url;
 
             if (this.user && newUrl) {
-              this.user.profilePictureUrl = newUrl;
-              this.user.profile_picture_url = newUrl;
+              this.user = { ...this.user, profilePictureUrl: newUrl };
             }
 
             finalizeSuccess();

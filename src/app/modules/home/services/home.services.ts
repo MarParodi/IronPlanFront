@@ -135,8 +135,12 @@ getLeaderboard(id: number): Observable<any[]> {
   return this.http.get<any[]>(`${this.baseUrl}/competitions/${id}/leaderboard`);
 }
 
-getMemberLeaderboard(id: number): Observable<any[]> {
-  return this.http.get<any[]>(`${this.baseUrl}/competitions/${id}/leaderboard/members`);
+getMemberLeaderboard(id: number, level?: string): Observable<any[]> {
+  const params: Record<string, string> = {};
+  if (level) {
+    params['level'] = level;
+  }
+  return this.http.get<any[]>(`${this.baseUrl}/competitions/${id}/leaderboard/members`, { params });
 }
 
 getInternalRanking(id: number): Observable<any[]> {

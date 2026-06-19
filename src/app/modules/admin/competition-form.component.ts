@@ -86,6 +86,30 @@ interface Participant {
  
       <div class="divider"></div>
       <span class="section-title">Participantes</span>
+
+      <div class="field" *ngIf="selectedRoot && !isMemberCompetition">
+        <label class="field-label">Modo de participación</label>
+        <div class="mode-toggle">
+          <button type="button"
+            class="mode-btn"
+            [class.active]="form.participantMode === 'GROUP'"
+            (click)="form.participantMode = 'GROUP'">
+            Grupos
+          </button>
+          <button type="button"
+            class="mode-btn"
+            [class.active]="form.participantMode === 'ORGANIZATION_MEMBERS'"
+            (click)="form.participantMode = 'ORGANIZATION_MEMBERS'">
+            Miembros org.
+          </button>
+        </div>
+        <p class="hint mt-1" *ngIf="form.participantMode === 'GROUP'">
+          Ranking entre grupos seleccionados.
+        </p>
+        <p class="hint mt-1" *ngIf="form.participantMode === 'ORGANIZATION_MEMBERS'">
+          Ranking individual de todos los miembros de la organización.
+        </p>
+      </div>
  
       <!-- Tipo hint -->
       <div class="type-hint" *ngIf="form.competitionType">
@@ -330,6 +354,20 @@ interface Participant {
       font-size: 11px; font-weight: 600; color: #64748b;
       text-transform: uppercase; letter-spacing: 0.5px;
     }
+
+    .mode-toggle {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .mode-btn {
+      padding: 9px 12px; border-radius: 9px; font-size: 12px; font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03);
+      color: #94a3b8; cursor: pointer; transition: all 0.15s;
+    }
+    .mode-btn.active {
+      background: rgba(45,212,191,0.12); border-color: rgba(45,212,191,0.35); color: #2dd4bf;
+    }
+    .hint { font-size: 11px; color: #64748b; }
+    .mt-1 { margin-top: 4px; }
  
     /* Type hints */
     .type-hint { display: flex; }
@@ -532,6 +570,7 @@ export class CompetitionFormComponent implements OnInit {
     metricType: '',
     startDate: '',
     endDate: '',
+    participantMode: 'GROUP' as 'GROUP' | 'ORGANIZATION_MEMBERS',
   };
  
   saving   = false;
@@ -737,6 +776,7 @@ export class CompetitionFormComponent implements OnInit {
       endDate:          this.form.endDate || undefined,
       scopeReferenceId: this.currentParentId,
       scopeLevel:       this.isMemberCompetition ? 'GRUPO' : this.currentScopeLevel,
+      participantMode:  this.isMemberCompetition ? undefined : this.form.participantMode,
     };
 
     if (this.isMemberCompetition) {

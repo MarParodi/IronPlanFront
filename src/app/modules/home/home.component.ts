@@ -5,7 +5,9 @@ import {
   OnInit,
   OnDestroy,
   inject,
+  PLATFORM_ID,
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -43,6 +45,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly _route = inject(ActivatedRoute);
   private readonly _homeService = inject(HomeService);
   private readonly _userService = inject(UserService);
+  private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
 
   // lifecycle
@@ -60,6 +63,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   loading = false;
   errorMsg = '';
   searchFocused = false;
+  filtersOpen = false;
 
   // data
   cardsList: Card[] = [];
@@ -113,18 +117,21 @@ pendingRoutine: XpRoutineCandidate | null = null;
         this.page = 0;
         this.load();
       });
-    this._userService.getMe().subscribe({
-      next: (me) => {
-        this.userXp = me?.xpPoints ?? 0;
-        this.userGroupName = me?.organizationalGroupName ?? null;
-        this.userOrgRoot   = me?.organizationRootName ?? null;
-        this.userOrgMiddle = me?.organizationMiddlePath ?? null;
-        this._cdr.markForCheck();
-      },
-    });
+    if (this._isBrowser) {
+      this._userService.getMe().subscribe({
+        next: (me) => {
+          this.userXp = me?.xpPoints ?? 0;
+          this.userGroupName = me?.organizationalGroupName ?? null;
+          this.userOrgRoot   = me?.organizationRootName ?? null;
+          this.userOrgMiddle = me?.organizationMiddlePath ?? null;
+          this._cdr.markForCheck();
+        },
+        error: () => this._cdr.markForCheck(),
+      });
 
-    this.loadActiveCompetitions();
-    this.load();
+      this.loadActiveCompetitions();
+      this.load();
+    }
   }
 
   ngOnDestroy(): void {
@@ -188,6 +195,7 @@ getMetricLabel(metric: string): string {
           this._cdr.markForCheck();
         },
         error: () => {
+          this.loading = false;
           this.errorMsg = 'Error al cargar rutinas';
           this._cdr.markForCheck();
         },
@@ -220,6 +228,33 @@ getMetricLabel(metric: string): string {
   clearSearch(): void {
     this.searchQuery = '';
     this.searchSubject$.next('');
+  }
+
+  toggleFilters(): void {
+    this.filtersOpen = !this.filtersOpen;
+    this._cdr.markForCheck();
+  }
+
+  get hasActiveFilters(): boolean {
+    return this.goalFilter !== null || this.daysFilter !== null || this.genderFilter !== null;
+  }
+
+  get activeGoalLabel(): string | null {
+    if (!this.goalFilter) return null;
+    return this.goals.find(g => g.key === this.goalFilter)?.label ?? this.goalFilter;
+  }
+
+  get activeGenderLabel(): string | null {
+    if (!this.genderFilter) return null;
+    return this.genders.find(g => g.key === this.genderFilter)?.label ?? this.genderFilter;
+  }
+
+  clearAllFilters(): void {
+    this.goalFilter = null;
+    this.daysFilter = null;
+    this.genderFilter = null;
+    this.page = 0;
+    this.load();
   }
 
   onSelectGoal(goal: Goal | null): void {

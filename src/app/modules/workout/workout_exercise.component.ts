@@ -63,6 +63,17 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   exitAction: 'discard' | 'finish' | null = null;
   processingExit = false;
 
+  weightUnit: 'KG' | 'LB' = 'KG';
+  displayWeights: (number | null)[] = [];
+
+  restSecondsRemaining = 0;
+  restTimerActive = false;
+  private restTimerSub?: Subscription;
+
+  newExerciseId: number | null = null;
+  addingExercise = false;
+  mutatingSets = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -90,6 +101,7 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopTimer();
+    this.stopRestTimer();
   }
 
   // ─────────────────────────────────────────────
@@ -203,7 +215,71 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
     }
 
     this.currentSets = sets;
+    this.displayWeights = sets.map(() => null);
     this.notes = null;
+  }
+
+  private lbToKg(value: number): number {
+    return Math.round(value * 0.453592 * 100) / 100;
+  }
+
+  private kgToLb(value: number): number {
+    return Math.round(value * 2.20462 * 10) / 10;
+  }
+
+  toggleWeightUnit(): void {
+    this.weightUnit = this.weightUnit === 'KG' ? 'LB' : 'KG';
+    this.displayWeights = this.currentSets.map((set) => {
+      if (set.weightKg == null) return null;
+      return this.weightUnit === 'LB' ? this.kgToLb(set.weightKg) : set.weightKg;
+    });
+  }
+
+  onWeightInput(index: number, value: number | null): void {
+    this.displayWeights[index] = value;
+    if (value == null) {
+      this.currentSets[index].weightKg = null;
+      return;
+    }
+    this.currentSets[index].weightKg =
+      this.weightUnit === 'LB' ? this.lbToKg(value) : value;
+  }
+
+  get weightPlaceholder(): string {
+    return this.weightUnit === 'LB' ? 'lb' : 'kg';
+  }
+
+  private startRestTimer(): void {
+    if (!this.data?.plannedRestSeconds) return;
+    this.stopRestTimer();
+    this.restSecondsRemaining = this.data.plannedRestSeconds;
+    this.restTimerActive = true;
+    this.restTimerSub = interval(1000).subscribe(() => {
+      if (this.restSecondsRemaining <= 1) {
+        this.stopRestTimer();
+      } else {
+        this.restSecondsRemaining -= 1;
+      }
+    });
+  }
+
+  private stopRestTimer(): void {
+    this.restTimerActive = false;
+    this.restSecondsRemaining = 0;
+    if (this.restTimerSub) {
+      this.restTimerSub.unsubscribe();
+      this.restTimerSub = undefined;
+    }
+  }
+
+  get restTimerLabel(): string {
+    const mm = Math.floor(this.restSecondsRemaining / 60).toString().padStart(2, '0');
+    const ss = (this.restSecondsRemaining % 60).toString().padStart(2, '0');
+    return `${mm}:${ss}`;
+  }
+
+  skipRestTimer(): void {
+    this.stopRestTimer();
   }
 
   /**
@@ -321,8 +397,67 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
    */
   onToggleSetCompleted(index: number): void {
     if (this.currentSets[index]) {
-      this.currentSets[index].completed = !this.currentSets[index].completed;
+      const wasCompleted = this.currentSets[index].completed;
+      this.currentSets[index].completed = !wasCompleted;
+      if (!wasCompleted && this.currentSets[index].completed) {
+        this.startRestTimer();
+      }
     }
+  }
+
+  onAddSet(): void {
+    if (!this.data || this.mutatingSets) return;
+    this.mutatingSets = true;
+    this.workoutService.addPlannedSet(this.sessionId, this.data.workoutExerciseId).subscribe({
+      next: (plannedSets) => {
+        this.data!.plannedSets = plannedSets;
+        this.currentSets.push({
+          setNumber: this.currentSets.length + 1,
+          reps: null,
+          weightKg: null,
+          completed: false,
+        });
+        this.displayWeights.push(null);
+        this.mutatingSets = false;
+      },
+      error: () => {
+        this.mutatingSets = false;
+        this.errorMessage = 'No se pudo agregar la serie.';
+      },
+    });
+  }
+
+  onRemoveSet(): void {
+    if (!this.data || this.mutatingSets || this.currentSets.length <= 1) return;
+    this.mutatingSets = true;
+    this.workoutService.removePlannedSet(this.sessionId, this.data.workoutExerciseId).subscribe({
+      next: (plannedSets) => {
+        this.data!.plannedSets = plannedSets;
+        this.currentSets.pop();
+        this.displayWeights.pop();
+        this.mutatingSets = false;
+      },
+      error: () => {
+        this.mutatingSets = false;
+        this.errorMessage = 'No se pudo quitar la serie.';
+      },
+    });
+  }
+
+  onAddExercise(): void {
+    if (!this.newExerciseId || this.addingExercise) return;
+    this.addingExercise = true;
+    this.workoutService.addExercise(this.sessionId, { exerciseId: this.newExerciseId }).subscribe({
+      next: () => {
+        this.addingExercise = false;
+        this.newExerciseId = null;
+        this.loadExercise();
+      },
+      error: () => {
+        this.addingExercise = false;
+        this.errorMessage = 'No se pudo agregar el ejercicio.';
+      },
+    });
   }
 
   /**

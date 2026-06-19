@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule, NavigationEnd } from '@angular/router';
 import { GruposService, GroupDetail, GroupMember, GroupMetrics, RetoSummary } from './services/grupos.service';
 import { filter } from 'rxjs/operators';
+import { Chart } from 'chart.js';
+import { destroyChart, renderBarChart } from '../../core/utils/bar-chart.util';
 
 @Component({
   selector: 'app-group-detail',
@@ -281,6 +283,19 @@ import { filter } from 'rxjs/operators';
               </div>
             </div>
 
+            <div *ngIf="metrics.objectiveDistribution?.length" class="rounded-xl bg-ip-page border border-ip-border p-4 space-y-3">
+              <h4 class="text-sm font-semibold text-ip-secondary">Distribución de objetivos personales</h4>
+              <div class="h-56">
+                <canvas #objectiveChartCanvas></canvas>
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div *ngFor="let item of metrics.objectiveDistribution" class="flex justify-between text-ip-muted">
+                  <span>{{ item.label }}</span>
+                  <span class="text-teal-300 font-semibold">{{ item.count }}</span>
+                </div>
+              </div>
+            </div>
+
             <div class="rounded-xl bg-ip-page border border-ip-border overflow-hidden">
               <h4 class="text-sm font-semibold text-ip-secondary px-4 py-3 border-b border-ip-border">
                 Top participantes
@@ -403,7 +418,9 @@ import { filter } from 'rxjs/operators';
     }
   `]
 })
-export class GroupDetailComponent implements OnInit {
+export class GroupDetailComponent implements OnInit, AfterViewChecked, OnDestroy {
+  @ViewChild('objectiveChartCanvas') objectiveChartCanvas?: ElementRef<HTMLCanvasElement>;
+
   detail?: GroupDetail;
   members: GroupMember[] = [];
   retos: RetoSummary[] = [];
@@ -437,6 +454,8 @@ export class GroupDetailComponent implements OnInit {
   loadingMetricas = false;
   metricasError = '';
   maxWeeklyWorkouts = 1;
+  private objectiveChart?: Chart;
+  private objectiveChartRenderedFor?: string;
 
   visibleTabs: { path: string; label: string }[] = [];
 
@@ -609,6 +628,9 @@ export class GroupDetailComponent implements OnInit {
     if (!force && this.metrics) return;
     this.loadingMetricas = true;
     this.metricasError = '';
+    destroyChart(this.objectiveChart);
+    this.objectiveChart = undefined;
+    this.objectiveChartRenderedFor = undefined;
     this.gruposService.getMetricas(this.groupId, this.metricsDays).subscribe({
       next: (m) => {
         this.metrics = m;
@@ -620,6 +642,31 @@ export class GroupDetailComponent implements OnInit {
         this.metricasError = this.apiError(err, 'No se pudieron cargar las métricas');
       }
     });
+  }
+
+  ngAfterViewChecked(): void {
+    this.renderObjectiveChartIfReady();
+  }
+
+  ngOnDestroy(): void {
+    destroyChart(this.objectiveChart);
+  }
+
+  private renderObjectiveChartIfReady(): void {
+    const distribution = this.metrics?.objectiveDistribution;
+    if (!distribution?.length || !this.objectiveChartCanvas?.nativeElement) return;
+
+    const key = `${this.groupId}-${this.metricsDays}-${distribution.map(d => d.count).join(',')}`;
+    if (this.objectiveChartRenderedFor === key) return;
+
+    destroyChart(this.objectiveChart);
+    this.objectiveChart = renderBarChart(
+      this.objectiveChartCanvas.nativeElement,
+      distribution.map((d) => d.label),
+      distribution.map((d) => d.count),
+      { label: 'Miembros', color: 'rgba(45, 212, 191, 0.85)' }
+    );
+    this.objectiveChartRenderedFor = key;
   }
 
   weeklyBarWidth(workouts: number): number {

@@ -24,7 +24,7 @@
             (click)="fileInput.click()" (keydown.enter)="fileInput.click()" (keydown.space)="fileInput.click()"
             aria-label="Cambiar foto de perfil">
             <img
-              [src]="imagePreview || user?.profilePictureUrl || user?.profile_picture_url || 'assets/default-user.png'"
+              [src]="imagePreview || user?.profilePictureUrl || 'assets/default-user.png'"
               alt="Foto de perfil" class="h-28 w-28 sm:h-32 sm:w-32 rounded-full object-cover ring-2 ring-teal-400 shadow-lg shadow-black/40
                      transition duration-200 group-hover:opacity-90" />
 
@@ -153,9 +153,70 @@
             </p>
           </div>
 
+          <!-- Objetivo personal -->
+          <div>
+            <label class="block text-sm text-ip-muted mb-2">Objetivo personal</label>
+            <div class="relative rounded-xl border border-ip-border/60 bg-ip-surface/80
+                     focus-within:border-teal-400/90 focus-within:ring-2 focus-within:ring-teal-400/30 transition">
+              <select formControlName="personalObjective"
+                class="w-full bg-transparent border-none outline-none py-3 pl-3 pr-10 text-ip-primary appearance-none">
+                <option *ngFor="let o of personalObjectives" [value]="o.value" class="bg-ip-page">
+                  {{ o.label }}
+                </option>
+              </select>
+              <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ip-muted">
+                <i class="fas fa-chevron-down"></i>
+              </span>
+            </div>
+          </div>
+
+          <div *ngIf="profileForm.get('personalObjective')?.value === 'OTRO'">
+            <label class="block text-sm text-ip-muted mb-2">Describe tu objetivo</label>
+            <input type="text" formControlName="personalObjectiveOther"
+              class="w-full rounded-xl border border-ip-border/60 bg-ip-surface/80 px-4 py-3 text-ip-primary outline-none
+                     focus:border-teal-400/90 focus:ring-2 focus:ring-teal-400/30 transition"
+              placeholder="Ej: Preparar un triatlón" />
+          </div>
+
+          <!-- Tipo de rutina -->
+          <div>
+            <label class="block text-sm text-ip-muted mb-2">Tipo de rutina</label>
+            <div class="relative rounded-xl border border-ip-border/60 bg-ip-surface/80
+                     focus-within:border-teal-400/90 focus-within:ring-2 focus-within:ring-teal-400/30 transition">
+              <select formControlName="goal"
+                class="w-full bg-transparent border-none outline-none py-3 pl-3 pr-10 text-ip-primary appearance-none">
+                <option *ngFor="let g of goals" [value]="g.value" class="bg-ip-page">
+                  {{ g.label }}
+                </option>
+              </select>
+              <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ip-muted">
+                <i class="fas fa-chevron-down"></i>
+              </span>
+            </div>
+          </div>
+
+          <!-- Unidad de peso -->
+          <div>
+            <label class="block text-sm text-ip-muted mb-2">Unidad de peso</label>
+            <div class="relative rounded-xl border border-ip-border/60 bg-ip-surface/80
+                     focus-within:border-teal-400/90 focus-within:ring-2 focus-within:ring-teal-400/30 transition">
+              <select formControlName="weightUnit"
+                class="w-full bg-transparent border-none outline-none py-3 pl-3 pr-10 text-ip-primary appearance-none">
+                <option *ngFor="let u of weightUnits" [value]="u.value" class="bg-ip-page">
+                  {{ u.label }}
+                </option>
+              </select>
+              <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ip-muted">
+                <i class="fas fa-chevron-down"></i>
+              </span>
+            </div>
+          </div>
+
           <!-- Peso -->
           <div>
-            <label class="block text-sm text-ip-muted mb-2">Peso (kg)</label>
+            <label class="block text-sm text-ip-muted mb-2">
+              Peso ({{ profileForm.get('weightUnit')?.value === 'LB' ? 'lb' : 'kg' }})
+            </label>
             <input type="number" formControlName="weight" class="w-full rounded-xl border border-ip-border/60 bg-ip-surface/80
                      px-4 py-3 text-ip-primary placeholder-ip-muted/50 outline-none
                      focus:border-teal-400/90 focus:ring-2 focus:ring-teal-400/30 transition" placeholder="Ej. 70" />

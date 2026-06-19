@@ -2,26 +2,28 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { MeResponse, UserUpdatePayload } from '../models/user.models';
+
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private http = inject(HttpClient);
-private readonly baseUrl = environment.apiUrl;
+  private readonly baseUrl = environment.apiUrl;
 
-  // Para actualizar username, birthday, gender
-  updateProfile(data: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/users/profile`, data);
+  updateProfile(data: UserUpdatePayload): Observable<MeResponse> {
+    return this.http.put<MeResponse>(`${this.baseUrl}/users/profile`, data);
   }
 
-  // Para subir la foto de perfil a Cloudinary vía Backend
-  uploadPhoto(file: File): Observable<any> {
+  uploadPhoto(file: File): Observable<{ profilePictureUrl?: string; profile_picture_url?: string }> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post(`${this.baseUrl}/users/profile/photo`, formData);
+    return this.http.post<{ profilePictureUrl?: string; profile_picture_url?: string }>(
+      `${this.baseUrl}/users/profile/photo`,
+      formData
+    );
   }
 
-  // Para obtener los datos del usuario logueado (Endpoint /me)
-  getMe(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/users/me`);
+  getMe(): Observable<MeResponse> {
+    return this.http.get<MeResponse>(`${this.baseUrl}/users/me`);
   }
 
   validateOrganizationCode(code: string): Observable<{
@@ -38,7 +40,7 @@ private readonly baseUrl = environment.apiUrl;
     }>(`${this.baseUrl}/users/me/organization/validate-code`, { code });
   }
 
-  joinOrganization(code: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/users/me/organization/join`, { code });
+  joinOrganization(code: string): Observable<MeResponse> {
+    return this.http.post<MeResponse>(`${this.baseUrl}/users/me/organization/join`, { code });
   }
 }

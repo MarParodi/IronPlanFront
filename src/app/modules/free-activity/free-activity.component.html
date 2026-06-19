@@ -1,0 +1,93 @@
+<div class="min-h-screen bg-ip-gradient text-ip-primary">
+  <div class="max-w-lg mx-auto px-4 py-6 space-y-5">
+    <div class="flex items-center gap-3">
+      <button (click)="goBack()" class="w-10 h-10 rounded-xl border border-ip-border bg-ip-surface flex items-center justify-center text-ip-muted hover:text-ip-primary">←</button>
+      <div>
+        <h1 class="text-xl font-semibold">Actividad libre</h1>
+        <p class="text-xs text-ip-muted">Registra cardio u otra actividad fuera de rutina</p>
+      </div>
+    </div>
+
+    <section class="rounded-2xl border border-ip-border/60 bg-ip-surface/70 backdrop-blur-md p-5 space-y-4">
+      <div>
+        <label class="block text-sm text-ip-muted mb-2">Tipo de actividad</label>
+        <select [(ngModel)]="form.activityType" class="w-full rounded-xl border border-ip-border/60 bg-ip-input px-4 py-3 text-sm outline-none focus:border-teal-400">
+          <option *ngFor="let t of activityTypes" [ngValue]="t.value">{{ t.label }}</option>
+        </select>
+      </div>
+
+      <div *ngIf="form.activityType === 'OTRA'">
+        <label class="block text-sm text-ip-muted mb-2">Describe la actividad</label>
+        <input [(ngModel)]="form.activityTypeOther" type="text" class="w-full rounded-xl border border-ip-border/60 bg-ip-input px-4 py-3 text-sm outline-none focus:border-teal-400" placeholder="Ej: Elíptica" />
+      </div>
+
+      <div>
+        <label class="block text-sm text-ip-muted mb-2">Distancia</label>
+        <div class="flex gap-2">
+          <input [(ngModel)]="form.distance" type="number" min="0" step="0.1" class="flex-1 rounded-xl border border-ip-border/60 bg-ip-input px-4 py-3 text-sm outline-none focus:border-teal-400" placeholder="Opcional" />
+          <div class="flex rounded-xl border border-ip-border/60 overflow-hidden">
+            <button type="button" (click)="distanceUnit = 'KM'" class="px-3 py-2 text-xs font-semibold" [ngClass]="distanceUnit === 'KM' ? 'bg-teal-400 text-slate-950' : 'bg-ip-input text-ip-muted'">km</button>
+            <button type="button" (click)="distanceUnit = 'MI'" class="px-3 py-2 text-xs font-semibold" [ngClass]="distanceUnit === 'MI' ? 'bg-teal-400 text-slate-950' : 'bg-ip-input text-ip-muted'">mi</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-ip-border/60 bg-ip-input/40 p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium">Duración</span>
+          <span class="text-2xl font-bold tabular-nums text-teal-300">{{ timerLabel }}</span>
+        </div>
+        <div class="flex gap-2">
+          <button type="button" (click)="toggleTimer()" class="flex-1 py-2 rounded-xl text-sm font-semibold" [ngClass]="timerRunning ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-teal-400 text-slate-950'">
+            {{ timerRunning ? 'Pausar' : 'Iniciar timer' }}
+          </button>
+          <button type="button" (click)="resetTimer()" class="px-4 py-2 rounded-xl text-sm border border-ip-border/60 text-ip-muted">Reiniciar</button>
+        </div>
+        <label class="flex items-center gap-2 text-xs text-ip-muted">
+          <input type="checkbox" [(ngModel)]="useManualDuration" />
+          Ingresar duración manualmente
+        </label>
+        <div *ngIf="useManualDuration" class="grid grid-cols-2 gap-2">
+          <input [(ngModel)]="form.durationMinutes" type="number" min="0" class="rounded-xl border border-ip-border/60 bg-ip-input px-3 py-2 text-sm" placeholder="Min" />
+          <input [(ngModel)]="form.durationSeconds" type="number" min="0" max="59" class="rounded-xl border border-ip-border/60 bg-ip-input px-3 py-2 text-sm" placeholder="Seg" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm text-ip-muted mb-2">Foto (opcional)</label>
+        <div class="flex items-center gap-3">
+          <img *ngIf="photoPreview" [src]="photoPreview" alt="Vista previa" class="h-16 w-16 rounded-xl object-cover ring-2 ring-teal-400/50" />
+          <input type="file" accept="image/*" (change)="onPhotoSelected($event)" class="text-xs text-ip-muted" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm text-ip-muted mb-2">Notas</label>
+        <textarea [(ngModel)]="form.notes" rows="3" class="w-full rounded-xl border border-ip-border/60 bg-ip-input px-4 py-3 text-sm outline-none focus:border-teal-400" placeholder="Observaciones..."></textarea>
+      </div>
+
+      <p *ngIf="error" class="text-xs text-rose-400 bg-rose-900/20 border border-rose-500/30 rounded-lg px-3 py-2">{{ error }}</p>
+      <p *ngIf="success" class="text-xs text-teal-300 bg-emerald-900/20 border border-emerald-500/30 rounded-lg px-3 py-2">Actividad registrada correctamente.</p>
+
+      <button (click)="submit()" [disabled]="saving" class="w-full py-3 rounded-xl bg-gradient-to-b from-teal-300 to-teal-500 text-slate-950 font-semibold disabled:opacity-60">
+        {{ saving ? 'Guardando...' : 'Registrar actividad' }}
+      </button>
+    </section>
+
+    <section class="rounded-2xl border border-ip-border/60 bg-ip-surface/70 backdrop-blur-md p-5">
+      <h2 class="text-sm font-semibold mb-3">Mis actividades recientes</h2>
+      <p *ngIf="loadingMine" class="text-sm text-ip-muted">Cargando...</p>
+      <p *ngIf="!loadingMine && !mine.length" class="text-sm text-ip-muted">Aún no tienes actividades registradas.</p>
+      <div class="space-y-3">
+        <article *ngFor="let item of mine" class="rounded-xl border border-ip-border/40 bg-ip-input/30 p-3 flex gap-3">
+          <img *ngIf="item.photoUrl" [src]="item.photoUrl" alt="" class="h-14 w-14 rounded-lg object-cover shrink-0" />
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium truncate">{{ getActivityLabel(item.activityType, item.activityTypeOther) }}</p>
+            <p class="text-xs text-ip-muted mt-1">{{ formatDuration(item.durationSeconds) }}<span *ngIf="item.distanceKm"> · {{ item.distanceKm | number:'1.1-1' }} km</span></p>
+            <p *ngIf="item.notes" class="text-xs text-ip-muted mt-1 line-clamp-2">{{ item.notes }}</p>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+</div>
