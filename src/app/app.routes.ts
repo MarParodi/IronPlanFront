@@ -89,6 +89,13 @@ export const routes: Routes = [
 },
 
 {
+  path: 'reto/:retoId/inscripcion',
+  loadComponent: () =>
+    import('./modules/reto/reto-inscripcion.component').then(m => m.RetoInscripcionComponent),
+  canActivate: [authGuard],
+},
+
+{
   path: 'actividad-libre',
   loadComponent: () =>
     import('./modules/free-activity/free-activity.component').then(m => m.FreeActivityComponent),

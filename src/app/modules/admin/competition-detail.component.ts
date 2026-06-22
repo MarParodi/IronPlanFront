@@ -608,11 +608,17 @@ export class CompetitionDetailModalComponent implements OnInit {
   }
  
   metricLabel(m: string): string {
-    return ({ SESSIONS: 'Sesiones', ACTIVE_MINUTES: 'Minutos activos', WORKOUTS_COUNT: 'Entrenamientos' })[m] ?? m;
+    return ({
+      SESSIONS: 'Sesiones', ACTIVE_MINUTES: 'Minutos activos', WORKOUTS_COUNT: 'Entrenamientos',
+      VOLUME_TOTAL: 'Volumen total (kg)', FREE_ACTIVITY_COUNT: 'Actividades libres', FREE_ACTIVITY_KM: 'Km actividad libre',
+    })[m] ?? m;
   }
- 
+
   metricIcon(m: string): string {
-    return ({ SESSIONS: '🏋️', ACTIVE_MINUTES: '⏱️', WORKOUTS_COUNT: '🔥' })[m] ?? '📊';
+    return ({
+      SESSIONS: '🏋️', ACTIVE_MINUTES: '⏱️', WORKOUTS_COUNT: '🔥', VOLUME_TOTAL: '💪',
+      FREE_ACTIVITY_COUNT: '🏃', FREE_ACTIVITY_KM: '📍',
+    })[m] ?? '📊';
   }
  
   scopeLabel(s: string): string {

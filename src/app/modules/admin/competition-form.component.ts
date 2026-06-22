@@ -67,6 +67,7 @@ interface Participant {
             <option value="SESSIONS">Sesiones</option>
             <option value="ACTIVE_MINUTES">Minutos activos</option>
             <option value="WORKOUTS_COUNT">Entrenamientos</option>
+            <option value="VOLUME_TOTAL">Volumen total (kg)</option>
           </select>
         </div>
       </div>
@@ -93,13 +94,13 @@ interface Participant {
           <button type="button"
             class="mode-btn"
             [class.active]="form.participantMode === 'GROUP'"
-            (click)="form.participantMode = 'GROUP'">
+            (click)="onParticipantModeChange('GROUP')">
             Grupos
           </button>
           <button type="button"
             class="mode-btn"
             [class.active]="form.participantMode === 'ORGANIZATION_MEMBERS'"
-            (click)="form.participantMode = 'ORGANIZATION_MEMBERS'">
+            (click)="onParticipantModeChange('ORGANIZATION_MEMBERS')">
             Miembros org.
           </button>
         </div>
@@ -116,11 +117,14 @@ interface Participant {
         <span *ngIf="form.competitionType === 'VERSUS'" class="type-badge versus">
           VERSUS — selecciona exactamente 2 participantes del mismo nivel
         </span>
-        <span *ngIf="form.competitionType === 'RANKING'" class="type-badge ranking">
+        <span *ngIf="form.competitionType === 'RANKING' && !isOrganizationWide" class="type-badge ranking">
           RANKING — selecciona 2 o más del mismo nivel
         </span>
-        <span *ngIf="form.competitionType === 'CHALLENGE'" class="type-badge challenge">
+        <span *ngIf="form.competitionType === 'CHALLENGE' && !isOrganizationWide" class="type-badge challenge">
           CHALLENGE — selecciona 2 o más del mismo nivel (requiere fecha fin)
+        </span>
+        <span *ngIf="isOrganizationWide" class="type-badge ranking">
+          Ranking individual — todos los miembros de {{ selectedRoot?.name }} compiten entre sí
         </span>
       </div>
  
@@ -142,8 +146,8 @@ interface Participant {
         </div>
       </div>
  
-      <!-- Navegación jerárquica -->
-      <div class="field" *ngIf="selectedRoot">
+      <!-- Navegación jerárquica (solo modo grupos o selección manual de miembros) -->
+      <div class="field" *ngIf="selectedRoot && !isOrganizationWide">
         <label class="field-label">Navega y elige el nivel que compite</label>
  
         <!-- Breadcrumb -->
@@ -245,6 +249,21 @@ interface Participant {
         <div class="loading-nodes" *ngIf="loadingNodes">
           <div class="spinner-sm"></div>
           <span>Cargando...</span>
+        </div>
+      </div>
+
+      <!-- Modo org-wide: no hace falta elegir subgrupos -->
+      <div class="org-wide-banner" *ngIf="isOrganizationWide && selectedRoot">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        <div>
+          <p class="org-wide-title">Competencia a nivel organización</p>
+          <p class="org-wide-desc">
+            Todos los miembros activos de <strong>{{ selectedRoot.name }}</strong> participarán
+            en un ranking individual. No necesitas seleccionar facultades ni grupos.
+          </p>
         </div>
       </div>
  
@@ -557,6 +576,16 @@ interface Participant {
       background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25);
       border-radius: 8px; padding: 8px 12px;
     }
+
+    .org-wide-banner {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 14px; border-radius: 12px;
+      background: rgba(45,212,191,0.08); border: 1px solid rgba(45,212,191,0.25);
+      color: #94a3b8; font-size: 13px;
+    }
+    .org-wide-title { font-weight: 600; color: #2dd4bf; margin: 0 0 4px; font-size: 13px; }
+    .org-wide-desc { margin: 0; line-height: 1.45; }
+    .org-wide-desc strong { color: #e2e8f0; }
   `]
 })
 export class CompetitionFormComponent implements OnInit {
@@ -590,6 +619,11 @@ export class CompetitionFormComponent implements OnInit {
 
   selectedParticipants: Participant[] = [];
   isMemberCompetition = false;
+
+  /** Ranking individual de toda la organización (modo Miembros org.) */
+  get isOrganizationWide(): boolean {
+    return this.form.participantMode === 'ORGANIZATION_MEMBERS' && !!this.selectedRoot;
+  }
  
   constructor(private adminService: AdminService) {}
  
@@ -611,8 +645,21 @@ export class CompetitionFormComponent implements OnInit {
   // ─── Cambio de tipo ───────────────────────────────────────────────────────
  
   onTypeChange() {
-    // Si cambia el tipo, limpiar selección para evitar inconsistencias
     this.selectedParticipants = [];
+    if (this.form.competitionType === 'CHALLENGE' && this.selectedRoot) {
+      this.form.participantMode = 'ORGANIZATION_MEMBERS';
+    }
+  }
+
+  onParticipantModeChange(mode: 'GROUP' | 'ORGANIZATION_MEMBERS') {
+    this.form.participantMode = mode;
+    this.selectedParticipants = [];
+    this.isMemberCompetition = false;
+    this.isMemberLevel = false;
+    if (mode === 'ORGANIZATION_MEMBERS' && this.selectedRoot) {
+      this.resetNavigation();
+    }
+    this.errorMsg = '';
   }
  
   // ─── Navegación ───────────────────────────────────────────────────────────
@@ -625,6 +672,9 @@ export class CompetitionFormComponent implements OnInit {
     this.isMemberCompetition  = false;
     this.currentParentId      = org.id;
     this.currentScopeLevel    = org.groupType;
+    if (this.form.competitionType === 'CHALLENGE') {
+      this.form.participantMode = 'ORGANIZATION_MEMBERS';
+    }
     this.loadChildren(org.id);
   }
 
@@ -747,13 +797,16 @@ export class CompetitionFormComponent implements OnInit {
     if (this.form.competitionType === 'CHALLENGE' && !this.form.endDate) {
       this.errorMsg = 'CHALLENGE requiere fecha de fin'; return;
     }
-    if (!this.currentParentId) {
+    if (!this.selectedRoot) {
+      this.errorMsg = 'Selecciona una organización'; return;
+    }
+    if (!this.isOrganizationWide && !this.currentParentId) {
       this.errorMsg = 'Navega la jerarquía y selecciona los participantes'; return;
     }
-    if (!this.isMemberCompetition && this.selectedParticipants.length < 2) {
+    if (!this.isOrganizationWide && !this.isMemberCompetition && this.selectedParticipants.length < 2) {
       this.errorMsg = 'Selecciona al menos 2 participantes'; return;
     }
-    if (this.isMemberCompetition && this.selectedParticipants.length === 1) {
+    if (this.isMemberCompetition && !this.isOrganizationWide && this.selectedParticipants.length === 1) {
       this.errorMsg = 'Selecciona al menos 2 miembros o deja vacío para inscribir a todos'; return;
     }
     if (this.form.competitionType === 'VERSUS') {
@@ -774,17 +827,24 @@ export class CompetitionFormComponent implements OnInit {
       metricType:       this.form.metricType,
       startDate:        this.form.startDate,
       endDate:          this.form.endDate || undefined,
-      scopeReferenceId: this.currentParentId,
-      scopeLevel:       this.isMemberCompetition ? 'GRUPO' : this.currentScopeLevel,
-      participantMode:  this.isMemberCompetition ? undefined : this.form.participantMode,
     };
 
-    if (this.isMemberCompetition) {
-      if (this.selectedParticipants.length > 0) {
-        payload.participantUserIds = this.selectedParticipants.map(p => p.id);
-      }
+    if (this.isOrganizationWide) {
+      payload.scopeReferenceId = this.selectedRoot!.id;
+      payload.scopeLevel       = 'EMPRESA';
+      payload.participantMode  = 'ORGANIZATION_MEMBERS';
     } else {
-      payload.participantGroupIds = this.selectedParticipants.map(p => p.id);
+      payload.scopeReferenceId = this.currentParentId;
+      payload.scopeLevel       = this.isMemberCompetition ? 'GRUPO' : this.currentScopeLevel;
+      payload.participantMode  = this.isMemberCompetition ? undefined : this.form.participantMode;
+
+      if (this.isMemberCompetition) {
+        if (this.selectedParticipants.length > 0) {
+          payload.participantUserIds = this.selectedParticipants.map(p => p.id);
+        }
+      } else {
+        payload.participantGroupIds = this.selectedParticipants.map(p => p.id);
+      }
     }
 
     this.adminService.createCompetition(payload).subscribe({

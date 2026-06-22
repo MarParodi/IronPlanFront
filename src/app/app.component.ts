@@ -8,13 +8,15 @@ import { FooterComponent } from './core/components/footer/footer.component';
 import { HeaderComponent } from './core/components/header/header.component';
 import { SpinnerComponent } from './features/components/spinner/spinner.component';
 import { ThemeService } from './core/services/theme.service';
+import { RetoPendingOverlayComponent } from './modules/reto/components/reto-pending-overlay.component';
 import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, FooterComponent, HeaderComponent, SpinnerComponent],
+  imports: [CommonModule, RouterOutlet, FooterComponent, HeaderComponent, SpinnerComponent, RetoPendingOverlayComponent],
   template: `
+    <app-reto-pending-overlay />
     <app-header *ngIf="!isAuthRoute" />
     <router-outlet />
     <app-footer *ngIf="!isAuthRoute" />

@@ -10,11 +10,12 @@ import { CompetitionFormComponent } from './competition-form.component';
 import { InvitationFormComponent } from './invitation-form.component';
 import { ExerciseFormComponent, Exercise, MUSCLE_OPTIONS } from './exercise-form.component';
 import { CompetitionDetailModalComponent } from './competition-detail.component';
+import { AdminRetoExperimentoComponent } from '../reto/admin-reto-experimento.component';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, OrgTreeComponent, OrgCascadeFormComponent, CompetitionFormComponent, InvitationFormComponent, ExerciseFormComponent, CompetitionDetailModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, OrgTreeComponent, OrgCascadeFormComponent, CompetitionFormComponent, InvitationFormComponent, ExerciseFormComponent, CompetitionDetailModalComponent, AdminRetoExperimentoComponent],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css']
 })
@@ -24,7 +25,7 @@ export class AdminComponent implements OnInit {
   showCompetitionDetailModal = false;
   selectedCompetitionId?: number;
  
-  activeSection: 'grupos' | 'invitaciones' | 'competencias' | 'ejercicios' = 'grupos';
+  activeSection: 'grupos' | 'invitaciones' | 'competencias' | 'ejercicios' | 'experimento' = 'grupos';
  
   // ─── GRUPOS ───────────────────────────────────────────────
   groups: any[] = [];
@@ -99,7 +100,7 @@ export class AdminComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -118,7 +119,7 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  setSection(section: 'grupos' | 'invitaciones' | 'competencias' | 'ejercicios') {
+  setSection(section: 'grupos' | 'invitaciones' | 'competencias' | 'ejercicios' | 'experimento') {
     this.activeSection = section;
     if (section === 'grupos')       this.loadGroups();
     if (section === 'invitaciones') this.loadInvitations();

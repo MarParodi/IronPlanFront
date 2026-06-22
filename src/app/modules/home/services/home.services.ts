@@ -169,10 +169,12 @@ export interface ActiveRoutineBlock {
   name: string;
   description: string | null;
   durationWeeks: number;
+  currentWeek: number;
+  blockCompleted: boolean;
+  locked: boolean;
   sessions: ActiveRoutineSession[];
 }
 
-// ACTUALIZADO: sessionOrder en lugar de orderInBlock
 export interface ActiveRoutineSession {
   sessionId: number;
   title: string;
@@ -181,6 +183,8 @@ export interface ActiveRoutineSession {
   sessionOrder: number;
   completed: boolean;
   completedAt?: string;
+  completionsDone: number;
+  completionsRequired: number;
 }
 
 export interface CurrentRoutineResponse {

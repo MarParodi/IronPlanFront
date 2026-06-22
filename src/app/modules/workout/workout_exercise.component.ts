@@ -1,7 +1,8 @@
 // src/app/modules/workout/workout_exercise.component.ts
 // workout-exercise-page.component.ts
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectorRef, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -43,6 +44,7 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
 
   // Timer
   elapsedSeconds = 0;
+  private sessionStartedAtMs: number | null = null;
   private timerSub?: Subscription;
 
   // Loading / error
@@ -68,17 +70,21 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
 
   restSecondsRemaining = 0;
   restTimerActive = false;
+  private restEndsAtMs: number | null = null;
   private restTimerSub?: Subscription;
+  private visibilityHandler = (): void => this.onPageVisibleAgain();
 
   newExerciseId: number | null = null;
   addingExercise = false;
   mutatingSets = false;
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private workoutService: WorkoutService,
-    private progressService: ProgressService
+    private progressService: ProgressService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   // ─────────────────────────────────────────────
@@ -97,11 +103,25 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
 
       this.loadExercise();
     });
+
+    if (this.isBrowser) {
+      document.addEventListener('visibilitychange', this.visibilityHandler);
+    }
   }
 
   ngOnDestroy(): void {
+    if (this.isBrowser) {
+      document.removeEventListener('visibilitychange', this.visibilityHandler);
+    }
     this.stopTimer();
     this.stopRestTimer();
+  }
+
+  /** Al volver a la pestaña, recalculamos con la hora real (el interval se pausa en background). */
+  private onPageVisibleAgain(): void {
+    if (document.visibilityState !== 'visible') return;
+    this.updateElapsed();
+    this.updateRestRemaining();
   }
 
   // ─────────────────────────────────────────────
@@ -210,7 +230,8 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
         setNumber: i,
         reps: null,
         weightKg: null,
-        completed: false
+        completed: false,
+        rirRegistrado: resp.plannedRir ?? 2,
       });
     }
 
@@ -251,25 +272,37 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
 
   private startRestTimer(): void {
     if (!this.data?.plannedRestSeconds) return;
-    this.stopRestTimer();
-    this.restSecondsRemaining = this.data.plannedRestSeconds;
+    this.stopRestTimer(false);
+    this.restEndsAtMs = Date.now() + this.data.plannedRestSeconds * 1000;
     this.restTimerActive = true;
-    this.restTimerSub = interval(1000).subscribe(() => {
-      if (this.restSecondsRemaining <= 1) {
-        this.stopRestTimer();
-      } else {
-        this.restSecondsRemaining -= 1;
-      }
-    });
+    this.updateRestRemaining();
+    this.restTimerSub = interval(1000).subscribe(() => this.updateRestRemaining());
   }
 
-  private stopRestTimer(): void {
+  private updateRestRemaining(): void {
+    if (this.restEndsAtMs == null) return;
+
+    const remainingMs = this.restEndsAtMs - Date.now();
+    if (remainingMs <= 0) {
+      this.stopRestTimer();
+      return;
+    }
+
+    this.restSecondsRemaining = Math.ceil(remainingMs / 1000);
+    this.cdr.markForCheck();
+  }
+
+  private stopRestTimer(resetDisplay = true): void {
     this.restTimerActive = false;
-    this.restSecondsRemaining = 0;
+    this.restEndsAtMs = null;
+    if (resetDisplay) {
+      this.restSecondsRemaining = 0;
+    }
     if (this.restTimerSub) {
       this.restTimerSub.unsubscribe();
       this.restTimerSub = undefined;
     }
+    this.cdr.markForCheck();
   }
 
   get restTimerLabel(): string {
@@ -283,30 +316,68 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Timer basado en progress.startedAt
+   * Timer basado en progress.startedAt del backend.
    */
   private setupTimer(resp: WorkoutExerciseDetailResponse): void {
     this.stopTimer();
 
-    // Validar que startedAt exista y sea una fecha válida
-    if (!resp.progress?.startedAt) {
-      this.elapsedSeconds = 0;
-      return;
+    this.sessionStartedAtMs = this.resolveSessionStartMs(
+      resp.progress?.sessionId ?? this.sessionId,
+      resp.progress?.startedAt
+    );
+
+    this.updateElapsed();
+    this.timerSub = interval(1000).subscribe(() => this.updateElapsed());
+  }
+
+  private resolveSessionStartMs(sessionId: number, startedAt: unknown): number {
+    const parsed = this.parseStartedAt(startedAt);
+    const key = `ws-start-${sessionId}`;
+    const storage = this.isBrowser ? sessionStorage : null;
+
+    if (parsed != null) {
+      storage?.setItem(key, String(parsed));
+      return parsed;
     }
 
-    const startedAt = new Date(resp.progress.startedAt).getTime();
-    
-    // Si la fecha no es válida, usar 0
-    if (isNaN(startedAt)) {
-      this.elapsedSeconds = 0;
-      return;
+    const stored = storage?.getItem(key);
+    if (stored) {
+      const ms = Number(stored);
+      if (Number.isFinite(ms)) return ms;
     }
 
-    this.timerSub = interval(1000).subscribe(() => {
-      const now = Date.now();
-      const diffMs = now - startedAt;
-      this.elapsedSeconds = Math.max(0, Math.floor(diffMs / 1000));
-    });
+    const now = Date.now();
+    storage?.setItem(key, String(now));
+    return now;
+  }
+
+  private updateElapsed(): void {
+    if (this.sessionStartedAtMs == null) {
+      this.elapsedSeconds = 0;
+      this.cdr.markForCheck();
+      return;
+    }
+    const diffMs = Date.now() - this.sessionStartedAtMs;
+    this.elapsedSeconds = Math.max(0, Math.floor(diffMs / 1000));
+    this.cdr.markForCheck();
+  }
+
+  /** Soporta ISO string, timestamp numérico o array [y,m,d,h,min,s] de Jackson. */
+  private parseStartedAt(value: unknown): number | null {
+    if (value == null) return null;
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : null;
+    }
+    if (typeof value === 'string') {
+      const ms = Date.parse(value);
+      return Number.isNaN(ms) ? null : ms;
+    }
+    if (Array.isArray(value) && value.length >= 3) {
+      const [y, m, d, h = 0, min = 0, s = 0, nano = 0] = value.map(Number);
+      const ms = new Date(y, m - 1, d, h, min, s, Math.floor(nano / 1_000_000)).getTime();
+      return Number.isNaN(ms) ? null : ms;
+    }
+    return null;
   }
 
   private stopTimer(): void {
@@ -416,6 +487,7 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
           reps: null,
           weightKg: null,
           completed: false,
+          rirRegistrado: this.data?.plannedRir ?? 2,
         });
         this.displayWeights.push(null);
         this.mutatingSets = false;

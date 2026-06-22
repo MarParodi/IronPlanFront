@@ -12,7 +12,7 @@ export interface WorkoutSessionProgressDto {
   totalExercises: number;
   progressPercentage: number;
   xpEarned: number;
-  startedAt: string; // ISO string que viene del back
+  startedAt?: string | number | number[]; // ISO, epoch o array Jackson LocalDateTime
 }
 
 export interface NextExerciseSummaryDto {
@@ -54,6 +54,7 @@ export interface WorkoutSetItemRequest {
   reps: number | null;
   weightKg: number | null;
   completed: boolean;
+  rirRegistrado?: number | null;
 }
 
 export interface WorkoutSetRequest {

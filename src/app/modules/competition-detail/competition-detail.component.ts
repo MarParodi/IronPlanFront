@@ -672,7 +672,10 @@ export class CompetitionDetailComponent implements OnInit {
     const labels: Record<string, string> = {
       SESSIONS: 'Sesiones',
       ACTIVE_MINUTES: 'Min. activos',
-      WORKOUTS_COUNT: 'Entrenamientos'
+      WORKOUTS_COUNT: 'Entrenamientos',
+      VOLUME_TOTAL: 'Volumen (kg)',
+      FREE_ACTIVITY_COUNT: 'Actividades libres',
+      FREE_ACTIVITY_KM: 'Km cardio',
     };
 
     return labels[metric] ?? metric;

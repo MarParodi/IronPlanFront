@@ -116,10 +116,15 @@
         Marca cada serie como hecha (✔) para que se tome en cuenta en tu entrenamiento.
       </p>
       <div class="space-y-3 text-xs md:text-sm">
-        <div *ngFor="let s of currentSets; index as i" class="grid grid-cols-[auto_1fr_1fr_auto] items-center gap-2 md:gap-3">
-          <span class="text-ip-muted">Serie {{ i + 1 }}</span>
+        <div class="grid grid-cols-[auto_1fr_1fr_3rem_1fr_auto] gap-2 md:gap-3 text-[10px] text-ip-muted px-1">
+          <span></span><span>Reps</span><span>Peso</span><span>RIR</span><span></span><span></span>
+        </div>
+        <div *ngFor="let s of currentSets; index as i" class="grid grid-cols-[auto_1fr_1fr_3rem_1fr_auto] items-center gap-2 md:gap-3">
+          <span class="text-ip-muted">S{{ i + 1 }}</span>
           <input type="number" class="w-full bg-ip-input border border-ip-border rounded-2xl px-3 py-2 text-xs md:text-sm focus:outline-none focus:border-emerald-400" placeholder="Reps" [(ngModel)]="currentSets[i].reps">
           <input type="number" class="w-full bg-ip-input border border-ip-border rounded-2xl px-3 py-2 text-xs md:text-sm focus:outline-none focus:border-emerald-400" [placeholder]="weightPlaceholder" [ngModel]="displayWeights[i]" (ngModelChange)="onWeightInput(i, $event)">
+          <input type="number" min="0" max="5" class="w-full bg-ip-input border border-ip-border rounded-xl px-2 py-2 text-xs text-center focus:outline-none focus:border-emerald-400" [(ngModel)]="currentSets[i].rirRegistrado" title="Reps en reserva">
+          <span></span>
           <button type="button" class="w-8 h-8 md:w-9 md:h-9 rounded-xl border flex items-center justify-center transition" [ngClass]="currentSets[i].completed ? 'border-emerald-400 bg-emerald-400/20' : 'border-ip-border'" (click)="onToggleSetCompleted(i)">
             <span *ngIf="currentSets[i].completed">✔</span>
           </button>
