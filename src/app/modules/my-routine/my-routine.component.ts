@@ -130,8 +130,23 @@ export class MyRoutineComponent implements OnInit {
 
   onStartSession(session: ActiveRoutineSession): void {
     if (!this.routine) return;
-    // Navegar a iniciar el workout
+    if (this.isSessionLocked(session)) return;
     this.router.navigate(['/academia/routines', this.routine.id, 'sessions', session.sessionId]);
+  }
+
+  isBlockLocked(block: ActiveRoutineBlock): boolean {
+    return block.locked === true;
+  }
+
+  isSessionLocked(session: ActiveRoutineSession): boolean {
+    const block = this.routine?.blocks.find(b =>
+      b.sessions.some(s => s.sessionId === session.sessionId)
+    );
+    return block?.locked === true;
+  }
+
+  sessionProgressLabel(session: ActiveRoutineSession): string {
+    return `${session.completionsDone}/${session.completionsRequired} sem.`;
   }
 
   // Drag and drop para reordenar sesiones dentro de un bloque

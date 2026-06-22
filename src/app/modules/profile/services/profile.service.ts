@@ -16,7 +16,7 @@ export interface CompetitionResponse {
   scopeLevel:          string;
   scopeReferenceId:    number;
   scopeReferenceName:  string;
-  metricType:          'SESSIONS' | 'ACTIVE_MINUTES' | 'WORKOUTS_COUNT';
+  metricType:          'SESSIONS' | 'ACTIVE_MINUTES' | 'WORKOUTS_COUNT' | 'VOLUME_TOTAL' | 'FREE_ACTIVITY_COUNT' | 'FREE_ACTIVITY_KM';
   startDate:           string;
   endDate:             string | null;
   status:              'DRAFT' | 'ACTIVE' | 'FINISHED';

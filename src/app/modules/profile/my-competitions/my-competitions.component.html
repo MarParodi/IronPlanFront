@@ -32,7 +32,15 @@
       </div>
     </div>
   </div>
- 
+
+  <!-- Reto experimental pendiente -->
+  <div *ngIf="retoActivo && retoEstado && !retoEstado.completoPretest"
+    class="mx-auto max-w-3xl mb-4 rounded-xl bg-teal-500/10 border border-teal-500/30 px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+    <p class="text-sm"><strong>{{ retoActivo.nombre }}</strong> — completa la inscripción (IPAQ pre-test obligatorio).</p>
+    <a [routerLink]="['/reto', retoActivo.id, 'inscripcion']"
+      class="text-sm font-semibold text-teal-400 underline">Continuar inscripción</a>
+  </div>
+
   <!-- ── Tabs ── -->
   <div class="mc-tabs" *ngIf="!loading && competitions.length > 0">
     <button class="mc-tab" [class.tab-active]="activeTab === 'all'" (click)="applyTab('all')">

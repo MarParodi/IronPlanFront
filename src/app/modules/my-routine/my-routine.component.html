@@ -198,14 +198,23 @@
 
       <!-- Bloques / Semanas -->
       <div class="space-y-8">
-        <div *ngFor="let block of routine.blocks; trackBy: trackByBlock">
+        <div *ngFor="let block of routine.blocks; trackBy: trackByBlock"
+             [class.opacity-50]="isBlockLocked(block)">
           <!-- Título del bloque -->
-          <h2 class="text-teal-400 font-bold text-sm uppercase tracking-wider mb-3">
-            {{ block.name }}
-            <span *ngIf="block.durationWeeks" class="text-ip-muted font-normal">
-              — {{ block.durationWeeks }} semanas
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-teal-400 font-bold text-sm uppercase tracking-wider">
+              {{ block.name }}
+              <span *ngIf="block.durationWeeks" class="text-ip-muted font-normal">
+                — {{ block.durationWeeks }} semanas
+              </span>
+            </h2>
+            <span *ngIf="!block.blockCompleted && !block.locked"
+                  class="text-xs text-amber-400 font-medium">
+              Semana {{ block.currentWeek }} de {{ block.durationWeeks }}
             </span>
-          </h2>
+            <span *ngIf="block.blockCompleted" class="text-xs text-teal-400 font-medium">Completado</span>
+            <span *ngIf="block.locked" class="text-xs text-ip-muted font-medium">Bloqueado</span>
+          </div>
 
           <!-- Sesiones del bloque (drag and drop) -->
           <div 
@@ -217,13 +226,17 @@
             <div
               *ngFor="let session of block.sessions; trackBy: trackBySession"
               cdkDrag
+              [cdkDragDisabled]="isBlockLocked(block)"
               [cdkDragData]="session"
-              (click)="onSessionClick(session)"
-              class="group rounded-xl px-4 py-4 flex items-center gap-3 transition-all duration-200 cursor-grab active:cursor-grabbing"
+              (click)="!isBlockLocked(block) && onSessionClick(session)"
+              class="group rounded-xl px-4 py-4 flex items-center gap-3 transition-all duration-200"
               [ngClass]="{
-                'bg-amber-500 text-slate-900': selectedSessionId === session.sessionId,
-                'bg-ip-surface border border-ip-border/50 hover:border-ip-border': selectedSessionId !== session.sessionId && !session.completed,
-                'bg-ip-surface/60 border border-ip-border/30 opacity-60': session.completed
+                'cursor-grab active:cursor-grabbing': !isBlockLocked(block),
+                'cursor-not-allowed': isBlockLocked(block),
+                'bg-amber-500 text-slate-900': selectedSessionId === session.sessionId && !isBlockLocked(block),
+                'bg-ip-surface border border-ip-border/50 hover:border-ip-border': selectedSessionId !== session.sessionId && !session.completed && !isBlockLocked(block),
+                'bg-ip-surface/60 border border-ip-border/30': session.completed,
+                'bg-ip-surface/40 border border-ip-border/20 opacity-70': isBlockLocked(block)
               }">
               
               <!-- Handle de drag -->
@@ -251,6 +264,7 @@
                 <p class="text-xs mt-0.5"
                    [ngClass]="selectedSessionId === session.sessionId ? 'text-slate-800' : 'text-amber-400'">
                   {{ session.totalSeries }} series - {{ session.mainMuscles }}
+                  · {{ sessionProgressLabel(session) }}
                 </p>
               </div>
 
@@ -277,7 +291,7 @@
       </div>
 
       <!-- Botón de iniciar sesión seleccionada -->
-      <div *ngIf="selectedSessionId && getSelectedSession()" class="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-ip-page via-ip-page to-transparent">
+      <div *ngIf="selectedSessionId && getSelectedSession() && !isSessionLocked(getSelectedSession()!)" class="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-ip-page via-ip-page to-transparent">
         <div class="max-w-2xl mx-auto">
           <button
             (click)="onStartSession(getSelectedSession()!)"

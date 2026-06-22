@@ -272,7 +272,10 @@ export class GrupoRetoDetailComponent implements OnInit {
     const labels: Record<string, string> = {
       SESSIONS: 'sesiones',
       ACTIVE_MINUTES: 'min. activos',
-      WORKOUTS_COUNT: 'entrenamientos'
+      WORKOUTS_COUNT: 'entrenamientos',
+      VOLUME_TOTAL: 'kg volumen',
+      FREE_ACTIVITY_COUNT: 'actividades libres',
+      FREE_ACTIVITY_KM: 'km cardio',
     };
     return labels[m] ?? m;
   }
