@@ -147,6 +147,14 @@ getInternalRanking(id: number): Observable<any[]> {
   return this.http.get<any[]>(`${this.baseUrl}/competitions/${id}/leaderboard/internal`);
 }
 
+getCompetitionPodiums(id: number): Observable<any> {
+  return this.http.get<any>(`${this.baseUrl}/competitions/${id}/podiums`);
+}
+
+getCompetitionWinners(id: number): Observable<any[]> {
+  return this.http.get<any[]>(`${this.baseUrl}/competitions/${id}/winners`);
+}
+
 }
 
 // Interfaces para rutina activa con progreso

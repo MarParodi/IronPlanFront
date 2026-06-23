@@ -4,6 +4,8 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import {
   GruposService,
   CompetitionDetailView,
+  DeclaredWinnerDto,
+  PodiumsResponse,
 } from './services/grupos.service';
 import { UserService } from '../user/services/user.service';
 
@@ -40,7 +42,19 @@ import { UserService } from '../user/services/user.service';
           <span [class]="statusClass(detail.competition.status)">{{ statusLabel(detail.competition.status) }}</span>
         </div>
 
-        <div *ngIf="detail.winner?.name"
+        <div *ngIf="declaredWinners.length"
+          class="space-y-2">
+          <div *ngFor="let w of declaredWinners"
+            class="rounded-xl bg-amber-500/10 border border-amber-500/30 px-4 py-3 flex items-center gap-3">
+            <span class="text-2xl">🏆</span>
+            <div>
+              <p class="text-xs uppercase tracking-wide text-amber-400 font-semibold">Ganador — {{ w.levelLabel }}</p>
+              <p class="text-lg font-semibold text-ip-primary">{{ w.fullName }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!declaredWinners.length && detail.winner?.name"
           class="rounded-xl bg-teal-500/10 border border-teal-500/30 px-4 py-3 flex flex-wrap items-center gap-3">
           <span class="text-2xl">🏆</span>
           <div>
@@ -56,10 +70,44 @@ import { UserService } from '../user/services/user.service';
             </p>
           </div>
         </div>
-        <p *ngIf="!detail.winner?.name" class="text-sm text-ip-primary0">
+        <p *ngIf="!declaredWinners.length && !detail.winner?.name" class="text-sm text-ip-primary0">
           Aún no hay puntuación registrada. Los puntos se actualizan al completar entrenamientos.
         </p>
       </header>
+
+      <!-- Podios compuestos (solo lectura) -->
+      <section *ngIf="podiums && detail.competition.isMemberCompetition && detail.competition.status === 'FINISHED'"
+        class="rounded-2xl bg-ip-surface border border-ip-border overflow-hidden space-y-4 p-4">
+        <h3 class="text-sm font-semibold text-ip-secondary">Podios (puntuación compuesta)</h3>
+
+        <div *ngIf="podiums.generalTop3?.length">
+          <p class="text-xs font-semibold text-ip-muted mb-2">General</p>
+          <div class="space-y-2">
+            <div *ngFor="let e of podiums.generalTop3" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-ip-page/50">
+              <span>{{ e.rank === 1 ? '🥇' : e.rank === 2 ? '🥈' : '🥉' }}</span>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-sm">{{ e.fullName }}</p>
+                <p class="text-xs text-ip-muted">Score {{ e.compositeScore | number:'1.1-1' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngFor="let level of levelKeys">
+          <ng-container *ngIf="podiums.byLevel[level]?.length">
+            <p class="text-xs font-semibold text-ip-muted mb-2">{{ levelLabels[level] }}</p>
+            <div class="space-y-2">
+              <div *ngFor="let e of podiums.byLevel[level]" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-ip-page/50">
+                <span>{{ e.rank === 1 ? '🥇' : e.rank === 2 ? '🥈' : '🥉' }}</span>
+                <div class="flex-1 min-w-0">
+                  <p class="font-medium text-sm">{{ e.fullName }}</p>
+                  <p class="text-xs text-ip-muted">Score {{ e.compositeScore | number:'1.1-1' }}</p>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </section>
 
       <div *ngIf="detail.myScore" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <div *ngIf="!detail.myScore.isMemberCompetition && detail.myScore.groupRank"
@@ -208,6 +256,14 @@ export class GrupoRetoDetailComponent implements OnInit {
   groupId = 0;
   competitionId = 0;
   detail?: CompetitionDetailView;
+  podiums?: PodiumsResponse;
+  declaredWinners: DeclaredWinnerDto[] = [];
+  levelKeys = ['PRINCIPIANTE', 'INTERMEDIO', 'AVANZADO'];
+  levelLabels: Record<string, string> = {
+    PRINCIPIANTE: 'Principiante',
+    INTERMEDIO: 'Intermedio',
+    AVANZADO: 'Avanzado',
+  };
   loading = true;
   error = '';
   currentUserId: number | null = null;
@@ -235,7 +291,20 @@ export class GrupoRetoDetailComponent implements OnInit {
     this.loading = true;
     this.error = '';
     this.gruposService.getRetoDetail(this.groupId, this.competitionId).subscribe({
-      next: (d) => { this.detail = d; this.loading = false; },
+      next: (d) => {
+        this.detail = d;
+        this.loading = false;
+        if (d.competition.isMemberCompetition && d.competition.status === 'FINISHED') {
+          this.gruposService.getRetoWinners(this.competitionId).subscribe({
+            next: (w) => { this.declaredWinners = w || []; },
+            error: () => { this.declaredWinners = []; },
+          });
+          this.gruposService.getRetoPodiums(this.competitionId).subscribe({
+            next: (p) => { this.podiums = p?.generalTop3?.length || p?.byLevel ? p : undefined; },
+            error: () => { this.podiums = undefined; },
+          });
+        }
+      },
       error: (err) => {
         this.loading = false;
         this.error = err?.error?.error || err?.error?.message || 'No se pudo cargar el reto';

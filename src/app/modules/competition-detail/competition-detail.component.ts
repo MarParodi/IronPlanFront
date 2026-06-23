@@ -190,6 +190,62 @@ import { HomeService } from '../home/services/home.services';
         </div>
       </div>
 
+      <!-- Ganadores declarados (retos finalizados) -->
+      <div
+        *ngIf="myScore?.isMemberCompetition && competition?.status === 'FINISHED' && declaredWinners.length"
+        class="space-y-2">
+        <div
+          *ngFor="let w of declaredWinners"
+          class="rounded-xl bg-amber-500/10 border border-amber-500/30 px-5 py-4 flex items-center gap-3">
+          <span class="text-2xl">🏆</span>
+          <div>
+            <p class="text-xs uppercase tracking-wide text-amber-400 font-semibold">
+              Ganador — {{ w.levelLabel }}
+            </p>
+            <p class="text-lg font-semibold text-ip-primary">{{ w.fullName }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Podios compuestos (solo lectura) -->
+      <section
+        *ngIf="podiums && myScore?.isMemberCompetition && competition?.status === 'FINISHED'"
+        class="rounded-xl border border-ip-border bg-ip-surface overflow-hidden space-y-4 p-5">
+        <h3 class="text-sm font-semibold text-ip-secondary">Podios (puntuación compuesta)</h3>
+
+        <div *ngIf="podiums.generalTop3?.length">
+          <p class="text-xs font-semibold text-ip-muted mb-2">General</p>
+          <div class="space-y-2">
+            <div
+              *ngFor="let e of podiums.generalTop3"
+              class="flex items-center gap-3 px-3 py-2 rounded-lg bg-ip-page/50">
+              <span>{{ e.rank === 1 ? '🥇' : e.rank === 2 ? '🥈' : '🥉' }}</span>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-sm">{{ e.fullName }}</p>
+                <p class="text-xs text-ip-muted">Score {{ e.compositeScore | number:'1.1-1' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngFor="let level of levelKeys">
+          <ng-container *ngIf="podiums.byLevel[level]?.length">
+            <p class="text-xs font-semibold text-ip-muted mb-2">{{ levelLabels[level] }}</p>
+            <div class="space-y-2">
+              <div
+                *ngFor="let e of podiums.byLevel[level]"
+                class="flex items-center gap-3 px-3 py-2 rounded-lg bg-ip-page/50">
+                <span>{{ e.rank === 1 ? '🥇' : e.rank === 2 ? '🥈' : '🥉' }}</span>
+                <div class="flex-1 min-w-0">
+                  <p class="font-medium text-sm">{{ e.fullName }}</p>
+                  <p class="text-xs text-ip-muted">Score {{ e.compositeScore | number:'1.1-1' }}</p>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </section>
+
       <!-- VERSUS -->
       <div
         *ngIf="competition?.competitionType === 'VERSUS' && leaderboard.length === 2"
@@ -540,6 +596,14 @@ export class CompetitionDetailComponent implements OnInit {
     { label: 'Intermedio', value: 'INTERMEDIO' },
     { label: 'Avanzado', value: 'AVANZADO' },
   ];
+  podiums: any = null;
+  declaredWinners: any[] = [];
+  levelKeys = ['PRINCIPIANTE', 'INTERMEDIO', 'AVANZADO'];
+  levelLabels: Record<string, string> = {
+    PRINCIPIANTE: 'Principiante',
+    INTERMEDIO: 'Intermedio',
+    AVANZADO: 'Avanzado',
+  };
   private competitionId = 0;
   myGroupId: number | null = null;
 
@@ -583,6 +647,9 @@ export class CompetitionDetailComponent implements OnInit {
 
         if (this.myScore?.isMemberCompetition) {
           this.loadMemberLeaderboard();
+          if (this.competition?.status === 'FINISHED') {
+            this.loadRetoResults();
+          }
         }
       },
 
@@ -596,6 +663,32 @@ export class CompetitionDetailComponent implements OnInit {
   setMemberLevelFilter(level: string | null): void {
     this.memberLevelFilter = level;
     this.loadMemberLeaderboard();
+  }
+
+  loadRetoResults(): void {
+    if (!this.competitionId) return;
+
+    this.homeService.getCompetitionWinners(this.competitionId).subscribe({
+      next: (w) => {
+        this.declaredWinners = w || [];
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.declaredWinners = [];
+        this.cdr.markForCheck();
+      },
+    });
+
+    this.homeService.getCompetitionPodiums(this.competitionId).subscribe({
+      next: (p) => {
+        this.podiums = p?.generalTop3?.length || p?.byLevel ? p : null;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.podiums = null;
+        this.cdr.markForCheck();
+      },
+    });
   }
 
   loadMemberLeaderboard(): void {

@@ -533,7 +533,7 @@
           </div>
 
           <!-- Parámetros del ejercicio -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             <div>
               <label class="block text-xs font-medium text-ip-muted mb-1">Series</label>
               <input type="number" [(ngModel)]="exercise.sets" min="1" max="20"
@@ -552,6 +552,11 @@
             <div>
               <label class="block text-xs font-medium text-ip-muted mb-1">RIR</label>
               <input type="number" [(ngModel)]="exercise.rir" min="0" max="5"
+                     class="w-full px-3 py-2 bg-ip-input/50 border border-ip-border/50 rounded-lg text-ip-primary text-center focus:outline-none focus:border-teal-500/50 transition-all" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-ip-muted mb-1">Descanso (min)</label>
+              <input type="number" [(ngModel)]="exercise.restMinutes" min="0" max="10" step="0.5"
                      class="w-full px-3 py-2 bg-ip-input/50 border border-ip-border/50 rounded-lg text-ip-primary text-center focus:outline-none focus:border-teal-500/50 transition-all" />
             </div>
           </div>

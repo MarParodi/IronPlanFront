@@ -138,6 +138,14 @@ export class GruposService {
   activateReto(groupId: number, competitionId: number): Observable<{ id: number; status: string }> {
     return this.http.post<{ id: number; status: string }>(`${this.base}/${groupId}/retos/${competitionId}/activate`, {});
   }
+
+  getRetoPodiums(competitionId: number): Observable<PodiumsResponse> {
+    return this.http.get<PodiumsResponse>(`${environment.apiUrl}/competitions/${competitionId}/podiums`);
+  }
+
+  getRetoWinners(competitionId: number): Observable<DeclaredWinnerDto[]> {
+    return this.http.get<DeclaredWinnerDto[]>(`${environment.apiUrl}/competitions/${competitionId}/winners`);
+  }
 }
 
 export interface CreateRetoRequest {
@@ -218,4 +226,37 @@ export interface MyCompetitionScore {
   memberRank?: number;
   isMemberCompetition?: boolean;
   participantGroupId?: number;
+}
+
+export interface PodiumEntryDto {
+  rank: number;
+  userId: number;
+  fullName: string;
+  username?: string;
+  profilePictureUrl?: string;
+  levelCategory?: string;
+  compositeScore: number;
+  consistencyRaw: number;
+  oneRmProgressRaw: number;
+  volumeRaw: number;
+  consistencyNorm?: number;
+  oneRmNorm?: number;
+  volumeNorm?: number;
+}
+
+export interface PodiumsResponse {
+  generated?: string;
+  generalTop3: PodiumEntryDto[];
+  byLevel: Record<string, PodiumEntryDto[]>;
+}
+
+export interface DeclaredWinnerDto {
+  scope: string;
+  levelCategory?: string;
+  levelLabel: string;
+  userId: number;
+  fullName: string;
+  username?: string;
+  profilePictureUrl?: string;
+  declaredAt?: string;
 }

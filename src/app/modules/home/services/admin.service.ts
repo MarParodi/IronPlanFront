@@ -140,6 +140,22 @@ getExercises() {
     return this.http.get<any[]>(
         `${this.base}/admin/competitions/${competitionId}/participants/${groupId}/members`
     );
-}
+  }
+
+  generatePodiums(competitionId: number) {
+    return this.http.post<any>(`${this.base}/admin/competitions/${competitionId}/generate-podiums`, {});
+  }
+
+  getPodiums(competitionId: number) {
+    return this.http.get<any>(`${this.base}/admin/competitions/${competitionId}/podiums`);
+  }
+
+  declareWinner(competitionId: number, body: { scope: 'GENERAL' | 'LEVEL'; levelCategory?: string; userId: number }) {
+    return this.http.post<any>(`${this.base}/admin/competitions/${competitionId}/declare-winner`, body);
+  }
+
+  getDeclaredWinners(competitionId: number) {
+    return this.http.get<any[]>(`${this.base}/competitions/${competitionId}/winners`);
+  }
 
 }
