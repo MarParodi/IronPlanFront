@@ -15,8 +15,10 @@ import {
 import { WorkoutService } from './services/workout.services';
 import { ProgressService } from './services/progress.service';
 import { ProgressionRecommendation } from './models/progress.models';
+import { CreateRoutineService } from '../create-routine/services/create-routine.service';
+import { Exercise } from '../create-routine/models/create-routine.models';
 import { SafePipe } from './pipes/safe.pipe';
-import { Subscription, interval } from 'rxjs';
+import { Subscription, interval, switchMap } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -75,15 +77,31 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   private visibilityHandler = (): void => this.onPageVisibleAgain();
 
   newExerciseId: number | null = null;
+  newExerciseName = '';
+  exercises: Exercise[] = [];
+  filteredExercises: Exercise[] = [];
+  showExerciseDropdown = false;
+  loadingExercises = false;
   addingExercise = false;
+  removingExercise = false;
   mutatingSets = false;
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
+  // Superset: ejercicio combinado con el siguiente
+  pairedData: WorkoutExerciseDetailResponse | null = null;
+  pairedSets: WorkoutSetItemRequest[] = [];
+  pairedDisplayWeights: (number | null)[] = [];
+  pairedNotes: string | null = null;
+  isCombined = false;
+  loadingPaired = false;
+  mutatingPairedSets = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private workoutService: WorkoutService,
     private progressService: ProgressService,
+    private createRoutineService: CreateRoutineService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -129,8 +147,15 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   // ─────────────────────────────────────────────
 
   private loadExercise(): void {
+    const comboAnchor = this.getComboAnchorOrder();
+    if (comboAnchor != null && this.order === comboAnchor + 1) {
+      this.router.navigate(['/workouts', this.sessionId, 'exercise', comboAnchor], { replaceUrl: true });
+      return;
+    }
+
     this.loading = true;
     this.errorMessage = null;
+    this.resetPairedState();
 
     this.workoutService.getExerciseDetail(this.sessionId, this.order)
       .subscribe({
@@ -139,9 +164,12 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
           this.setupSets(resp);
           this.setupTimer(resp);
           this.loading = false;
-          
-          // Cargar recomendación de progresión
+
           this.loadRecommendation(resp);
+
+          if (this.getComboAnchorOrder() === this.order) {
+            this.loadPairedExercise(this.order + 1);
+          }
         },
         error: (err) => {
           console.error(err);
@@ -149,6 +177,81 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
           this.loading = false;
         }
       });
+  }
+
+  private comboStorageKey(): string {
+    return `workout-combo:${this.sessionId}`;
+  }
+
+  private saveComboState(anchorOrder: number): void {
+    if (!this.isBrowser) return;
+    sessionStorage.setItem(this.comboStorageKey(), JSON.stringify({ anchorOrder }));
+  }
+
+  private clearComboState(): void {
+    if (!this.isBrowser) return;
+    sessionStorage.removeItem(this.comboStorageKey());
+  }
+
+  private getComboAnchorOrder(): number | null {
+    if (!this.isBrowser) return null;
+    const raw = sessionStorage.getItem(this.comboStorageKey());
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw);
+      const n = Number(parsed?.anchorOrder);
+      return Number.isFinite(n) ? n : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private resetPairedState(): void {
+    this.pairedData = null;
+    this.pairedSets = [];
+    this.pairedDisplayWeights = [];
+    this.pairedNotes = null;
+    this.isCombined = false;
+    this.loadingPaired = false;
+  }
+
+  combineWithNext(): void {
+    if (!this.data || this.data.nextExercises.length === 0 || this.isCombined || this.loadingPaired) return;
+    this.saveComboState(this.order);
+    this.loadPairedExercise(this.order + 1);
+  }
+
+  uncombine(): void {
+    this.clearComboState();
+    this.resetPairedState();
+    this.cdr.markForCheck();
+  }
+
+  private loadPairedExercise(pairedOrder: number): void {
+    this.loadingPaired = true;
+    this.workoutService.getExerciseDetail(this.sessionId, pairedOrder).subscribe({
+      next: (resp) => {
+        this.setupPairedSets(resp);
+        this.isCombined = true;
+        this.loadingPaired = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.loadingPaired = false;
+        this.clearComboState();
+        this.resetPairedState();
+        this.errorMessage = 'No se pudo cargar el ejercicio combinado.';
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  get nextExerciseName(): string | null {
+    return this.data?.nextExercises?.[0]?.exerciseName ?? null;
+  }
+
+  get canCombineWithNext(): boolean {
+    return !!this.data && this.data.nextExercises.length > 0 && !this.isCombined && !this.loadingPaired;
   }
 
   private loadRecommendation(resp: WorkoutExerciseDetailResponse): void {
@@ -179,13 +282,21 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
     });
   }
 
-  applySuggestedWeight(weight: number): void {
-    // Aplicar peso sugerido a todas las series que no tienen peso
+  applySuggestedWeight(weight: number, overwriteExisting = false): void {
     this.currentSets.forEach(set => {
-      if (set.weightKg === null || set.weightKg === undefined) {
+      if (overwriteExisting || set.weightKg === null || set.weightKg === undefined) {
         set.weightKg = weight;
       }
     });
+    this.syncDisplayWeights();
+  }
+
+  private syncDisplayWeights(): void {
+    this.displayWeights = this.currentSets.map(set => {
+      if (set.weightKg == null) return null;
+      return this.weightUnit === 'LB' ? this.kgToLb(set.weightKg) : set.weightKg;
+    });
+    this.cdr.markForCheck();
   }
 
   openRecommendationModal(): void {
@@ -222,9 +333,8 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
    * Inicializa las series basadas en plannedSets.
    * Aquí puedes precargar info de previousSet si quisieras.
    */
-  private setupSets(resp: WorkoutExerciseDetailResponse): void {
+  private buildSetsFromResponse(resp: WorkoutExerciseDetailResponse): WorkoutSetItemRequest[] {
     const sets: WorkoutSetItemRequest[] = [];
-
     for (let i = 1; i <= resp.plannedSets; i++) {
       sets.push({
         setNumber: i,
@@ -234,10 +344,20 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
         rirRegistrado: resp.plannedRir ?? 2,
       });
     }
+    return sets;
+  }
 
-    this.currentSets = sets;
-    this.displayWeights = sets.map(() => null);
+  private setupSets(resp: WorkoutExerciseDetailResponse): void {
+    this.currentSets = this.buildSetsFromResponse(resp);
+    this.displayWeights = this.currentSets.map(() => null);
     this.notes = null;
+  }
+
+  private setupPairedSets(resp: WorkoutExerciseDetailResponse): void {
+    this.pairedData = resp;
+    this.pairedSets = this.buildSetsFromResponse(resp);
+    this.pairedDisplayWeights = this.pairedSets.map(() => null);
+    this.pairedNotes = null;
   }
 
   private lbToKg(value: number): number {
@@ -250,10 +370,8 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
 
   toggleWeightUnit(): void {
     this.weightUnit = this.weightUnit === 'KG' ? 'LB' : 'KG';
-    this.displayWeights = this.currentSets.map((set) => {
-      if (set.weightKg == null) return null;
-      return this.weightUnit === 'LB' ? this.kgToLb(set.weightKg) : set.weightKg;
-    });
+    this.syncDisplayWeights();
+    this.syncPairedDisplayWeights();
   }
 
   onWeightInput(index: number, value: number | null): void {
@@ -264,6 +382,24 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
     }
     this.currentSets[index].weightKg =
       this.weightUnit === 'LB' ? this.lbToKg(value) : value;
+  }
+
+  onPairedWeightInput(index: number, value: number | null): void {
+    this.pairedDisplayWeights[index] = value;
+    if (value == null) {
+      this.pairedSets[index].weightKg = null;
+      return;
+    }
+    this.pairedSets[index].weightKg =
+      this.weightUnit === 'LB' ? this.lbToKg(value) : value;
+  }
+
+  private syncPairedDisplayWeights(): void {
+    this.pairedDisplayWeights = this.pairedSets.map(set => {
+      if (set.weightKg == null) return null;
+      return this.weightUnit === 'LB' ? this.kgToLb(set.weightKg) : set.weightKg;
+    });
+    this.cdr.markForCheck();
   }
 
   get weightPlaceholder(): string {
@@ -476,6 +612,52 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
     }
   }
 
+  onTogglePairedSetCompleted(index: number): void {
+    if (this.pairedSets[index]) {
+      this.pairedSets[index].completed = !this.pairedSets[index].completed;
+    }
+  }
+
+  onAddPairedSet(): void {
+    if (!this.pairedData || this.mutatingPairedSets) return;
+    this.mutatingPairedSets = true;
+    this.workoutService.addPlannedSet(this.sessionId, this.pairedData.workoutExerciseId).subscribe({
+      next: (plannedSets) => {
+        this.pairedData!.plannedSets = plannedSets;
+        this.pairedSets.push({
+          setNumber: this.pairedSets.length + 1,
+          reps: null,
+          weightKg: null,
+          completed: false,
+          rirRegistrado: this.pairedData?.plannedRir ?? 2,
+        });
+        this.pairedDisplayWeights.push(null);
+        this.mutatingPairedSets = false;
+      },
+      error: () => {
+        this.mutatingPairedSets = false;
+        this.errorMessage = 'No se pudo agregar la serie al ejercicio combinado.';
+      },
+    });
+  }
+
+  onRemovePairedSet(): void {
+    if (!this.pairedData || this.mutatingPairedSets || this.pairedSets.length <= 1) return;
+    this.mutatingPairedSets = true;
+    this.workoutService.removePlannedSet(this.sessionId, this.pairedData.workoutExerciseId).subscribe({
+      next: (plannedSets) => {
+        this.pairedData!.plannedSets = plannedSets;
+        this.pairedSets.pop();
+        this.pairedDisplayWeights.pop();
+        this.mutatingPairedSets = false;
+      },
+      error: () => {
+        this.mutatingPairedSets = false;
+        this.errorMessage = 'No se pudo quitar la serie del ejercicio combinado.';
+      },
+    });
+  }
+
   onAddSet(): void {
     if (!this.data || this.mutatingSets) return;
     this.mutatingSets = true;
@@ -516,6 +698,62 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadExerciseCatalog(): void {
+    if (this.exercises.length > 0 || this.loadingExercises) return;
+    this.loadingExercises = true;
+    this.createRoutineService.getExercises(0, 200).subscribe({
+      next: (resp) => {
+        this.exercises = resp.content;
+        this.filteredExercises = [...this.exercises];
+        this.loadingExercises = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.loadingExercises = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  openExerciseDropdown(): void {
+    this.loadExerciseCatalog();
+    this.showExerciseDropdown = true;
+    this.filteredExercises = this.newExerciseName.trim()
+      ? this.filterExerciseList(this.newExerciseName)
+      : [...this.exercises];
+    this.cdr.markForCheck();
+  }
+
+  closeExerciseDropdown(): void {
+    setTimeout(() => {
+      this.showExerciseDropdown = false;
+      this.cdr.markForCheck();
+    }, 150);
+  }
+
+  filterExerciseSearch(query: string): void {
+    this.newExerciseName = query;
+    this.showExerciseDropdown = true;
+    this.filteredExercises = this.filterExerciseList(query);
+    this.cdr.markForCheck();
+  }
+
+  private filterExerciseList(query: string): Exercise[] {
+    if (!query.trim()) return [...this.exercises];
+    const q = query.toLowerCase();
+    return this.exercises.filter(e =>
+      e.name.toLowerCase().includes(q) ||
+      e.muscleGroup?.toLowerCase().includes(q)
+    );
+  }
+
+  selectExerciseForAdd(exercise: Exercise): void {
+    this.newExerciseId = exercise.id;
+    this.newExerciseName = exercise.name;
+    this.showExerciseDropdown = false;
+    this.cdr.markForCheck();
+  }
+
   onAddExercise(): void {
     if (!this.newExerciseId || this.addingExercise) return;
     this.addingExercise = true;
@@ -523,11 +761,44 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
       next: () => {
         this.addingExercise = false;
         this.newExerciseId = null;
+        this.newExerciseName = '';
         this.loadExercise();
       },
       error: () => {
         this.addingExercise = false;
         this.errorMessage = 'No se pudo agregar el ejercicio.';
+      },
+    });
+  }
+
+  onRemoveCurrentExercise(): void {
+    if (!this.data || this.removingExercise) return;
+    if (!confirm(`¿Eliminar "${this.data.exerciseName}" de esta sesión?`)) return;
+
+    if (this.isCombined) {
+      this.uncombine();
+    }
+
+    this.removingExercise = true;
+    const wasLast = this.isLastExercise;
+    const wasOnly = this.data.progress.totalExercises <= 1;
+
+    this.workoutService.removeExercise(this.sessionId, this.data.workoutExerciseId).subscribe({
+      next: () => {
+        this.removingExercise = false;
+        if (wasOnly) {
+          this.router.navigate(['/mis-rutinas']);
+          return;
+        }
+        if (wasLast && this.order > 1) {
+          this.router.navigate(['/workouts', this.sessionId, 'exercise', this.order - 1]);
+        } else {
+          this.loadExercise();
+        }
+      },
+      error: () => {
+        this.removingExercise = false;
+        this.errorMessage = 'No se pudo eliminar el ejercicio.';
       },
     });
   }
@@ -548,6 +819,9 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
    */
   get isLastExercise(): boolean {
     if (!this.data) return false;
+    if (this.isCombined) {
+      return this.data.nextExercises.length <= 1;
+    }
     return this.data.nextExercises.length === 0;
   }
 
@@ -560,6 +834,7 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
 
   onSaveAndNext(): void {
     if (!this.data) return;
+    if (this.isCombined && !this.pairedData) return;
 
     this.saving = true;
 
@@ -568,32 +843,46 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
       notes: this.notes
     };
 
-    this.workoutService.saveSets(this.sessionId, this.data.workoutExerciseId, body)
-      .subscribe({
-        next: () => {
-          this.saving = false;
+    const savePrimary$ = this.workoutService.saveSets(this.sessionId, this.data.workoutExerciseId, body);
+    const save$ = this.isCombined && this.pairedData
+      ? savePrimary$.pipe(
+          switchMap(() => this.workoutService.saveSets(this.sessionId, this.pairedData!.workoutExerciseId, {
+            sets: this.pairedSets,
+            notes: this.pairedNotes,
+          }))
+        )
+      : savePrimary$;
 
-          if (this.isLastExercise) {
-            // Primero finalizar la sesión, luego ir al summary
-            this.workoutService.finishSession(this.sessionId).subscribe({
-              next: () => {
-                this.router.navigate(['/workouts', this.sessionId, 'summary']);
-              },
-              error: () => {
-                this.router.navigate(['/workouts', this.sessionId, 'summary']);
-              }
-            });
-          } else {
-            const nextOrder = this.data!.exerciseOrder + 1;
-            this.router.navigate(['/workouts', this.sessionId, 'exercise', nextOrder]);
-          }
-        },
-        error: (err) => {
-          console.error(err);
-          this.saving = false;
-          this.errorMessage = 'No se pudieron guardar las series.';
+    save$.subscribe({
+      next: () => {
+        this.saving = false;
+
+        if (this.isCombined) {
+          this.clearComboState();
         }
-      });
+
+        if (this.isLastExercise) {
+          this.workoutService.finishSession(this.sessionId).subscribe({
+            next: () => {
+              this.router.navigate(['/workouts', this.sessionId, 'summary']);
+            },
+            error: () => {
+              this.router.navigate(['/workouts', this.sessionId, 'summary']);
+            }
+          });
+        } else {
+          const nextOrder = this.isCombined
+            ? this.data!.exerciseOrder + 2
+            : this.data!.exerciseOrder + 1;
+          this.router.navigate(['/workouts', this.sessionId, 'exercise', nextOrder]);
+        }
+      },
+      error: (err) => {
+        console.error(err);
+        this.saving = false;
+        this.errorMessage = 'No se pudieron guardar las series.';
+      }
+    });
   }
 
   // ─────────────────────────────────────────────

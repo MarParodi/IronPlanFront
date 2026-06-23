@@ -279,6 +279,72 @@ export interface MemberLeaderboardEntry {
  
         </div>
       </div>
+
+      <!-- SECCIÓN: Podios compuestos (reto individual finalizado) -->
+      <div class="detail-section" *ngIf="detail.isMemberCompetition && detail.status === 'FINISHED'">
+        <div class="podium-header">
+          <span class="section-label">Podios y ganadores</span>
+          <button class="btn-generate" (click)="generatePodiums()" [disabled]="generatingPodiums">
+            {{ generatingPodiums ? 'Generando...' : (podiums ? 'Regenerar podios' : 'Generar podios') }}
+          </button>
+        </div>
+        <p class="podium-hint">
+          Puntuación compuesta: constancia 35% · progresión 1RM 30% · volumen 25%.
+          Elige al ganador manualmente entre el top 3 de cada categoría.
+        </p>
+
+        <div *ngIf="declaredWinners.length" class="declared-winners">
+          <div *ngFor="let w of declaredWinners" class="winner-badge">
+            🏆 {{ w.fullName }} — {{ w.levelLabel }}
+          </div>
+        </div>
+
+        <div *ngIf="!podiums && !generatingPodiums" class="empty-lb">
+          <p>Genera los podios para ver el top 3 por categoría.</p>
+        </div>
+
+        <ng-container *ngIf="podiums">
+          <ng-container *ngTemplateOutlet="podiumPool; context: { title: 'General', scope: 'GENERAL', entries: podiums.generalTop3 }"></ng-container>
+          <ng-container *ngFor="let level of levelKeys">
+            <ng-container *ngTemplateOutlet="podiumPool; context: {
+              title: levelLabels[level],
+              scope: 'LEVEL',
+              levelCategory: level,
+              entries: podiums.byLevel[level] || []
+            }"></ng-container>
+          </ng-container>
+        </ng-container>
+      </div>
+
+      <ng-template #podiumPool let-title="title" let-scope="scope" let-levelCategory="levelCategory" let-entries="entries">
+        <div class="podium-pool" *ngIf="entries?.length">
+          <div class="pool-title">{{ title }}</div>
+          <div *ngFor="let e of entries" class="podium-row"
+               [class.lb-gold]="e.rank === 1" [class.lb-silver]="e.rank === 2" [class.lb-bronze]="e.rank === 3">
+            <div class="lb-rank">
+              <span *ngIf="e.rank === 1">🥇</span>
+              <span *ngIf="e.rank === 2">🥈</span>
+              <span *ngIf="e.rank === 3">🥉</span>
+            </div>
+            <div class="lb-info">
+              <span class="lb-name">{{ e.fullName }}</span>
+              <span class="lb-sub">
+                Score {{ e.compositeScore | number:'1.1-1' }} ·
+                Const. {{ e.consistencyRaw | number:'1.0-0' }} ·
+                1RM +{{ e.oneRmProgressRaw | number:'1.1-1' }}% ·
+                Vol. {{ e.volumeRaw | number:'1.0-0' }}
+              </span>
+            </div>
+            <button class="btn-declare"
+              *ngIf="!hasDeclaredWinner(scope, levelCategory)"
+              (click)="declareWinner(scope, levelCategory, e.userId)"
+              [disabled]="declaringUserId === e.userId">
+              {{ declaringUserId === e.userId ? '...' : 'Elegir ganador' }}
+            </button>
+            <span *ngIf="isDeclaredWinner(scope, levelCategory, e.userId)" class="winner-tag">Ganador</span>
+          </div>
+        </div>
+      </ng-template>
  
       <!-- Empty leaderboard -->
       <div class="detail-section" *ngIf="leaderboard.length === 0 && memberLeaderboard.length === 0">
@@ -531,6 +597,29 @@ export interface MemberLeaderboardEntry {
 }
 .member-name { font-size: 12px; color: #cbd5e1; }
 
+    .podium-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .podium-hint { font-size: 11px; color: #64748b; margin: 0; line-height: 1.4; }
+    .btn-generate {
+      padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+      background: rgba(45,212,191,0.15); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.3); cursor: pointer;
+    }
+    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+    .declared-winners { display: flex; flex-wrap: wrap; gap: 8px; }
+    .winner-badge {
+      font-size: 12px; padding: 6px 10px; border-radius: 8px;
+      background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.25); color: #fcd34d;
+    }
+    .podium-pool { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+    .pool-title { font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 4px; }
+    .podium-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px;
+      background: #1b1f23; border: 1px solid rgba(255,255,255,0.05); }
+    .btn-declare {
+      padding: 5px 10px; border-radius: 7px; font-size: 11px; font-weight: 600; flex-shrink: 0;
+      background: rgba(139,92,246,0.15); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.3); cursor: pointer;
+    }
+    .btn-declare:disabled { opacity: 0.5; }
+    .winner-tag { font-size: 11px; font-weight: 700; color: #fcd34d; flex-shrink: 0; }
+
   `]
 })
 export class CompetitionDetailModalComponent implements OnInit {
@@ -545,6 +634,16 @@ export class CompetitionDetailModalComponent implements OnInit {
   detail:            CompetitionDetail | null = null;
   leaderboard:       LeaderboardEntry[]       = [];
   memberLeaderboard: MemberLeaderboardEntry[] = [];
+  podiums: any = null;
+  declaredWinners: any[] = [];
+  generatingPodiums = false;
+  declaringUserId: number | null = null;
+  levelKeys = ['PRINCIPIANTE', 'INTERMEDIO', 'AVANZADO'];
+  levelLabels: Record<string, string> = {
+    PRINCIPIANTE: 'Principiante',
+    INTERMEDIO: 'Intermedio',
+    AVANZADO: 'Avanzado',
+  };
   loading = true;
  
   constructor(private adminService: AdminService) {}
@@ -572,11 +671,77 @@ export class CompetitionDetailModalComponent implements OnInit {
           } else {
             this.leaderboard = data;
           }
-          this.loading = false;
+          if (detail.isMemberCompetition && detail.status === 'FINISHED') {
+            this.loadPodiumData();
+          } else {
+            this.loading = false;
+          }
         });
       },
       error: () => { this.loading = false; }
     });
+  }
+
+  loadPodiumData() {
+    forkJoin({
+      podiums: this.adminService.getPodiums(this.competitionId).pipe(catchError(() => of(null))),
+      winners: this.adminService.getDeclaredWinners(this.competitionId).pipe(catchError(() => of([]))),
+    }).subscribe(({ podiums, winners }) => {
+      this.podiums = podiums?.generalTop3?.length || podiums?.byLevel ? podiums : null;
+      this.declaredWinners = winners || [];
+      this.loading = false;
+    });
+  }
+
+  generatePodiums() {
+    if (!confirm('¿Generar podios con la puntuación compuesta actual?')) return;
+    this.generatingPodiums = true;
+    this.adminService.generatePodiums(this.competitionId).subscribe({
+      next: (resp) => {
+        this.podiums = resp;
+        this.generatingPodiums = false;
+      },
+      error: (err) => {
+        this.generatingPodiums = false;
+        alert(err?.error?.message || 'No se pudieron generar los podios');
+      },
+    });
+  }
+
+  declareWinner(scope: 'GENERAL' | 'LEVEL', levelCategory: string | undefined, userId: number) {
+    const label = scope === 'GENERAL' ? 'General' : this.levelLabels[levelCategory || ''] || levelCategory;
+    if (!confirm(`¿Declarar ganador en categoría ${label}?`)) return;
+    this.declaringUserId = userId;
+    this.adminService.declareWinner(this.competitionId, {
+      scope,
+      levelCategory: scope === 'LEVEL' ? levelCategory : undefined,
+      userId,
+    }).subscribe({
+      next: (winner) => {
+        this.declaredWinners = [...this.declaredWinners.filter(w =>
+          !(w.scope === scope && (w.levelCategory || null) === (levelCategory || null))
+        ), winner];
+        this.declaringUserId = null;
+      },
+      error: (err) => {
+        this.declaringUserId = null;
+        alert(err?.error?.message || 'No se pudo declarar el ganador');
+      },
+    });
+  }
+
+  hasDeclaredWinner(scope: string, levelCategory?: string): boolean {
+    return this.declaredWinners.some(w =>
+      w.scope === scope && (w.levelCategory || null) === (levelCategory || null)
+    );
+  }
+
+  isDeclaredWinner(scope: string, levelCategory: string | undefined, userId: number): boolean {
+    return this.declaredWinners.some(w =>
+      w.scope === scope &&
+      (w.levelCategory || null) === (levelCategory || null) &&
+      w.userId === userId
+    );
   }
 
   toggleGroupMembers(groupId: number) {
