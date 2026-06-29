@@ -8,7 +8,6 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HomeService } from '../home/services/home.services';
-import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-competition-detail',
@@ -632,46 +631,24 @@ export class CompetitionDetailComponent implements OnInit {
     this.loading = true;
     this.competitionId = id;
 
-    forkJoin({
-      competition: this.homeService.getCompetitionById(id),
-      myScore: this.homeService.getMyScore(id),
-      leaderboard: this.homeService.getLeaderboard(id),
-    }).subscribe({
-      next: ({ competition, myScore, leaderboard }) => {
-        const competitionData: any = competition;
-        const myScoreData: any = myScore;
-        const leaderboardData: any = leaderboard;
-
-        this.competition = competitionData?.competition ?? competitionData;
-        this.myScore = myScoreData?.myScore ?? myScoreData;
-        this.leaderboard = Array.isArray(leaderboardData)
-          ? leaderboardData
-          : (leaderboardData?.groupLeaderboard ?? []);
-        this.memberLeaderboard = [];
-        this.internalRanking = [];
+    this.homeService.getCompetitionDetail(id).subscribe({
+      next: (data) => {
+        this.competition = data?.competition ?? data;
+        this.myScore = data?.myScore ?? null;
+        this.leaderboard = data?.groupLeaderboard ?? [];
+        this.memberLeaderboard = data?.memberLeaderboard ?? [];
+        this.internalRanking = data?.internalRanking ?? [];
 
         this.loading = false;
         this.cdr.markForCheck();
 
         if (this.myScore?.isMemberCompetition) {
-          this.loadMemberLeaderboard();
+          if (this.memberLevelFilter) {
+            this.loadMemberLeaderboard();
+          }
           if (this.competition?.status === 'FINISHED') {
             this.loadRetoResults();
           }
-        } else {
-          this.homeService.getInternalRanking(id).subscribe({
-            next: (ir) => {
-              const internalData: any = ir;
-              this.internalRanking = Array.isArray(internalData)
-                ? internalData
-                : (internalData?.internalRanking ?? []);
-              this.cdr.markForCheck();
-            },
-            error: () => {
-              this.internalRanking = [];
-              this.cdr.markForCheck();
-            },
-          });
         }
       },
       error: () => {

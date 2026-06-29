@@ -33,7 +33,7 @@ export interface MemberLeaderboardEntry {
   userId:            number;
   fullName:          string;
   username:          string;
-  profilePictureUrl: string;
+  profilePictureUrl?: string;
   score:             number;
 }
  
@@ -656,46 +656,29 @@ export class CompetitionDetailModalComponent implements OnInit {
   loadAll() {
     this.loading = true;
 
-    this.adminService.getCompetitionById(this.competitionId).subscribe({
-      next: (detail) => {
-        const detailData: any = detail?.competition ?? detail;
-        this.detail = detailData;
+    forkJoin({
+      adminDetail: this.adminService.getCompetitionById(this.competitionId),
+      view: this.adminService.getCompetitionView(this.competitionId).pipe(catchError(() => of(null))),
+    }).subscribe({
+      next: ({ adminDetail, view }) => {
+        this.detail = adminDetail;
 
-        const lb$ = detailData.isMemberCompetition
-          ? this.adminService.getMemberLeaderboard(this.competitionId).pipe(catchError(() => of(null)))
-          : this.adminService.getLeaderboard(this.competitionId).pipe(catchError(() => of(null)));
+        if (this.detail?.isMemberCompetition) {
+          this.memberLeaderboard = view?.memberLeaderboard ?? [];
+          this.leaderboard = [];
+        } else {
+          this.leaderboard = view?.groupLeaderboard ?? [];
+          this.memberLeaderboard = [];
+        }
 
-        lb$.subscribe((data) => {
-          if (detailData.isMemberCompetition) {
-            this.memberLeaderboard = this.normalizeMemberLeaderboard(data, detailData.memberLeaderboard);
-            this.leaderboard = [];
-          } else {
-            this.leaderboard = this.normalizeGroupLeaderboard(data, detailData.groupLeaderboard);
-            this.memberLeaderboard = [];
-          }
-
-          if (detailData.isMemberCompetition && detailData.status === 'FINISHED') {
-            this.loadPodiumData();
-          } else {
-            this.loading = false;
-          }
-        });
+        if (this.detail?.isMemberCompetition && this.detail?.status === 'FINISHED') {
+          this.loadPodiumData();
+        } else {
+          this.loading = false;
+        }
       },
-      error: () => { this.loading = false; }
+      error: () => { this.loading = false; },
     });
-  }
-
-  private normalizeGroupLeaderboard(data: any, fallback?: LeaderboardEntry[]): LeaderboardEntry[] {
-    if (Array.isArray(data)) return data;
-    if (Array.isArray(data?.groupLeaderboard)) return data.groupLeaderboard;
-    return fallback ?? [];
-  }
-
-  private normalizeMemberLeaderboard(data: any, fallback?: MemberLeaderboardEntry[]): MemberLeaderboardEntry[] {
-    if (Array.isArray(data)) return data;
-    if (Array.isArray(data?.memberLeaderboard)) return data.memberLeaderboard;
-    if (Array.isArray(data?.entries)) return data.entries;
-    return fallback ?? [];
   }
 
   loadPodiumData() {
