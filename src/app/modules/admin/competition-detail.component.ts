@@ -357,7 +357,8 @@ export interface MemberLeaderboardEntry {
                  a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
           </svg>
           <p>Aún no hay datos de clasificación.</p>
-          <span>Activa la competencia y recalcula scores para ver el leaderboard.</span>
+          <span *ngIf="detail.status === 'DRAFT'">Activa la competencia y recalcula scores para ver el leaderboard.</span>
+          <span *ngIf="detail.status !== 'DRAFT'">Recalcula los scores desde la lista de competencias para actualizar la clasificación.</span>
         </div>
       </div>
  
@@ -654,24 +655,26 @@ export class CompetitionDetailModalComponent implements OnInit {
  
   loadAll() {
     this.loading = true;
- 
-    // Primero cargamos el detalle para saber si es grupal o individual
+
     this.adminService.getCompetitionById(this.competitionId).subscribe({
       next: (detail) => {
-        this.detail = detail;
- 
-        // Según el tipo cargamos el leaderboard correspondiente
-        const lb$ = detail.isMemberCompetition
-          ? this.adminService.getMemberLeaderboard(this.competitionId).pipe(catchError(() => of([])))
-          : this.adminService.getLeaderboard(this.competitionId).pipe(catchError(() => of([])));
- 
-        lb$.subscribe((data: any[]) => {
-          if (detail.isMemberCompetition) {
-            this.memberLeaderboard = data;
+        const detailData: any = detail?.competition ?? detail;
+        this.detail = detailData;
+
+        const lb$ = detailData.isMemberCompetition
+          ? this.adminService.getMemberLeaderboard(this.competitionId).pipe(catchError(() => of(null)))
+          : this.adminService.getLeaderboard(this.competitionId).pipe(catchError(() => of(null)));
+
+        lb$.subscribe((data) => {
+          if (detailData.isMemberCompetition) {
+            this.memberLeaderboard = this.normalizeMemberLeaderboard(data, detailData.memberLeaderboard);
+            this.leaderboard = [];
           } else {
-            this.leaderboard = data;
+            this.leaderboard = this.normalizeGroupLeaderboard(data, detailData.groupLeaderboard);
+            this.memberLeaderboard = [];
           }
-          if (detail.isMemberCompetition && detail.status === 'FINISHED') {
+
+          if (detailData.isMemberCompetition && detailData.status === 'FINISHED') {
             this.loadPodiumData();
           } else {
             this.loading = false;
@@ -680,6 +683,19 @@ export class CompetitionDetailModalComponent implements OnInit {
       },
       error: () => { this.loading = false; }
     });
+  }
+
+  private normalizeGroupLeaderboard(data: any, fallback?: LeaderboardEntry[]): LeaderboardEntry[] {
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.groupLeaderboard)) return data.groupLeaderboard;
+    return fallback ?? [];
+  }
+
+  private normalizeMemberLeaderboard(data: any, fallback?: MemberLeaderboardEntry[]): MemberLeaderboardEntry[] {
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.memberLeaderboard)) return data.memberLeaderboard;
+    if (Array.isArray(data?.entries)) return data.entries;
+    return fallback ?? [];
   }
 
   loadPodiumData() {
