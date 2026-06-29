@@ -155,7 +155,8 @@ interface ScopeNode { id: number; name: string; groupType: string; }
             <h2 class="text-xl font-bold text-ip-primary">{{ estado.nombre }}</h2>
             <p class="text-sm text-ip-muted">
               {{ selectedReto?.organizacionNombre }} · Estado: {{ estado.estado }} ·
-              {{ estado.fechaInicio }} — {{ estado.fechaFin }}
+              {{ estado.fechaInicio }} — {{ estado.fechaFin }} ·
+              {{ estado.semanasIntervencion }} sem. intervención
             </p>
           </header>
 
@@ -180,6 +181,11 @@ interface ScopeNode { id: number; name: string; groupType: string; }
             <button type="button" class="action-btn danger" (click)="cerrar()" [disabled]="busy || estado.estado === 'CERRADO'">Cerrar reto</button>
             <button *ngIf="estado.estado !== 'ACTIVO'" type="button" class="action-btn danger-outline" (click)="eliminar()" [disabled]="busy">Eliminar experimento</button>
           </div>
+          <p class="hint">
+            Snapshots: genera semanas faltantes (1–{{ estado.semanasIntervencion }}).
+            Al cerrar el reto se generan retroactivamente. Piloto de 1 semana → usa columnas
+            <em>volumen_semana_inicio/fin</em> en el CSV (ambas = semana 1).
+          </p>
           <p *ngIf="estado.estado === 'ACTIVO'" class="hint warn">Para eliminar, cierra el reto primero.</p>
 
           <p *ngIf="actionMsg" class="success-msg">{{ actionMsg }}</p>
@@ -478,8 +484,26 @@ export class AdminRetoExperimentoComponent implements OnInit {
   activar(): void { this.run(() => this.retoService.activarReto(this.selectedRetoId!), 'Reto activado.'); }
   activarPosttest(): void { this.run(() => this.retoService.activarPosttest(this.selectedRetoId!), 'Post-test IPAQ activado.'); }
   activarSus(): void { this.run(() => this.retoService.activarSus(this.selectedRetoId!), 'Encuesta SUS activada.'); }
-  cerrar(): void { this.run(() => this.retoService.cerrarReto(this.selectedRetoId!), 'Reto cerrado.'); }
-  snapshots(): void { this.run(() => this.retoService.generarSnapshots(this.selectedRetoId!), 'Snapshots generados.'); }
+  cerrar(): void {
+    this.run(() => this.retoService.cerrarReto(this.selectedRetoId!), 'Reto cerrado. Snapshots generados automáticamente.');
+  }
+
+  snapshots(): void {
+    if (!this.selectedRetoId) return;
+    this.busy = true;
+    this.actionMsg = '';
+    this.detailError = '';
+    this.retoService.generarSnapshots(this.selectedRetoId).subscribe({
+      next: (r) => {
+        this.busy = false;
+        this.actionMsg = r.usuariosProcesados > 0
+          ? `${r.usuariosProcesados} snapshot(s) creados (hasta semana ${r.semanaGenerada}).`
+          : `No había snapshots pendientes (hasta semana ${r.semanaGenerada}).`;
+        this.loadDetail();
+      },
+      error: () => { this.busy = false; this.detailError = 'Error al generar snapshots.'; },
+    });
+  }
 
   exportar(): void {
     if (!this.selectedRetoId) return;

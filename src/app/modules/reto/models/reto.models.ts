@@ -120,6 +120,7 @@ export interface ExperimentoEstado {
   estado: ExperimentoRetoEstado;
   fechaInicio: string;
   fechaFin: string;
+  semanasIntervencion: number;
   competitionId: number | null;
   participantesInscritos: number;
   completaronPretest: number;

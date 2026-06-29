@@ -103,6 +103,7 @@ import { destroyChart, renderBarChart } from '../../core/utils/bar-chart.util';
                 <tr>
                   <th class="px-4 py-3">Nombre</th>
                   <th class="px-4 py-3">Usuario</th>
+                  <th class="px-4 py-3">Nivel</th>
                   <th class="px-4 py-3">Rol</th>
                   <th *ngIf="detail.canManage" class="px-4 py-3 text-right">Acciones</th>
                 </tr>
@@ -111,6 +112,7 @@ import { destroyChart, renderBarChart } from '../../core/utils/bar-chart.util';
                 <tr *ngFor="let m of members" class="hover:bg-slate-800/30">
                   <td class="px-4 py-3 text-ip-primary">{{ m.fullName }}</td>
                   <td class="px-4 py-3 text-ip-muted">{{ m.username }}</td>
+                  <td class="px-4 py-3 text-ip-secondary">{{ levelLabel(m.level) }}</td>
                   <td class="px-4 py-3">
                     <select *ngIf="detail.canManage"
                       [ngModel]="m.role"
@@ -518,6 +520,16 @@ export class GroupDetailComponent implements OnInit, AfterViewChecked, OnDestroy
     return isAdmin
       ? 'text-xs font-semibold px-2.5 py-1 rounded-md bg-teal-500/15 text-teal-400 border border-teal-500/25'
       : 'text-xs font-semibold px-2.5 py-1 rounded-md bg-ip-surface/50 text-ip-secondary';
+  }
+
+  levelLabel(level?: string): string {
+    if (!level) return '—';
+    const labels: Record<string, string> = {
+      NOVATO: 'Principiante',
+      INTERMEDIO: 'Intermedio',
+      AVANZADO: 'Avanzado',
+    };
+    return labels[level] ?? level;
   }
 
   statusBadgeClass(isActive: boolean): string {

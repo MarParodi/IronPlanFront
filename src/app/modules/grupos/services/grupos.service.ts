@@ -41,6 +41,7 @@ export interface GroupMember {
   fullName: string;
   username: string;
   role: string;
+  level?: string;
   joinedAt: string;
   profilePictureUrl?: string;
 }
