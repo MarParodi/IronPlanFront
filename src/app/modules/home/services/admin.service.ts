@@ -129,11 +129,11 @@ getExercises() {
   }
  
   getLeaderboard(id: number) {
-    return this.http.get<any[]>(`${this.base}/competitions/${id}/leaderboard`);
+    return this.http.get<any>(`${this.base}/admin/competitions/${id}/leaderboard`);
   }
- 
+
   getMemberLeaderboard(id: number) {
-    return this.http.get<any[]>(`${this.base}/competitions/${id}/leaderboard/members`);
+    return this.http.get<any>(`${this.base}/admin/competitions/${id}/leaderboard/members`);
   }
 
   getParticipantMembers(competitionId: number, groupId: number) {

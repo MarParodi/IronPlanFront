@@ -8,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HomeService } from '../home/services/home.services';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-competition-detail',
@@ -118,7 +119,7 @@ import { HomeService } from '../home/services/home.services';
             </p>
 
             <h3 class="text-3xl font-bold text-cyan-400">
-              #{{ myScore.groupRank }}
+              {{ myScore.groupRank != null ? '#' + myScore.groupRank : '—' }}
             </h3>
           </div>
 
@@ -129,7 +130,7 @@ import { HomeService } from '../home/services/home.services';
             </p>
 
             <h3 class="text-3xl font-bold text-ip-primary">
-              {{ myScore.groupScore | number:'1.0-0' }}
+              {{ myScore.groupScore != null ? (myScore.groupScore | number:'1.0-0') : '—' }}
             </h3>
           </div>
 
@@ -140,7 +141,7 @@ import { HomeService } from '../home/services/home.services';
             </p>
 
             <h3 class="text-3xl font-bold text-violet-400">
-              #{{ myScore.internalRank }}
+              {{ myScore.internalRank != null ? '#' + myScore.internalRank : '—' }}
             </h3>
           </div>
         </div>
@@ -628,19 +629,26 @@ export class CompetitionDetailComponent implements OnInit {
   }
 
   loadCompetition(id: number): void {
-
     this.loading = true;
     this.competitionId = id;
 
-    this.homeService.getCompetitionDetail(id).subscribe({
+    forkJoin({
+      competition: this.homeService.getCompetitionById(id),
+      myScore: this.homeService.getMyScore(id),
+      leaderboard: this.homeService.getLeaderboard(id),
+    }).subscribe({
+      next: ({ competition, myScore, leaderboard }) => {
+        const competitionData: any = competition;
+        const myScoreData: any = myScore;
+        const leaderboardData: any = leaderboard;
 
-      next: (data) => {
-
-        this.competition = data.competition;
-        this.myScore = data.myScore;
-        this.leaderboard = data.groupLeaderboard ?? [];
-        this.memberLeaderboard = data.memberLeaderboard ?? [];
-        this.internalRanking = data.internalRanking ?? [];
+        this.competition = competitionData?.competition ?? competitionData;
+        this.myScore = myScoreData?.myScore ?? myScoreData;
+        this.leaderboard = Array.isArray(leaderboardData)
+          ? leaderboardData
+          : (leaderboardData?.groupLeaderboard ?? []);
+        this.memberLeaderboard = [];
+        this.internalRanking = [];
 
         this.loading = false;
         this.cdr.markForCheck();
@@ -650,13 +658,26 @@ export class CompetitionDetailComponent implements OnInit {
           if (this.competition?.status === 'FINISHED') {
             this.loadRetoResults();
           }
+        } else {
+          this.homeService.getInternalRanking(id).subscribe({
+            next: (ir) => {
+              const internalData: any = ir;
+              this.internalRanking = Array.isArray(internalData)
+                ? internalData
+                : (internalData?.internalRanking ?? []);
+              this.cdr.markForCheck();
+            },
+            error: () => {
+              this.internalRanking = [];
+              this.cdr.markForCheck();
+            },
+          });
         }
       },
-
       error: () => {
         this.loading = false;
         this.cdr.markForCheck();
-      }
+      },
     });
   }
 
