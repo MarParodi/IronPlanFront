@@ -18,7 +18,7 @@ import { ProgressionRecommendation } from './models/progress.models';
 import { CreateRoutineService } from '../create-routine/services/create-routine.service';
 import { Exercise } from '../create-routine/models/create-routine.models';
 import { SafePipe } from './pipes/safe.pipe';
-import { Subscription, interval, switchMap } from 'rxjs';
+import { Subscription, interval, switchMap, of, Observable } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -61,6 +61,9 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   recommendation: ProgressionRecommendation | null = null;
   loadingRecommendation = false;
   showRecommendationModal = false;
+  recommendationModalTarget: 'main' | 'paired' = 'main';
+  pairedRecommendation: ProgressionRecommendation | null = null;
+  loadingPairedRecommendation = false;
 
   // Modal de salida
   showExitModal = false;
@@ -215,6 +218,8 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
     this.pairedSets = [];
     this.pairedDisplayWeights = [];
     this.pairedNotes = null;
+    this.pairedRecommendation = null;
+    this.loadingPairedRecommendation = false;
     this.isCombined = false;
     this.loadingPaired = false;
   }
@@ -227,7 +232,14 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
 
   uncombine(): void {
     this.clearComboState();
-    this.resetPairedState();
+    this.pairedData = null;
+    this.pairedSets = [];
+    this.pairedDisplayWeights = [];
+    this.pairedNotes = null;
+    this.pairedRecommendation = null;
+    this.loadingPairedRecommendation = false;
+    this.isCombined = false;
+    this.loadingPaired = false;
     this.cdr.markForCheck();
   }
 
@@ -238,6 +250,7 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
         this.setupPairedSets(resp);
         this.isCombined = true;
         this.loadingPaired = false;
+        this.loadPairedRecommendation(resp);
         this.cdr.markForCheck();
       },
       error: () => {
@@ -259,31 +272,56 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   }
 
   private loadRecommendation(resp: WorkoutExerciseDetailResponse): void {
-    // Necesitamos el exerciseId - lo obtenemos del routineExerciseId o directamente
-    // Asumimos que el backend expone exerciseId en la respuesta
     if (!resp.exerciseId) return;
 
     this.loadingRecommendation = true;
-    this.progressService.getProgressionRecommendation(
-      resp.exerciseId,
-      resp.plannedSets,
-      resp.plannedRepsMin,
-      resp.plannedRepsMax
-    ).subscribe({
+    this.fetchRecommendation(resp).subscribe({
       next: (rec) => {
         this.recommendation = rec;
         this.loadingRecommendation = false;
-        
-        // Pre-llenar peso sugerido si hay recomendación
-        if (rec.suggestedWeightKg && this.currentSets.length > 0) {
+        if (rec?.suggestedWeightKg && this.currentSets.length > 0) {
           this.applySuggestedWeight(rec.suggestedWeightKg);
         }
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Error cargando recomendación:', err);
         this.loadingRecommendation = false;
-      }
+        this.cdr.markForCheck();
+      },
     });
+  }
+
+  private loadPairedRecommendation(resp: WorkoutExerciseDetailResponse): void {
+    if (!resp.exerciseId) return;
+
+    this.loadingPairedRecommendation = true;
+    this.pairedRecommendation = null;
+    this.fetchRecommendation(resp).subscribe({
+      next: (rec) => {
+        this.pairedRecommendation = rec;
+        this.loadingPairedRecommendation = false;
+        if (rec?.suggestedWeightKg && this.pairedSets.length > 0) {
+          this.applySuggestedPairedWeight(rec.suggestedWeightKg);
+        }
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Error cargando recomendación pareada:', err);
+        this.loadingPairedRecommendation = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  private fetchRecommendation(resp: WorkoutExerciseDetailResponse): Observable<ProgressionRecommendation | null> {
+    if (!resp.exerciseId) return of(null);
+    return this.progressService.getProgressionRecommendation(
+      resp.exerciseId,
+      resp.plannedSets,
+      resp.plannedRepsMin,
+      resp.plannedRepsMax
+    );
   }
 
   applySuggestedWeight(weight: number, overwriteExisting = false): void {
@@ -295,6 +333,15 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
     this.syncDisplayWeights();
   }
 
+  applySuggestedPairedWeight(weight: number, overwriteExisting = false): void {
+    this.pairedSets.forEach(set => {
+      if (overwriteExisting || set.weightKg === null || set.weightKg === undefined) {
+        set.weightKg = weight;
+      }
+    });
+    this.syncPairedDisplayWeights();
+  }
+
   private syncDisplayWeights(): void {
     this.displayWeights = this.currentSets.map(set => {
       if (set.weightKg == null) return null;
@@ -304,6 +351,12 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   }
 
   openRecommendationModal(): void {
+    this.recommendationModalTarget = 'main';
+    this.showRecommendationModal = true;
+  }
+
+  openPairedRecommendationModal(): void {
+    this.recommendationModalTarget = 'paired';
     this.showRecommendationModal = true;
   }
 
@@ -311,19 +364,59 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
     this.showRecommendationModal = false;
   }
 
+  get activeRecommendationForModal(): ProgressionRecommendation | null {
+    return this.recommendationModalTarget === 'paired'
+      ? this.pairedRecommendation
+      : this.recommendation;
+  }
+
+  applyActiveRecommendationWeight(overwriteExisting = false): void {
+    const rec = this.activeRecommendationForModal;
+    if (!rec?.suggestedWeightKg) return;
+    if (this.recommendationModalTarget === 'paired') {
+      this.applySuggestedPairedWeight(rec.suggestedWeightKg, overwriteExisting);
+    } else {
+      this.applySuggestedWeight(rec.suggestedWeightKg, overwriteExisting);
+    }
+  }
+
   getRecommendationColor(): string {
-    if (!this.recommendation) return 'text-ip-muted';
-    return this.progressService.getRecommendationColor(this.recommendation.type);
+    return this.getRecommendationColorFor(this.recommendation);
   }
 
   getRecommendationIcon(): string {
-    if (!this.recommendation) return '•';
-    return this.progressService.getRecommendationIcon(this.recommendation.type);
+    return this.getRecommendationIconFor(this.recommendation);
   }
 
   getRecommendationBgColor(): string {
-    if (!this.recommendation) return 'bg-slate-700/20';
-    switch (this.recommendation.type) {
+    return this.getRecommendationBgColorFor(this.recommendation);
+  }
+
+  getPairedRecommendationColor(): string {
+    return this.getRecommendationColorFor(this.pairedRecommendation);
+  }
+
+  getPairedRecommendationIcon(): string {
+    return this.getRecommendationIconFor(this.pairedRecommendation);
+  }
+
+  getPairedRecommendationBgColor(): string {
+    return this.getRecommendationBgColorFor(this.pairedRecommendation);
+  }
+
+  getRecommendationColorFor(rec: ProgressionRecommendation | null): string {
+    if (!rec) return 'text-ip-muted';
+    return this.progressService.getRecommendationColor(rec.type);
+  }
+
+  getRecommendationIconFor(rec: ProgressionRecommendation | null): string {
+    if (!rec) return '•';
+    return this.progressService.getRecommendationIcon(rec.type);
+  }
+
+  getRecommendationBgColorFor(rec: ProgressionRecommendation | null): string {
+    if (!rec) return 'bg-slate-700/20';
+    switch (rec.type) {
       case 'INCREASE_WEIGHT': return 'bg-emerald-500/20 border-emerald-500/30';
       case 'DECREASE_WEIGHT': return 'bg-rose-500/20 border-rose-500/30';
       case 'INCREASE_REPS': return 'bg-teal-500/20 border-teal-500/30';
@@ -977,8 +1070,12 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
       .filter(i => !(this.isCombined && i === 0));
   }
 
+  get hasMultipleNextExercises(): boolean {
+    return this.reorderableNextIndices.length >= 2;
+  }
+
   canReorderNextExercises(): boolean {
-    return !this.isCombined && !this.saving && !this.savingReorder && this.reorderableNextIndices.length > 1;
+    return !this.isCombined && !this.saving && !this.savingReorder && this.hasMultipleNextExercises;
   }
 
   moveNextExerciseUp(dataIndex: number): void {
