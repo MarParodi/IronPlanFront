@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminService } from '../home/services/admin.service';
+import { inferMemberCompetitionFromDetail } from '../../core/utils/competition.util';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
  
@@ -663,7 +664,14 @@ export class CompetitionDetailModalComponent implements OnInit {
       next: ({ adminDetail, view }) => {
         this.detail = adminDetail;
 
-        if (this.detail?.isMemberCompetition) {
+        const isMember = inferMemberCompetitionFromDetail({
+          competition: adminDetail,
+          ...view,
+          myScore: view?.myScore,
+        });
+        if (this.detail) this.detail.isMemberCompetition = isMember;
+
+        if (isMember) {
           this.memberLeaderboard = view?.memberLeaderboard ?? [];
           this.leaderboard = [];
         } else {
@@ -671,7 +679,7 @@ export class CompetitionDetailModalComponent implements OnInit {
           this.memberLeaderboard = [];
         }
 
-        if (this.detail?.isMemberCompetition && this.detail?.status === 'FINISHED') {
+        if (isMember && this.detail?.status === 'FINISHED') {
           this.loadPodiumData();
         } else {
           this.loading = false;

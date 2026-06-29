@@ -8,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HomeService } from '../home/services/home.services';
+import { inferMemberCompetitionFromDetail } from '../../core/utils/competition.util';
 
 @Component({
   selector: 'app-competition-detail',
@@ -633,11 +634,16 @@ export class CompetitionDetailComponent implements OnInit {
 
     this.homeService.getCompetitionDetail(id).subscribe({
       next: (data) => {
+        const isMember = inferMemberCompetitionFromDetail(data);
+
         this.competition = data?.competition ?? data;
         this.myScore = data?.myScore ?? null;
         this.leaderboard = data?.groupLeaderboard ?? [];
         this.memberLeaderboard = data?.memberLeaderboard ?? [];
         this.internalRanking = data?.internalRanking ?? [];
+
+        if (this.competition) this.competition.isMemberCompetition = isMember;
+        if (this.myScore) this.myScore.isMemberCompetition = isMember;
 
         this.loading = false;
         this.cdr.markForCheck();

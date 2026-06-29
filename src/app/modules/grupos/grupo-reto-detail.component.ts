@@ -8,6 +8,7 @@ import {
   PodiumsResponse,
 } from './services/grupos.service';
 import { UserService } from '../user/services/user.service';
+import { inferMemberCompetitionFromDetail } from '../../core/utils/competition.util';
 
 @Component({
   selector: 'app-grupo-reto-detail',
@@ -292,9 +293,12 @@ export class GrupoRetoDetailComponent implements OnInit {
     this.error = '';
     this.gruposService.getRetoDetail(this.groupId, this.competitionId).subscribe({
       next: (d) => {
+        const isMember = inferMemberCompetitionFromDetail(d);
+        if (d.competition) d.competition.isMemberCompetition = isMember;
+        if (d.myScore) d.myScore.isMemberCompetition = isMember;
         this.detail = d;
         this.loading = false;
-        if (d.competition.isMemberCompetition && d.competition.status === 'FINISHED') {
+        if (isMember && d.competition.status === 'FINISHED') {
           this.gruposService.getRetoWinners(this.competitionId).subscribe({
             next: (w) => { this.declaredWinners = w || []; },
             error: () => { this.declaredWinners = []; },
