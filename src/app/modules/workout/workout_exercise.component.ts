@@ -85,6 +85,8 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   addingExercise = false;
   removingExercise = false;
   mutatingSets = false;
+  reorderDirty = false;
+  savingReorder = false;
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   // Superset: ejercicio combinado con el siguiente
@@ -156,6 +158,8 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.errorMessage = null;
     this.resetPairedState();
+    this.reorderDirty = false;
+    this.savingReorder = false;
 
     this.workoutService.getExerciseDetail(this.sessionId, this.order)
       .subscribe({
@@ -463,7 +467,10 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
     );
 
     this.updateElapsed();
-    this.timerSub = interval(1000).subscribe(() => this.updateElapsed());
+    if (this.isBrowser) {
+      this.timerSub = interval(1000).subscribe(() => this.updateElapsed());
+    }
+    this.cdr.markForCheck();
   }
 
   private resolveSessionStartMs(sessionId: number, startedAt: unknown): number {
@@ -498,7 +505,7 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  /** Soporta ISO string, timestamp numérico o array [y,m,d,h,min,s] de Jackson. */
+  /** Soporta ISO string, timestamp, array u objeto Jackson LocalDateTime. */
   private parseStartedAt(value: unknown): number | null {
     if (value == null) return null;
     if (typeof value === 'number') {
@@ -512,6 +519,20 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
       const [y, m, d, h = 0, min = 0, s = 0, nano = 0] = value.map(Number);
       const ms = new Date(y, m - 1, d, h, min, s, Math.floor(nano / 1_000_000)).getTime();
       return Number.isNaN(ms) ? null : ms;
+    }
+    if (typeof value === 'object') {
+      const o = value as Record<string, unknown>;
+      if ('year' in o) {
+        const y = Number(o['year']);
+        const m = Number(o['monthValue'] ?? o['month'] ?? 1);
+        const d = Number(o['dayOfMonth'] ?? o['day'] ?? 1);
+        const h = Number(o['hour'] ?? 0);
+        const min = Number(o['minute'] ?? 0);
+        const s = Number(o['second'] ?? 0);
+        const nano = Number(o['nano'] ?? 0);
+        const ms = new Date(y, m - 1, d, h, min, s, Math.floor(nano / 1_000_000)).getTime();
+        return Number.isNaN(ms) ? null : ms;
+      }
     }
     return null;
   }
@@ -948,29 +969,52 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   // Reordenar siguientes ejercicios en la UI
   // ─────────────────────────────────────────────
 
-  moveNextExerciseUp(index: number): void {
-    if (!this.data || index <= 0) return;
-
-    const arr = [...this.data.nextExercises];
-    const temp = arr[index - 1];
-    arr[index - 1] = arr[index];
-    arr[index] = temp;
-    this.data = { ...this.data, nextExercises: arr };
+  /** Índices en `nextExercises` visibles para reordenar (oculta el pareja en superset). */
+  get reorderableNextIndices(): number[] {
+    if (!this.data) return [];
+    return this.data.nextExercises
+      .map((_, i) => i)
+      .filter(i => !(this.isCombined && i === 0));
   }
 
-  moveNextExerciseDown(index: number): void {
-    if (!this.data || index >= this.data.nextExercises.length - 1) return;
+  canReorderNextExercises(): boolean {
+    return !this.isCombined && !this.saving && !this.savingReorder && this.reorderableNextIndices.length > 1;
+  }
+
+  moveNextExerciseUp(dataIndex: number): void {
+    if (!this.data || !this.canReorderNextExercises()) return;
+
+    const visible = this.reorderableNextIndices;
+    const pos = visible.indexOf(dataIndex);
+    if (pos <= 0) return;
 
     const arr = [...this.data.nextExercises];
-    const temp = arr[index + 1];
-    arr[index + 1] = arr[index];
-    arr[index] = temp;
+    const swapWith = visible[pos - 1];
+    [arr[swapWith], arr[dataIndex]] = [arr[dataIndex], arr[swapWith]];
     this.data = { ...this.data, nextExercises: arr };
+    this.reorderDirty = true;
+    this.cdr.markForCheck();
+  }
+
+  moveNextExerciseDown(dataIndex: number): void {
+    if (!this.data || !this.canReorderNextExercises()) return;
+
+    const visible = this.reorderableNextIndices;
+    const pos = visible.indexOf(dataIndex);
+    if (pos < 0 || pos >= visible.length - 1) return;
+
+    const arr = [...this.data.nextExercises];
+    const swapWith = visible[pos + 1];
+    [arr[swapWith], arr[dataIndex]] = [arr[dataIndex], arr[swapWith]];
+    this.data = { ...this.data, nextExercises: arr };
+    this.reorderDirty = true;
+    this.cdr.markForCheck();
   }
 
   onSaveReorder(): void {
-    if (!this.data) return;
+    if (!this.data || !this.reorderDirty || this.savingReorder) return;
 
+    this.savingReorder = true;
     const body = {
       workoutExerciseIds: this.data.nextExercises.map(x => x.workoutExerciseId)
     };
@@ -978,12 +1022,15 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
     this.workoutService.reorderNextExercises(this.sessionId, body)
       .subscribe({
         next: () => {
-          // Si quieres, mostrar toast / recargar datos
+          this.savingReorder = false;
+          this.reorderDirty = false;
           this.loadExercise();
         },
         error: (err) => {
           console.error(err);
+          this.savingReorder = false;
           this.errorMessage = 'No se pudo guardar el nuevo orden de ejercicios.';
+          this.cdr.markForCheck();
         }
       });
   }
