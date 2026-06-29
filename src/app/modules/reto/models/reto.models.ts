@@ -52,7 +52,6 @@ export interface ParticipanteStatus {
 }
 
 export interface InscripcionRequest {
-  categoria: ParticipanteCategoria;
   objetivoCodigo: string;
   objetivoTextoLibre?: string;
 }
@@ -146,12 +145,6 @@ export const OBJETIVOS = [
   { codigo: 'OBJ-5', label: 'Mejorar la constancia', desc: 'Aumentar frecuencia semanal de entrenamiento' },
   { codigo: 'OBJ-6', label: 'Rendimiento cardiovascular', desc: 'Mejorar tiempos/distancias en actividad libre' },
   { codigo: 'OBJ-7', label: 'Otro', desc: 'Describe tu objetivo con tus propias palabras' },
-];
-
-export const CATEGORIAS: { value: ParticipanteCategoria; label: string; desc: string }[] = [
-  { value: 'PRINCIPIANTE', label: 'Principiante', desc: 'Sin experiencia previa o menos de 3 meses de entrenamiento regular' },
-  { value: 'INTERMEDIO', label: 'Intermedio', desc: 'Entrenamiento regular de 3 a 18 meses' },
-  { value: 'AVANZADO', label: 'Avanzado', desc: 'Más de 18 meses de entrenamiento estructurado' },
 ];
 
 export const SUS_PREGUNTAS = [
