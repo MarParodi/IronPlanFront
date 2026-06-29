@@ -1,15 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { RetoService } from './services/reto.service';
 import { IpaqFormComponent } from './components/ipaq-form.component';
 import {
-  CATEGORIAS,
   CONSENTIMIENTO_TEXTO,
   IpaqFormData,
   OBJETIVOS,
-  ParticipanteCategoria,
 } from './models/reto.models';
 
 @Component({
@@ -21,7 +19,7 @@ import {
       <div class="max-w-2xl mx-auto space-y-6">
         <header>
           <h1 class="text-2xl font-bold">Inscripción al reto</h1>
-          <p class="text-sm text-ip-muted mt-1">Completa los 4 pasos para participar en el experimento.</p>
+          <p class="text-sm text-ip-muted mt-1">Completa los 3 pasos para participar en el experimento.</p>
         </header>
 
         <!-- Stepper -->
@@ -31,7 +29,7 @@ import {
             [class.bg-teal-500]="step > i"
             [class.bg-ip-border]="step <= i"></div>
         </div>
-        <p class="text-xs text-ip-muted">Paso {{ step }} de 4 — {{ steps[step - 1] }}</p>
+        <p class="text-xs text-ip-muted">Paso {{ step }} de 3 — {{ steps[step - 1] }}</p>
 
         <div *ngIf="error" class="text-sm text-red-300 bg-red-500/10 border border-red-500/25 rounded-lg px-3 py-2">{{ error }}</div>
 
@@ -59,18 +57,7 @@ import {
         </section>
 
         <!-- Paso 3 -->
-        <section *ngIf="step === 3" class="space-y-3">
-          <label *ngFor="let cat of categorias" class="flex items-start gap-3 p-3 rounded-xl border border-ip-border cursor-pointer">
-            <input type="radio" name="cat" [value]="cat.value" [(ngModel)]="categoria" class="mt-1" />
-            <div>
-              <p class="font-medium">{{ cat.label }}</p>
-              <p class="text-xs text-ip-muted">{{ cat.desc }}</p>
-            </div>
-          </label>
-        </section>
-
-        <!-- Paso 4 -->
-        <section *ngIf="step === 4">
+        <section *ngIf="step === 3">
           <app-ipaq-form (formChange)="ipaqData = $event"></app-ipaq-form>
         </section>
 
@@ -79,7 +66,7 @@ import {
             class="px-4 py-2 rounded-xl border border-ip-border text-sm">Atrás</button>
           <button type="button" (click)="next()" [disabled]="saving || !canContinue()"
             class="flex-1 px-4 py-2 rounded-xl bg-teal-500 text-slate-900 font-semibold text-sm disabled:opacity-50">
-            {{ step === 4 ? (saving ? 'Guardando...' : 'Finalizar inscripción') : 'Continuar' }}
+            {{ step === 3 ? (saving ? 'Guardando...' : 'Finalizar inscripción') : 'Continuar' }}
           </button>
         </div>
       </div>
@@ -89,19 +76,17 @@ import {
 export class RetoInscripcionComponent implements OnInit {
   retoId!: number;
   step = 1;
-  steps = ['Consentimiento', 'Objetivo', 'Categoría', 'IPAQ pre-test'];
+  steps = ['Consentimiento', 'Objetivo', 'IPAQ pre-test'];
   saving = false;
   error = '';
 
   aceptoConsentimiento = false;
   objetivoCodigo = 'OBJ-5';
   objetivoTextoLibre = '';
-  categoria: ParticipanteCategoria = 'PRINCIPIANTE';
   participanteRetoId: number | null = null;
   ipaqData: IpaqFormData | null = null;
 
   objetivos = OBJETIVOS;
-  categorias = CATEGORIAS;
   consentimientoTexto = CONSENTIMIENTO_TEXTO;
 
   constructor(
@@ -126,15 +111,14 @@ export class RetoInscripcionComponent implements OnInit {
     switch (this.step) {
       case 1: return this.aceptoConsentimiento;
       case 2: return !!this.objetivoCodigo && (this.objetivoCodigo !== 'OBJ-7' || this.objetivoTextoLibre.trim().length > 0);
-      case 3: return !!this.categoria;
-      case 4: return !!this.ipaqData;
+      case 3: return !!this.ipaqData;
       default: return false;
     }
   }
 
   next(): void {
     this.error = '';
-    if (this.step < 4) {
+    if (this.step < 3) {
       this.step++;
       return;
     }
@@ -146,7 +130,6 @@ export class RetoInscripcionComponent implements OnInit {
     this.saving = true;
 
     const inscripcion = {
-      categoria: this.categoria,
       objetivoCodigo: this.objetivoCodigo,
       objetivoTextoLibre: this.objetivoCodigo === 'OBJ-7' ? this.objetivoTextoLibre : undefined,
     };
