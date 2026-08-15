@@ -20,6 +20,9 @@ import { Exercise } from '../create-routine/models/create-routine.models';
 import { SafePipe } from './pipes/safe.pipe';
 import { Subscription, interval, switchMap, of, Observable } from 'rxjs';
 
+const NO_CATALOG_RECOMMENDATION_MESSAGE = 'Este ejercicio no está vinculado al catálogo, así que no hay historial que analizar.';
+const FAILED_RECOMMENDATION_MESSAGE = 'No pudimos calcular la sugerencia para este ejercicio.';
+
 @Component({
   standalone: true,
   selector: 'app-workout-exercise-page',
@@ -60,10 +63,14 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   // Recomendación de progresión
   recommendation: ProgressionRecommendation | null = null;
   loadingRecommendation = false;
+  recommendationError: string | null = null;
+  recommendationRetryable = false;
   showRecommendationModal = false;
   recommendationModalTarget: 'main' | 'paired' = 'main';
   pairedRecommendation: ProgressionRecommendation | null = null;
   loadingPairedRecommendation = false;
+  pairedRecommendationError: string | null = null;
+  pairedRecommendationRetryable = false;
 
   // Modal de salida
   showExitModal = false;
@@ -220,6 +227,8 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
     this.pairedNotes = null;
     this.pairedRecommendation = null;
     this.loadingPairedRecommendation = false;
+    this.pairedRecommendationError = null;
+    this.pairedRecommendationRetryable = false;
     this.isCombined = false;
     this.loadingPaired = false;
   }
@@ -232,14 +241,7 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
 
   uncombine(): void {
     this.clearComboState();
-    this.pairedData = null;
-    this.pairedSets = [];
-    this.pairedDisplayWeights = [];
-    this.pairedNotes = null;
-    this.pairedRecommendation = null;
-    this.loadingPairedRecommendation = false;
-    this.isCombined = false;
-    this.loadingPaired = false;
+    this.resetPairedState();
     this.cdr.markForCheck();
   }
 
@@ -272,7 +274,16 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   }
 
   private loadRecommendation(resp: WorkoutExerciseDetailResponse): void {
-    if (!resp.exerciseId) return;
+    this.recommendation = null;
+    this.recommendationError = null;
+    this.recommendationRetryable = false;
+
+    if (!resp.exerciseId) {
+      this.loadingRecommendation = false;
+      this.recommendationError = NO_CATALOG_RECOMMENDATION_MESSAGE;
+      this.cdr.markForCheck();
+      return;
+    }
 
     this.loadingRecommendation = true;
     this.fetchRecommendation(resp).subscribe({
@@ -287,16 +298,26 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Error cargando recomendación:', err);
         this.loadingRecommendation = false;
+        this.recommendationError = FAILED_RECOMMENDATION_MESSAGE;
+        this.recommendationRetryable = true;
         this.cdr.markForCheck();
       },
     });
   }
 
   private loadPairedRecommendation(resp: WorkoutExerciseDetailResponse): void {
-    if (!resp.exerciseId) return;
+    this.pairedRecommendation = null;
+    this.pairedRecommendationError = null;
+    this.pairedRecommendationRetryable = false;
+
+    if (!resp.exerciseId) {
+      this.loadingPairedRecommendation = false;
+      this.pairedRecommendationError = NO_CATALOG_RECOMMENDATION_MESSAGE;
+      this.cdr.markForCheck();
+      return;
+    }
 
     this.loadingPairedRecommendation = true;
-    this.pairedRecommendation = null;
     this.fetchRecommendation(resp).subscribe({
       next: (rec) => {
         this.pairedRecommendation = rec;
@@ -309,9 +330,21 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Error cargando recomendación pareada:', err);
         this.loadingPairedRecommendation = false;
+        this.pairedRecommendationError = FAILED_RECOMMENDATION_MESSAGE;
+        this.pairedRecommendationRetryable = true;
         this.cdr.markForCheck();
       },
     });
+  }
+
+  retryRecommendation(): void {
+    if (!this.recommendationRetryable || !this.data) return;
+    this.loadRecommendation(this.data);
+  }
+
+  retryPairedRecommendation(): void {
+    if (!this.pairedRecommendationRetryable || !this.pairedData) return;
+    this.loadPairedRecommendation(this.pairedData);
   }
 
   private fetchRecommendation(resp: WorkoutExerciseDetailResponse): Observable<ProgressionRecommendation | null> {
