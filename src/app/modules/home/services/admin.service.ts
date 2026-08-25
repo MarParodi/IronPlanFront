@@ -163,4 +163,69 @@ getExercises() {
     return this.http.get<any[]>(`${this.base}/competitions/${competitionId}/winners`);
   }
 
+  getRetoDashboard(id: number, groupId?: number | null) {
+    let params = new HttpParams();
+    if (groupId != null) params = params.set('groupId', String(groupId));
+    return this.http.get<AdminRetoDashboard>(`${this.base}/admin/competitions/${id}/reto-dashboard`, { params });
+  }
+
+}
+
+export interface AdminRetoDashboard {
+  competition: {
+    id: number;
+    name: string;
+    competitionType: string;
+    metricType: string;
+    startDate: string;
+    endDate: string | null;
+    status: string;
+    isMemberCompetition: boolean;
+    scopeReferenceName: string;
+    participantCount: number;
+  };
+  weekStart: string;
+  weekEnd: string;
+  weekIndex: number;
+  gapFirstSecond: number | null;
+  kpis: AdminRetoKpis;
+  teams: AdminRetoTeam[];
+}
+
+export interface AdminRetoKpis {
+  activeThisWeek: number;
+  totalActivities: number;
+  pointsToday: number;
+  pointsThisWeek: number;
+  avgPointsPerMember: number;
+  contributionPercent: number;
+}
+
+export interface AdminRetoTeam {
+  groupId: number | null;
+  groupName: string;
+  rank: number;
+  score: number;
+  gapFromLeader: number;
+  fuerzaPoints: number;
+  librePoints: number;
+  teamBonusPoints: number;
+  rosterSize: number;
+  activeThisWeek: number;
+  participationPercent: number;
+  contributionPercent: number;
+  members: AdminRetoMember[];
+  totalActivities: number;
+  pointsToday: number;
+  pointsThisWeek: number;
+}
+
+export interface AdminRetoMember {
+  userId: number;
+  fullName: string;
+  points: number;
+  fuerza: number;
+  libre: number;
+  activeDays: number;
+  lastActivityAt: string | null;
 }

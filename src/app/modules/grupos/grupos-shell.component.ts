@@ -23,7 +23,7 @@ import { filter } from 'rxjs/operators';
           <a routerLink="/grupos/mis-grupos" routerLinkActive="tab-active" [routerLinkActiveOptions]="{ exact: true }" class="grupos-tab">
             Mis grupos
           </a>
-          <a *ngIf="showAdministrar" routerLink="/grupos/administrar" routerLinkActive="tab-active" [routerLinkActiveOptions]="{ exact: true }" class="grupos-tab">
+          <a *ngIf="showAdministrar" routerLink="/grupos/administrar" routerLinkActive="tab-active" class="grupos-tab">
             Administrar
           </a>
         </nav>
@@ -96,6 +96,6 @@ export class GruposShellComponent implements OnInit {
   }
 
   private syncRoute(url: string) {
-    this.isAdministrar = url.includes('/grupos/administrar');
+    this.isAdministrar = url.split('?')[0].replace(/\/$/, '').endsWith('/grupos/administrar');
   }
 }
