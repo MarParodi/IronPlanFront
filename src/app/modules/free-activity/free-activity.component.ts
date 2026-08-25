@@ -19,9 +19,16 @@ export class FreeActivityComponent implements OnInit, OnDestroy {
 
   activityTypes: { label: string; value: FreeActivityType }[] = [
     { label: 'Caminadora', value: 'CAMINADORA' },
+    { label: 'Caminata', value: 'CAMINATA' },
     { label: 'Running', value: 'RUNNING' },
     { label: 'Bicicleta estática', value: 'BICICLETA_ESTATICA' },
+    { label: 'Elíptica', value: 'ELIPTICA' },
     { label: 'Natación', value: 'NATACION' },
+    { label: 'Baile', value: 'BAILE' },
+    { label: 'Yoga', value: 'YOGA' },
+    { label: 'Fútbol', value: 'FUTBOL' },
+    { label: 'Box', value: 'BOX' },
+    { label: 'Clase grupal', value: 'CLASE_GRUPAL' },
     { label: 'Otra', value: 'OTRA' },
   ];
 

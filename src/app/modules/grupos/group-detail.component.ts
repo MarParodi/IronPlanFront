@@ -164,6 +164,7 @@ import { destroyChart, renderBarChart } from '../../core/utils/bar-chart.util';
                 <option value="WORKOUTS_COUNT">Entrenamientos</option>
                 <option value="SESSIONS">Sesiones</option>
                 <option value="ACTIVE_MINUTES">Minutos activos</option>
+                <option value="TEAM_POINTS">Puntos de reto (Tipo Grupal)</option>
               </select>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -437,7 +438,7 @@ export class GroupDetailComponent implements OnInit, AfterViewChecked, OnDestroy
   retoForm = {
     name: '',
     competitionType: 'CHALLENGE' as 'RANKING' | 'CHALLENGE' | 'VERSUS',
-    metricType: 'WORKOUTS_COUNT' as 'SESSIONS' | 'ACTIVE_MINUTES' | 'WORKOUTS_COUNT',
+    metricType: 'WORKOUTS_COUNT' as 'SESSIONS' | 'ACTIVE_MINUTES' | 'WORKOUTS_COUNT' | 'TEAM_POINTS',
     startDate: new Date().toISOString().slice(0, 10),
     endDate: '',
   };

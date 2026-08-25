@@ -167,7 +167,9 @@ getCompetitionTypeLabel(type: string): string {
 
 getMetricLabel(metric: string): string {
   const labels: Record<string, string> = {
-    SESSIONS: 'Sesiones', ACTIVE_MINUTES: 'Minutos activos', WORKOUTS_COUNT: 'Entrenamientos'
+    SESSIONS: 'Sesiones', ACTIVE_MINUTES: 'Minutos activos', WORKOUTS_COUNT: 'Entrenamientos',
+    VOLUME_TOTAL: 'Volumen total (kg)', FREE_ACTIVITY_COUNT: 'Actividades libres',
+    FREE_ACTIVITY_KM: 'Km actividad libre', TEAM_POINTS: 'Puntos de reto'
   };
   return labels[metric] ?? metric;
 }

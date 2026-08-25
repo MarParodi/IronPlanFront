@@ -1,8 +1,15 @@
 export type FreeActivityType =
   | 'CAMINADORA'
+  | 'CAMINATA'
   | 'RUNNING'
   | 'BICICLETA_ESTATICA'
+  | 'ELIPTICA'
   | 'NATACION'
+  | 'BAILE'
+  | 'YOGA'
+  | 'FUTBOL'
+  | 'BOX'
+  | 'CLASE_GRUPAL'
   | 'OTRA';
 
 export interface CreateFreeActivityRequest {

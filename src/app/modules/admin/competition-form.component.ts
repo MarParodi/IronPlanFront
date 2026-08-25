@@ -68,6 +68,7 @@ interface Participant {
             <option value="ACTIVE_MINUTES">Minutos activos</option>
             <option value="WORKOUTS_COUNT">Entrenamientos</option>
             <option value="VOLUME_TOTAL">Volumen total (kg)</option>
+            <option value="TEAM_POINTS">Puntos de reto (Tipo Grupal)</option>
           </select>
         </div>
       </div>
