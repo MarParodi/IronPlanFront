@@ -19,6 +19,7 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'mis-grupos', pathMatch: 'full' },
       { path: 'mis-grupos', loadComponent: () => import('./modules/grupos/mis-grupos.component').then(m => m.MisGruposComponent) },
+      { path: 'administrar/competencias/:id', loadComponent: () => import('./modules/admin/reto-admin-dashboard.component').then(m => m.RetoAdminDashboardComponent) },
       { path: 'administrar', loadComponent: () => import('./modules/admin/admin.component').then(m => m.AdminComponent) },
       {
         path: ':groupId',

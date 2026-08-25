@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AdminService } from '../home/services/admin.service';
 import { UserService } from '../user/services/user.service';
 import { OrgTreeComponent, GroupTreeNode } from './org-three.component';
@@ -101,6 +101,7 @@ export class AdminComponent implements OnInit {
     private adminService: AdminService,
     private userService: UserService,
     private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
@@ -113,7 +114,12 @@ export class AdminComponent implements OnInit {
           this.router.navigate(['/grupos/mis-grupos']);
           return;
         }
-        this.loadGroups();
+        const seccion = this.route.snapshot.queryParamMap.get('seccion');
+        if (seccion === 'competencias' || seccion === 'invitaciones' || seccion === 'ejercicios' || seccion === 'experimento') {
+          this.setSection(seccion);
+        } else {
+          this.loadGroups();
+        }
       },
       error: () => this.router.navigate(['/grupos/mis-grupos'])
     });
@@ -338,6 +344,10 @@ export class AdminComponent implements OnInit {
   }
  
   viewCompetition(c: any) {
+    if (c?.metricType === 'TEAM_POINTS') {
+      this.router.navigate(['/grupos/administrar/competencias', c.id]);
+      return;
+    }
     this.selectedCompetitionId  = c.id;
     this.showCompetitionDetailModal = true;
   }
