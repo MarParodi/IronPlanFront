@@ -18,6 +18,7 @@ export interface MembershipSummary {
   groupType: string;
   role: string;
   canManage: boolean;
+  canLeave: boolean;
   memberCount: number;
   activeCompetitionsCount: number;
   hierarchyPath: HierarchyPath;
@@ -31,6 +32,7 @@ export interface GroupDetail {
   active: boolean;
   role: string;
   canManage: boolean;
+  canLeave: boolean;
   memberCount: number;
   activeCompetitionsCount: number;
   hierarchyPath: HierarchyPath;
@@ -44,6 +46,8 @@ export interface GroupMember {
   level?: string;
   joinedAt: string;
   profilePictureUrl?: string;
+  groupId?: number;
+  groupName?: string;
 }
 
 export interface ObjectiveDistributionPoint {
@@ -118,6 +122,10 @@ export class GruposService {
 
   removeMiembro(groupId: number, userId: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${groupId}/miembros/${userId}`);
+  }
+
+  salirDelGrupo(groupId: number): Observable<void> {
+    return this.http.post<void>(`${this.base}/${groupId}/salir`, {});
   }
 
   getMetricas(groupId: number, days = 30): Observable<GroupMetrics> {

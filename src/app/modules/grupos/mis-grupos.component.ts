@@ -108,14 +108,23 @@ import { OrgCascadeFormComponent } from '../admin/org-cascade-form.component';
             </span>
           </div>
  
-          <a [routerLink]="['/grupos', g.groupId, 'resumen']"
-            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
-                   bg-teal-500/15 text-teal-400 border border-teal-500/25 hover:bg-teal-500/25 transition">
-            Ver grupo
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-            </svg>
-          </a>
+          <div class="flex flex-wrap items-center gap-3">
+            <a [routerLink]="['/grupos', g.groupId, 'resumen']"
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
+                     bg-teal-500/15 text-teal-400 border border-teal-500/25 hover:bg-teal-500/25 transition">
+              Ver grupo
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
+            </a>
+            <button *ngIf="g.canLeave" type="button"
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
+                     text-red-300 bg-red-500/10 border border-red-500/25 hover:bg-red-500/20 transition"
+              (click)="onLeaveGroup(g)" [disabled]="leavingGroupId === g.groupId">
+              {{ leavingGroupId === g.groupId ? 'Saliendo...' : 'Salir del grupo' }}
+            </button>
+          </div>
+          <p *ngIf="leaveError && leaveErrorGroupId === g.groupId" class="text-sm text-red-300 mt-2">{{ leaveError }}</p>
         </article>
  
         <!-- Panel "¿Quieres más?" — unirse o crear -->
@@ -209,6 +218,9 @@ import { OrgCascadeFormComponent } from '../admin/org-cascade-form.component';
 export class MisGruposComponent implements OnInit {
   groups: MembershipSummary[] = [];
   loading = true;
+  leavingGroupId: number | null = null;
+  leaveErrorGroupId: number | null = null;
+  leaveError = '';
  
  
   /** Acción extra cuando YA hay grupos */
@@ -225,9 +237,28 @@ export class MisGruposComponent implements OnInit {
  
   load() {
     this.loading = true;
+    this.leaveError = '';
     this.gruposService.getMisGrupos().subscribe({
       next: (data) => { this.groups = data; this.loading = false; },
       error: () => { this.loading = false; }
+    });
+  }
+
+  onLeaveGroup(g: MembershipSummary) {
+    if (!confirm(`¿Salir de ${g.groupName}? Dejarás de pertenecer a esta organización.`)) return;
+    this.leavingGroupId = g.groupId;
+    this.leaveError = '';
+    this.leaveErrorGroupId = null;
+    this.gruposService.salirDelGrupo(g.groupId).subscribe({
+      next: () => {
+        this.leavingGroupId = null;
+        this.load();
+      },
+      error: (err) => {
+        this.leavingGroupId = null;
+        this.leaveErrorGroupId = g.groupId;
+        this.leaveError = err?.error?.error || err?.error?.message || 'No se pudo salir del grupo';
+      }
     });
   }
  

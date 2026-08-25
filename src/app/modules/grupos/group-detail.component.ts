@@ -28,7 +28,12 @@ import { destroyChart, renderBarChart } from '../../core/utils/bar-chart.util';
           <span [class]="roleBadgeClass(detail.role === 'ADMIN')">
             {{ detail.role === 'ADMIN' ? 'Administrador' : 'Miembro' }}
           </span>
+          <button *ngIf="detail.canLeave" type="button" class="btn-leave ml-auto"
+            (click)="onLeaveGroup()" [disabled]="leaving">
+            {{ leaving ? 'Saliendo...' : 'Salir del grupo' }}
+          </button>
         </div>
+        <p *ngIf="leaveError" class="text-sm text-red-300 bg-red-500/10 border border-red-500/25 rounded-lg px-3 py-2">{{ leaveError }}</p>
       </header>
 
       <nav class="flex flex-wrap gap-2">
@@ -73,7 +78,9 @@ import { destroyChart, renderBarChart } from '../../core/utils/bar-chart.util';
           <div>
             <h3 class="text-base font-semibold text-ip-primary">Miembros</h3>
             <p class="text-xs text-ip-primary0 mt-1">
-              Personas asignadas directamente a este grupo.
+              {{ detail.canManage
+                ? 'Integrantes de este grupo y de sus grupos hijos.'
+                : 'Personas asignadas directamente a este grupo.' }}
               <span *ngIf="detail.canManage"> Puedes dar de alta, cambiar rol o dar de baja.</span>
             </p>
           </div>
@@ -103,6 +110,7 @@ import { destroyChart, renderBarChart } from '../../core/utils/bar-chart.util';
                 <tr>
                   <th class="px-4 py-3">Nombre</th>
                   <th class="px-4 py-3">Usuario</th>
+                  <th *ngIf="showsChildGroups" class="px-4 py-3">Grupo</th>
                   <th class="px-4 py-3">Nivel</th>
                   <th class="px-4 py-3">Rol</th>
                   <th *ngIf="detail.canManage" class="px-4 py-3 text-right">Acciones</th>
@@ -112,6 +120,7 @@ import { destroyChart, renderBarChart } from '../../core/utils/bar-chart.util';
                 <tr *ngFor="let m of members" class="hover:bg-slate-800/30">
                   <td class="px-4 py-3 text-ip-primary">{{ m.fullName }}</td>
                   <td class="px-4 py-3 text-ip-muted">{{ m.username }}</td>
+                  <td *ngIf="showsChildGroups" class="px-4 py-3 text-ip-secondary">{{ m.groupName || '—' }}</td>
                   <td class="px-4 py-3 text-ip-secondary">{{ levelLabel(m.level) }}</td>
                   <td class="px-4 py-3">
                     <select *ngIf="detail.canManage"
@@ -394,6 +403,18 @@ import { destroyChart, renderBarChart } from '../../core/utils/bar-chart.util';
     }
     .btn-remove:hover:not(:disabled) { background: rgba(239,68,68,0.18); }
     .btn-remove:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-leave {
+      font-size: 12px;
+      font-weight: 600;
+      color: #f87171;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+    .btn-leave:hover:not(:disabled) { background: rgba(239,68,68,0.18); }
+    .btn-leave:disabled { opacity: 0.5; cursor: not-allowed; }
     .metric-card {
       border-radius: 12px;
       background: rgb(var(--ip-page));
@@ -449,6 +470,8 @@ export class GroupDetailComponent implements OnInit, AfterViewChecked, OnDestroy
   addingMember = false;
   updatingUserId: number | null = null;
   removingUserId: number | null = null;
+  leaving = false;
+  leaveError = '';
   membersError = '';
   membersSuccess = '';
 
@@ -593,7 +616,7 @@ export class GroupDetailComponent implements OnInit, AfterViewChecked, OnDestroy
     this.updatingUserId = m.userId;
     this.membersError = '';
     this.membersSuccess = '';
-    this.gruposService.updateMiembroRol(this.groupId, m.userId, role).subscribe({
+    this.gruposService.updateMiembroRol(this.membershipGroupId(m), m.userId, role).subscribe({
       next: (updated) => {
         m.role = updated.role;
         this.updatingUserId = null;
@@ -608,11 +631,12 @@ export class GroupDetailComponent implements OnInit, AfterViewChecked, OnDestroy
   }
 
   onRemoveMember(m: GroupMember) {
-    if (!confirm(`¿Dar de baja a ${m.fullName} de este grupo?`)) return;
+    const groupLabel = m.groupName || 'este grupo';
+    if (!confirm(`¿Dar de baja a ${m.fullName} de ${groupLabel}?`)) return;
     this.removingUserId = m.userId;
     this.membersError = '';
     this.membersSuccess = '';
-    this.gruposService.removeMiembro(this.groupId, m.userId).subscribe({
+    this.gruposService.removeMiembro(this.membershipGroupId(m), m.userId).subscribe({
       next: () => {
         this.removingUserId = null;
         this.membersSuccess = 'Miembro dado de baja';
@@ -624,6 +648,31 @@ export class GroupDetailComponent implements OnInit, AfterViewChecked, OnDestroy
         this.membersError = this.apiError(err, 'No se pudo dar de baja al miembro');
       }
     });
+  }
+
+  onLeaveGroup() {
+    if (!this.detail) return;
+    if (!confirm(`¿Salir de ${this.detail.groupName}? Dejarás de pertenecer a esta organización.`)) return;
+    this.leaving = true;
+    this.leaveError = '';
+    this.gruposService.salirDelGrupo(this.groupId).subscribe({
+      next: () => {
+        this.leaving = false;
+        this.router.navigate(['/grupos/mis-grupos']);
+      },
+      error: (err) => {
+        this.leaving = false;
+        this.leaveError = this.apiError(err, 'No se pudo salir del grupo');
+      }
+    });
+  }
+
+  get showsChildGroups(): boolean {
+    return this.members.some(m => m.groupId != null && m.groupId !== this.groupId);
+  }
+
+  private membershipGroupId(m: GroupMember): number {
+    return m.groupId ?? this.groupId;
   }
 
   private apiError(err: any, fallback: string): string {
