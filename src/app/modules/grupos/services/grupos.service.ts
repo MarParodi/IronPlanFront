@@ -152,7 +152,7 @@ export class GruposService {
 export interface CreateRetoRequest {
   name: string;
   competitionType: 'RANKING' | 'CHALLENGE' | 'VERSUS';
-  metricType: 'SESSIONS' | 'ACTIVE_MINUTES' | 'WORKOUTS_COUNT';
+  metricType: 'SESSIONS' | 'ACTIVE_MINUTES' | 'WORKOUTS_COUNT' | 'TEAM_POINTS';
   startDate: string;
   endDate?: string;
   participantUserIds?: number[];

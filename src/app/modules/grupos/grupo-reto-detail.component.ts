@@ -349,6 +349,7 @@ export class GrupoRetoDetailComponent implements OnInit {
       VOLUME_TOTAL: 'kg volumen',
       FREE_ACTIVITY_COUNT: 'actividades libres',
       FREE_ACTIVITY_KM: 'km cardio',
+      TEAM_POINTS: 'puntos',
     };
     return labels[m] ?? m;
   }

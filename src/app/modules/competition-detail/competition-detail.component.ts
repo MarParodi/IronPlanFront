@@ -773,6 +773,7 @@ export class CompetitionDetailComponent implements OnInit {
       VOLUME_TOTAL: 'Volumen (kg)',
       FREE_ACTIVITY_COUNT: 'Actividades libres',
       FREE_ACTIVITY_KM: 'Km cardio',
+      TEAM_POINTS: 'Puntos',
     };
 
     return labels[metric] ?? metric;
