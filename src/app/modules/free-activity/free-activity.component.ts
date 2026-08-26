@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { FreeActivityService } from './services/free-activity.service';
 import { FreeActivityResponse, FreeActivityType } from './models/free-activity.models';
 import { CreateRoutineService } from '../create-routine/services/create-routine.service';
+import { compressImageToJpeg, validateImageFile } from '../../core/utils/image-upload.util';
 
 @Component({
   selector: 'app-free-activity',
@@ -120,13 +121,37 @@ export class FreeActivityComponent implements OnInit, OnDestroy {
     return `${mm}:${ss}`;
   }
 
-  onPhotoSelected(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
+  async onPhotoSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (!file) return;
-    this.selectedFile = file;
-    const reader = new FileReader();
-    reader.onload = () => (this.photoPreview = reader.result as string);
-    reader.readAsDataURL(file);
+
+    this.error = null;
+    this.success = false;
+    const validationError = validateImageFile(file);
+    if (validationError) {
+      this.clearSelectedPhoto(input);
+      this.error = validationError;
+      return;
+    }
+
+    try {
+      const compressed = await compressImageToJpeg(file);
+      this.selectedFile = compressed;
+      const reader = new FileReader();
+      reader.onload = () => (this.photoPreview = reader.result as string);
+      reader.readAsDataURL(compressed);
+    } catch (err) {
+      this.clearSelectedPhoto(input);
+      this.error = err instanceof Error ? err.message : 'No se pudo procesar la imagen. Prueba con JPEG o PNG.';
+    }
+  }
+
+  private clearSelectedPhoto(input?: HTMLInputElement): void {
+    this.selectedFile = null;
+    this.photoPreview = null;
+    this.uploadedPhotoUrl = null;
+    if (input) input.value = '';
   }
 
   private getDurationSeconds(): number {
@@ -144,6 +169,8 @@ export class FreeActivityComponent implements OnInit, OnDestroy {
   }
 
   submit(): void {
+    if (this.saving) return;
+
     this.error = null;
     this.success = false;
 
@@ -176,9 +203,7 @@ export class FreeActivityComponent implements OnInit, OnDestroy {
           this.resetTimer();
           this.form.distance = null;
           this.form.notes = '';
-          this.selectedFile = null;
-          this.photoPreview = null;
-          this.uploadedPhotoUrl = null;
+          this.clearSelectedPhoto();
           this.loadMine();
         },
         error: (err) => {
@@ -191,9 +216,9 @@ export class FreeActivityComponent implements OnInit, OnDestroy {
     if (this.selectedFile) {
       this.createRoutineService.uploadRoutineImage(this.selectedFile).subscribe({
         next: (res) => saveActivity(res.url),
-        error: () => {
+        error: (err) => {
           this.saving = false;
-          this.error = 'No se pudo subir la foto.';
+          this.error = err?.error?.message || 'No se pudo subir la foto.';
         },
       });
     } else {
