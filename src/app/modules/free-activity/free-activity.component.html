@@ -57,7 +57,7 @@
         <label class="block text-sm text-ip-muted mb-2">Foto (opcional)</label>
         <div class="flex items-center gap-3">
           <img *ngIf="photoPreview" [src]="photoPreview" alt="Vista previa" class="h-16 w-16 rounded-xl object-cover ring-2 ring-teal-400/50" />
-          <input type="file" accept="image/*" (change)="onPhotoSelected($event)" class="text-xs text-ip-muted" />
+          <input type="file" accept="image/jpeg,image/png,image/webp,image/*" (change)="onPhotoSelected($event)" class="text-xs text-ip-muted" />
         </div>
       </div>
 
