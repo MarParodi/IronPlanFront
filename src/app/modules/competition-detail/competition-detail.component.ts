@@ -9,11 +9,20 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HomeService } from '../home/services/home.services';
 import { inferMemberCompetitionFromDetail } from '../../core/utils/competition.util';
+import { ordinalPosition } from '../../core/utils/reto-participant.util';
+import { MiAporteCardComponent } from '../../shared/reto/mi-aporte-card.component';
+import { MiEquipoCardComponent } from '../../shared/reto/mi-equipo-card.component';
+import { LeaderboardSimpleComponent } from '../../shared/reto/leaderboard-simple.component';
 
 @Component({
   selector: 'app-competition-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    MiAporteCardComponent,
+    MiEquipoCardComponent,
+    LeaderboardSimpleComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
 <div class="min-h-screen bg-ip-page text-ip-primary">
@@ -95,100 +104,20 @@ import { inferMemberCompetitionFromDetail } from '../../core/utils/competition.u
 
     <ng-container *ngIf="!loading">
 
-      <!-- MI POSICIÓN -->
-      <div
-        *ngIf="myScore"
-        class="rounded-xl border border-ip-border
-               bg-ip-surface overflow-hidden">
+      <!-- MI APORTE Y MI EQUIPO -->
+      <div *ngIf="myScore" class="grid gap-4 md:grid-cols-2">
 
-        <div class="px-5 py-4 border-b border-slate-900">
-          <p class="text-xs font-semibold uppercase tracking-wider text-ip-muted">
-            Mi posición
-          </p>
-        </div>
+        <app-mi-aporte-card
+          [myScore]="myScore"
+          [metricLabel]="getMetricLabel(competition?.metricType)"
+          [isMemberCompetition]="myScore.isMemberCompetition">
+        </app-mi-aporte-card>
 
-        <!-- GROUP -->
-        <div
-          *ngIf="!myScore.isMemberCompetition"
-          class="grid grid-cols-3 gap-3 p-5">
-
-          <div class="rounded-xl border border-ip-border bg-ip-surface p-4">
-
-            <p class="text-xs text-ip-primary0 mb-2">
-              Posición grupal
-            </p>
-
-            <h3 class="text-3xl font-bold text-cyan-400">
-              {{ myScore.groupRank != null ? '#' + myScore.groupRank : '—' }}
-            </h3>
-          </div>
-
-          <div class="rounded-xl border border-ip-border bg-ip-surface p-4">
-
-            <p class="text-xs text-ip-primary0 mb-2">
-              Score grupo
-            </p>
-
-            <h3 class="text-3xl font-bold text-ip-primary">
-              {{ myScore.groupScore != null ? (myScore.groupScore | number:'1.0-0') : '—' }}
-            </h3>
-          </div>
-
-          <div class="rounded-xl border border-ip-border bg-ip-surface p-4">
-
-            <p class="text-xs text-ip-primary0 mb-2">
-              Ranking interno
-            </p>
-
-            <h3 class="text-3xl font-bold text-violet-400">
-              {{ myScore.internalRank != null ? '#' + myScore.internalRank : '—' }}
-            </h3>
-          </div>
-        </div>
-
-        <!-- INDIVIDUAL -->
-        <div
-          *ngIf="myScore.isMemberCompetition"
-          class="grid grid-cols-2 gap-3 p-5">
-
-          <div class="rounded-xl border border-ip-border bg-ip-surface p-4">
-
-            <p class="text-xs text-ip-primary0 mb-2">
-              Mi posición
-            </p>
-
-            <h3 class="text-3xl font-bold text-cyan-400">
-              #{{ myScore.memberRank }}
-            </h3>
-          </div>
-
-          <div class="rounded-xl border border-ip-border bg-ip-surface p-4">
-
-            <p class="text-xs text-ip-primary0 mb-2">
-              Mi score
-            </p>
-
-            <h3 class="text-3xl font-bold text-ip-primary">
-              {{ myScore.individualScore | number:'1.0-0' }}
-            </h3>
-          </div>
-        </div>
-
-        <!-- GROUP NAME -->
-        <div *ngIf="myScore.groupName" class="px-5 pb-5">
-
-          <div class="flex items-center gap-2 rounded-lg
-                      border border-cyan-500/10
-                      bg-cyan-500/5
-                      px-3 py-2">
-
-            <div class="w-2 h-2 rounded-full bg-cyan-400"></div>
-
-            <span class="text-sm text-cyan-300">
-              {{ myScore.groupName }}
-            </span>
-          </div>
-        </div>
+        <app-mi-equipo-card
+          [myScore]="myScore"
+          [groupLeaderboard]="leaderboard"
+          [isMemberCompetition]="myScore.isMemberCompetition">
+        </app-mi-equipo-card>
       </div>
 
       <!-- Ganadores declarados (retos finalizados) -->
@@ -212,7 +141,7 @@ import { inferMemberCompetitionFromDetail } from '../../core/utils/competition.u
       <section
         *ngIf="podiums && myScore?.isMemberCompetition && competition?.status === 'FINISHED'"
         class="rounded-xl border border-ip-border bg-ip-surface overflow-hidden space-y-4 p-5">
-        <h3 class="text-sm font-semibold text-ip-secondary">Podios (puntuación compuesta)</h3>
+        <h3 class="text-sm font-semibold text-ip-secondary">Podios</h3>
 
         <div *ngIf="podiums.generalTop3?.length">
           <p class="text-xs font-semibold text-ip-muted mb-2">General</p>
@@ -223,7 +152,6 @@ import { inferMemberCompetitionFromDetail } from '../../core/utils/competition.u
               <span>{{ e.rank === 1 ? '🥇' : e.rank === 2 ? '🥈' : '🥉' }}</span>
               <div class="flex-1 min-w-0">
                 <p class="font-medium text-sm">{{ e.fullName }}</p>
-                <p class="text-xs text-ip-muted">Score {{ e.compositeScore | number:'1.1-1' }}</p>
               </div>
             </div>
           </div>
@@ -239,7 +167,6 @@ import { inferMemberCompetitionFromDetail } from '../../core/utils/competition.u
                 <span>{{ e.rank === 1 ? '🥇' : e.rank === 2 ? '🥈' : '🥉' }}</span>
                 <div class="flex-1 min-w-0">
                   <p class="font-medium text-sm">{{ e.fullName }}</p>
-                  <p class="text-xs text-ip-muted">Score {{ e.compositeScore | number:'1.1-1' }}</p>
                 </div>
               </div>
             </div>
@@ -277,19 +204,16 @@ import { inferMemberCompetitionFromDetail } from '../../core/utils/competition.u
               {{ leaderboard[0].groupName }}
             </p>
 
-            <h2
-              class="mt-2 text-5xl font-bold"
+            <p
+              class="mt-2 text-sm font-semibold uppercase tracking-wide"
 
               [ngClass]="{
-                'text-cyan-400':
-                  leaderboard[0].groupScore >= leaderboard[1].groupScore,
-
-                'text-ip-muted':
-                  leaderboard[0].groupScore < leaderboard[1].groupScore
+                'text-cyan-400': leaderboard[0].rank === 1,
+                'text-ip-muted': leaderboard[0].rank !== 1
               }">
 
-              {{ leaderboard[0].groupScore | number:'1.0-0' }}
-            </h2>
+              {{ getOrdinal(leaderboard[0].rank) }}
+            </p>
           </div>
 
           <!-- VS -->
@@ -322,224 +246,31 @@ import { inferMemberCompetitionFromDetail } from '../../core/utils/competition.u
               {{ leaderboard[1].groupName }}
             </p>
 
-            <h2
-              class="mt-2 text-5xl font-bold"
+            <p
+              class="mt-2 text-sm font-semibold uppercase tracking-wide"
 
               [ngClass]="{
-                'text-orange-400':
-                  leaderboard[1].groupScore >= leaderboard[0].groupScore,
-
-                'text-ip-muted':
-                  leaderboard[1].groupScore < leaderboard[0].groupScore
+                'text-orange-400': leaderboard[1].rank === 1,
+                'text-ip-muted': leaderboard[1].rank !== 1
               }">
 
-              {{ leaderboard[1].groupScore | number:'1.0-0' }}
-            </h2>
-          </div>
-        </div>
-      </div>
-
-      <!-- Ranking de miembros con filtro por nivel -->
-      <div
-        *ngIf="myScore?.isMemberCompetition"
-        class="rounded-xl border border-ip-border bg-ip-surface overflow-hidden">
-
-        <div class="px-5 py-4 border-b border-slate-900">
-          <p class="text-xs font-semibold uppercase tracking-wider text-ip-muted">
-            Ranking de miembros
-          </p>
-          <p class="text-[11px] text-ip-primary0 mt-1">
-            Competencia individual{{ competition?.participantMode === 'ORGANIZATION_MEMBERS' ? ' org-wide' : '' }}.
-          </p>
-          <div class="flex flex-wrap gap-2 mt-3">
-            <button
-              *ngFor="let tab of memberLevelTabs"
-              (click)="setMemberLevelFilter(tab.value)"
-              class="px-3 py-1.5 rounded-lg text-xs font-semibold border transition"
-              [ngClass]="memberLevelFilter === tab.value
-                ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30'
-                : 'bg-ip-surface text-ip-muted border-ip-border hover:text-ip-primary'">
-              {{ tab.label }}
-            </button>
-          </div>
-        </div>
-
-        <div *ngIf="loadingMemberLeaderboard" class="px-5 py-8 text-center text-sm text-ip-muted">
-          Cargando ranking...
-        </div>
-
-        <div *ngIf="!loadingMemberLeaderboard && memberLeaderboard.length === 0" class="px-5 py-8 text-center text-sm text-ip-muted">
-          Sin datos para este filtro.
-        </div>
-
-        <div *ngIf="!loadingMemberLeaderboard && memberLeaderboard.length > 0" class="divide-y divide-slate-900">
-          <div
-            *ngFor="let entry of memberLeaderboard"
-            class="grid grid-cols-[70px_1fr_100px_80px] items-center px-5 py-3"
-            [ngClass]="{ 'bg-cyan-500/5': isCurrentUser(entry.userId) }">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold"
-              [ngClass]="{
-                'bg-yellow-500/10 text-yellow-400': entry.rank === 1,
-                'bg-slate-800 text-ip-muted': entry.rank !== 1
-              }">
-              {{ entry.rank }}
-            </div>
-            <p class="text-sm text-ip-primary truncate">
-              {{ entry.fullName }}
-              <span *ngIf="isCurrentUser(entry.userId)" class="text-cyan-500/70 text-xs ml-1">(tú)</span>
+              {{ getOrdinal(leaderboard[1].rank) }}
             </p>
-            <span class="text-xs text-ip-muted capitalize">{{ getLevelLabel(entry.level) }}</span>
-            <span class="text-right text-sm font-semibold text-ip-secondary">
-              {{ entry.score | number:'1.0-0' }}
-            </span>
           </div>
         </div>
       </div>
 
-      <!-- LEADERBOARD grupal -->
-      <div
-        *ngIf="competition?.competitionType !== 'VERSUS'
-               && !myScore?.isMemberCompetition
-               && leaderboard.length > 0"
-
-        class="rounded-xl border border-ip-border
-               bg-ip-surface overflow-hidden">
-
-        <div class="px-5 py-4 border-b border-slate-900">
-
-          <p class="text-xs font-semibold uppercase tracking-wider text-ip-muted">
-            Ranking por equipos
-          </p>
-          <p class="text-[11px] text-ip-primary0 mt-1">
-            Puntuación total de cada grupo (suma de actividad de sus miembros).
-          </p>
-        </div>
-
-        <div class="divide-y divide-slate-900">
-
-          <div
-            *ngFor="let entry of leaderboard"
-            class="grid grid-cols-[70px_1fr_120px]
-                   items-center px-5 py-3 transition-colors"
-
-            [ngClass]="{
-              'bg-cyan-500/5': isMyGroup(entry.groupId)
-            }">
-
-            <!-- RANK -->
-            <div class="flex items-center">
-
-              <div
-                class="w-8 h-8 rounded-lg
-                       flex items-center justify-center
-                       text-xs font-bold"
-
-                [ngClass]="{
-                  'bg-yellow-500/10 text-yellow-400': entry.rank === 1,
-                  'bg-slate-800 text-ip-muted': entry.rank !== 1
-                }">
-
-                {{ entry.rank }}
-              </div>
-            </div>
-
-            <!-- USER -->
-            <div class="flex items-center gap-3 min-w-0">
-
-              <div
-                class="w-9 h-9 rounded-xl flex items-center justify-center
-                       text-xs font-bold"
-
-                [ngClass]="{
-                  'bg-cyan-500/10 text-cyan-400':
-                    isMyGroup(entry.groupId),
-
-                  'bg-ip-surface text-ip-primary0':
-                    !isMyGroup(entry.groupId)
-                }">
-
-                {{ getInitials(entry.groupName) }}
-              </div>
-
-              <div class="min-w-0">
-
-                <p
-                  class="text-sm truncate"
-
-                  [ngClass]="{
-                    'text-cyan-300': isMyGroup(entry.groupId),
-                    'text-ip-primary': !isMyGroup(entry.groupId)
-                  }">
-
-                  {{ entry.groupName }}
-
-                  <span
-                    *ngIf="isMyGroup(entry.groupId)"
-                    class="text-cyan-500/70 text-xs ml-1">
-
-                    (tú)
-                  </span>
-                </p>
-              </div>
-            </div>
-
-            <!-- SCORE -->
-            <div class="text-right">
-
-              <span
-                class="text-sm font-semibold"
-
-                [ngClass]="{
-                  'text-cyan-400': entry.rank === 1,
-                  'text-ip-secondary': entry.rank !== 1
-                }">
-
-                {{ entry.groupScore | number:'1.0-0' }}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Ranking interno de tu equipo -->
-      <div
-        *ngIf="!myScore?.isMemberCompetition && internalRanking.length > 0"
-        class="rounded-xl border border-violet-500/20 bg-ip-surface overflow-hidden">
-
-        <div class="px-5 py-4 border-b border-slate-900">
-          <p class="text-xs font-semibold uppercase tracking-wider text-violet-400">
-            Ranking interno de tu equipo
-            <span *ngIf="myScore?.groupName" class="text-ip-primary0 font-normal normal-case">
-              — {{ myScore.groupName }}
-            </span>
-          </p>
-          <p class="text-[11px] text-ip-primary0 mt-1">
-            Solo miembros de tu equipo ven este ranking.
-          </p>
-        </div>
-
-        <div class="divide-y divide-slate-900">
-          <div
-            *ngFor="let entry of internalRanking"
-            class="grid grid-cols-[70px_1fr_120px] items-center px-5 py-3"
-            [ngClass]="{ 'bg-violet-500/5': isCurrentUser(entry.userId) }">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold bg-slate-800 text-ip-muted">
-              {{ entry.position }}
-            </div>
-            <p class="text-sm text-ip-primary truncate">
-              {{ entry.fullName }}
-              <span *ngIf="isCurrentUser(entry.userId)" class="text-violet-400/80 text-xs ml-1">(tú)</span>
-            </p>
-            <span class="text-right text-sm font-semibold text-ip-secondary">
-              {{ entry.score | number:'1.0-0' }}
-            </span>
-          </div>
-        </div>
-      </div>
+      <!-- POSICIONES POR EQUIPO (sin puntajes) -->
+      <app-leaderboard-simple
+        *ngIf="competition?.competitionType !== 'VERSUS' && !myScore?.isMemberCompetition"
+        [entries]="leaderboard"
+        [myParticipantGroupId]="myParticipantGroupId"
+        title="Posiciones del reto">
+      </app-leaderboard-simple>
 
       <!-- EMPTY -->
       <div
-        *ngIf="leaderboard.length === 0 && memberLeaderboard.length === 0"
+        *ngIf="leaderboard.length === 0 && !myScore"
         class="h-[300px] flex flex-col items-center justify-center text-center">
 
         <div class="w-16 h-16 rounded-2xl
@@ -565,7 +296,7 @@ import { inferMemberCompetitionFromDetail } from '../../core/utils/competition.u
         </p>
 
         <p class="mt-1 text-sm text-ip-muted">
-          Los scores se actualizan diariamente
+          Registra una actividad para empezar a aportar
         </p>
       </div>
 
@@ -581,22 +312,12 @@ export class CompetitionDetailComponent implements OnInit {
   private homeService = inject(HomeService);
   private cdr = inject(ChangeDetectorRef);
   ancestorGroupIds: number[] = [];
-  currentUserId: number | null = null;
 
   competition: any = null;
   myScore: any = null;
   leaderboard: any[] = [];
-  memberLeaderboard: any[] = [];
-  internalRanking: any[] = [];
   loading = true;
-  loadingMemberLeaderboard = false;
-  memberLevelFilter: string | null = null;
-  memberLevelTabs = [
-    { label: 'Todos', value: null as string | null },
-    { label: 'Novato', value: 'NOVATO' },
-    { label: 'Intermedio', value: 'INTERMEDIO' },
-    { label: 'Avanzado', value: 'AVANZADO' },
-  ];
+  myParticipantGroupId: number | null = null;
   podiums: any = null;
   declaredWinners: any[] = [];
   levelKeys = ['PRINCIPIANTE', 'INTERMEDIO', 'AVANZADO'];
@@ -620,7 +341,6 @@ export class CompetitionDetailComponent implements OnInit {
       next: (me: any) => {
         this.myGroupId = me?.organizationalGroupId ?? null;
         this.ancestorGroupIds = me?.ancestorGroupIds ?? [];
-        this.currentUserId = me?.id ?? null;
         this.loadCompetition(Number(id));
       },
 
@@ -639,22 +359,17 @@ export class CompetitionDetailComponent implements OnInit {
         this.competition = data?.competition ?? data;
         this.myScore = data?.myScore ?? null;
         this.leaderboard = data?.groupLeaderboard ?? [];
-        this.memberLeaderboard = data?.memberLeaderboard ?? [];
-        this.internalRanking = data?.internalRanking ?? [];
 
         if (this.competition) this.competition.isMemberCompetition = isMember;
         if (this.myScore) this.myScore.isMemberCompetition = isMember;
 
+        this.myParticipantGroupId = this.resolveMyParticipantGroupId();
+
         this.loading = false;
         this.cdr.markForCheck();
 
-        if (this.myScore?.isMemberCompetition) {
-          if (this.memberLevelFilter) {
-            this.loadMemberLeaderboard();
-          }
-          if (this.competition?.status === 'FINISHED') {
-            this.loadRetoResults();
-          }
+        if (isMember && this.competition?.status === 'FINISHED') {
+          this.loadRetoResults();
         }
       },
       error: () => {
@@ -662,11 +377,6 @@ export class CompetitionDetailComponent implements OnInit {
         this.cdr.markForCheck();
       },
     });
-  }
-
-  setMemberLevelFilter(level: string | null): void {
-    this.memberLevelFilter = level;
-    this.loadMemberLeaderboard();
   }
 
   loadRetoResults(): void {
@@ -695,47 +405,23 @@ export class CompetitionDetailComponent implements OnInit {
     });
   }
 
-  loadMemberLeaderboard(): void {
-    if (!this.competitionId) return;
-
-    this.loadingMemberLeaderboard = true;
-    this.homeService
-      .getMemberLeaderboard(this.competitionId, this.memberLevelFilter ?? undefined)
-      .subscribe({
-        next: (entries) => {
-          this.memberLeaderboard = entries ?? [];
-          this.loadingMemberLeaderboard = false;
-          this.cdr.markForCheck();
-        },
-        error: () => {
-          this.loadingMemberLeaderboard = false;
-          this.cdr.markForCheck();
-        },
-      });
-  }
-
-  getLevelLabel(level?: string): string {
-    const labels: Record<string, string> = {
-      NOVATO: 'Novato',
-      INTERMEDIO: 'Intermedio',
-      AVANZADO: 'Avanzado',
-    };
-    return level ? labels[level] ?? level : '—';
-  }
-
   goBack(): void {
     this.router.navigate(['/']);
   }
 
-  isMyGroup(groupId: number): boolean {
-    const participantId = this.myScore?.participantGroupId;
-    if (participantId) return groupId === participantId;
-    if (this.myGroupId && groupId === this.myGroupId) return true;
-    return this.ancestorGroupIds.includes(groupId);
+  getOrdinal(rank?: number): string {
+    return ordinalPosition(rank);
   }
 
-  isCurrentUser(userId: number): boolean {
-    return this.currentUserId != null && userId === this.currentUserId;
+  /** El equipo propio puede ser el grupo directo o un ancestro presente en el reto. */
+  private resolveMyParticipantGroupId(): number | null {
+    const participantId = this.myScore?.participantGroupId;
+    if (participantId) return participantId;
+
+    const ids = this.leaderboard.map((e) => e.groupId);
+    if (this.myGroupId && ids.includes(this.myGroupId)) return this.myGroupId;
+
+    return this.ancestorGroupIds.find((id) => ids.includes(id)) ?? null;
   }
 
   getInitials(name: string): string {
