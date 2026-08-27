@@ -25,7 +25,7 @@ import {
         <div>
           <h3 *ngIf="!isMemberCompetition && myScore?.groupName"
             class="text-xl font-semibold text-ip-primary">
-            {{ myScore.groupName }}
+            {{ myScore?.groupName }}
           </h3>
           <p *ngIf="positionLabel" class="text-2xl font-bold text-teal-400 mt-1">
             {{ positionLabel }}

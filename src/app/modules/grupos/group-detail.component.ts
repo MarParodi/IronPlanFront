@@ -221,8 +221,8 @@ import { destroyChart, renderBarChart } from '../../core/utils/bar-chart.util';
             </div>
             <div *ngIf="r.leader?.name && canShowRetoLeader(r)" class="flex items-center gap-2 text-sm">
               <span>🏆</span>
-              <span class="text-teal-400 font-medium">{{ r.leader.name }}</span>
-              <span *ngIf="r.leader.tie" class="text-ip-primary0">(empate)</span>
+              <span class="text-teal-400 font-medium">{{ r.leader?.name }}</span>
+              <span *ngIf="r.leader?.tie" class="text-ip-primary0">(empate)</span>
             </div>
             <a [routerLink]="['/grupos', groupId, 'retos', r.id]"
               class="inline-flex items-center gap-2 text-sm font-semibold text-teal-400 hover:text-teal-300">

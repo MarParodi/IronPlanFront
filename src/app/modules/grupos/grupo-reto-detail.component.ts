@@ -72,8 +72,8 @@ import { LeaderboardSimpleComponent } from '../../shared/reto/leaderboard-simple
               {{ detail.competition.status === 'FINISHED' ? 'Ganador' : 'Líder actual' }}
             </p>
             <p class="text-lg font-semibold text-ip-primary">
-              {{ detail.winner.name }}
-              <span *ngIf="detail.winner.tie" class="text-sm text-ip-muted font-normal"> (empate)</span>
+              {{ detail.winner?.name }}
+              <span *ngIf="detail.winner?.tie" class="text-sm text-ip-muted font-normal"> (empate)</span>
             </p>
           </div>
         </div>
