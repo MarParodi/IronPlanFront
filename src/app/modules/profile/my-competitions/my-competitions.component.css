@@ -315,6 +315,26 @@
 /* ── Footer ── */
 .mc-card-footer {
   margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mc-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2dd4bf;
+  text-decoration: none;
+}
+
+.mc-card-link:hover {
+  color: #5eead4;
 }
  
 .individual-badge {

@@ -219,17 +219,14 @@ import { destroyChart, renderBarChart } from '../../core/utils/bar-chart.util';
               </div>
               <span [class]="retoStatusClass(r.status)">{{ retoStatusLabel(r.status) }}</span>
             </div>
-            <div *ngIf="r.leader?.name" class="flex items-center gap-2 text-sm">
+            <div *ngIf="r.leader?.name && canShowRetoLeader(r)" class="flex items-center gap-2 text-sm">
               <span>🏆</span>
-              <span class="text-teal-400 font-medium">{{ r.leader?.name }}</span>
-              <span class="text-ip-primary0">
-                — {{ r.leader?.score | number:'1.0-1' }}
-                <span *ngIf="r.leader?.tie"> (empate)</span>
-              </span>
+              <span class="text-teal-400 font-medium">{{ r.leader.name }}</span>
+              <span *ngIf="r.leader.tie" class="text-ip-primary0">(empate)</span>
             </div>
             <a [routerLink]="['/grupos', groupId, 'retos', r.id]"
               class="inline-flex items-center gap-2 text-sm font-semibold text-teal-400 hover:text-teal-300">
-              Ver ranking completo
+              Ver el reto
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
               </svg>
@@ -565,6 +562,11 @@ export class GroupDetailComponent implements OnInit, AfterViewChecked, OnDestroy
   retoTypeLabel(t: string): string {
     const m: Record<string, string> = { RANKING: 'Ranking', CHALLENGE: 'Reto', VERSUS: 'Versus' };
     return m[t] ?? t;
+  }
+
+  /** En retos individuales el líder solo se revela cuando el reto ya terminó. */
+  canShowRetoLeader(reto: RetoSummary): boolean {
+    return !reto.isMemberCompetition || reto.status === 'FINISHED';
   }
 
   retoStatusLabel(s: string): string {
