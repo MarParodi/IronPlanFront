@@ -17,8 +17,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((err: HttpErrorResponse) => {
-      // Spring Security devuelve 403 cuando no hay sesión válida (no solo 401)
-      if (isBrowser && (err.status === 401 || err.status === 403) && token) {
+      const isAuthEndpoint = req.url.includes('/auth/');
+      // 403 = autenticado sin permiso; no es sesión inválida.
+      // 401 en /auth/* (login, etc.) tampoco debe cerrar una sesión previa.
+      if (isBrowser && err.status === 401 && token && !isAuthEndpoint) {
         auth.logout();
         router.navigate(['/login']);
       }

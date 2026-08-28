@@ -412,6 +412,43 @@ routineImageError: string | null = null;
     }
   }
 
+  duplicateSession(sessionIndex: number): void {
+    if (!this.currentBlock) return;
+
+    if (!this.canAddSessionToCurrentBlock()) {
+      this.error = `No puedes agregar más de ${this.daysPerWeek} sesiones por bloque (días por semana)`;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    const source = this.currentBlock.sessions[sessionIndex];
+    if (!source) return;
+
+    this.error = null;
+    const duplicated = this.cloneSessionExercises(source);
+    this.currentBlock.sessions.push(duplicated);
+    this.currentSessionIndex = this.currentBlock.sessions.length - 1;
+    this.cdr.markForCheck();
+  }
+
+  private cloneSessionExercises(source: SessionForm): SessionForm {
+    return {
+      id: this.generateId(),
+      title: '',
+      icon: '💪',
+      muscles: '',
+      description: '',
+      exercises: source.exercises.map(ex => this.cloneExercise(ex)),
+    };
+  }
+
+  private cloneExercise(exercise: ExerciseForm): ExerciseForm {
+    return {
+      ...exercise,
+      id: this.generateId(),
+    };
+  }
+
   selectSession(blockIndex: number, sessionIndex: number): void {
     this.currentBlockIndex = blockIndex;
     this.currentSessionIndex = sessionIndex;
