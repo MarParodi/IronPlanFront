@@ -24,6 +24,12 @@ import { destroyChart, renderBarChart } from '../../core/utils/bar-chart.util';
       <header class="space-y-2">
         <p class="text-sm text-ip-muted">{{ detail.hierarchyPath.displayPath }}</p>
         <div class="flex flex-wrap items-center gap-3">
+          <img *ngIf="detail.photoUrl" [src]="detail.photoUrl" [alt]="detail.groupName"
+            class="w-20 h-20 rounded-full object-cover ring-4 ring-teal-400/20 shadow-lg shrink-0">
+          <div *ngIf="!detail.photoUrl"
+            class="w-20 h-20 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center ring-4 ring-teal-400/20 shadow-lg shrink-0">
+            <span class="text-2xl font-bold text-ip-primary uppercase">{{ groupInitials() }}</span>
+          </div>
           <h2 class="text-2xl font-bold text-ip-primary">{{ detail.groupName }}</h2>
           <span [class]="roleBadgeClass(detail.role === 'ADMIN')">
             {{ detail.role === 'ADMIN' ? 'Administrador' : 'Miembro' }}
@@ -535,6 +541,16 @@ export class GroupDetailComponent implements OnInit, AfterViewChecked, OnDestroy
       },
       error: () => this.router.navigate(['/grupos/mis-grupos'])
     });
+  }
+
+  groupInitials(): string {
+    const name = this.detail?.groupName?.trim();
+    if (!name) return '?';
+    const parts = name.split(/[\s_-]+/).filter(Boolean);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
   }
 
   roleBadgeClass(isAdmin: boolean): string {
