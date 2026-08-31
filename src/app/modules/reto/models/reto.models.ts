@@ -148,9 +148,9 @@ export const OBJETIVOS = [
 ];
 
 export const SUS_PREGUNTAS = [
-  { id: 1, tipo: 'positivo', texto: 'Creo que me gustaría usar este sistema frecuentemente.' },
-  { id: 2, tipo: 'negativo', texto: 'Encontré el sistema innecesariamente complejo.' },
-  { id: 3, tipo: 'positivo', texto: 'Pensé que el sistema era fácil de usar.' },
+  { id: 1, tipo: 'positivo', texto: 'Podría usar este sistema frecuentemente como parte de mi rutina diaria.' },
+  { id: 2, tipo: 'negativo', texto: 'Creo que el sistema es muy complejo.' },
+  { id: 3, tipo: 'positivo', texto: 'El sistema es fácil de usar.' },
   { id: 4, tipo: 'negativo', texto: 'Creo que necesitaría el apoyo de una persona técnica para usar este sistema.' },
   { id: 5, tipo: 'positivo', texto: 'Encontré que las diversas funciones del sistema estaban bien integradas.' },
   { id: 6, tipo: 'negativo', texto: 'Pensé que había demasiada inconsistencia en este sistema.' },

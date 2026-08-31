@@ -36,6 +36,7 @@ export interface GroupDetail {
   memberCount: number;
   activeCompetitionsCount: number;
   hierarchyPath: HierarchyPath;
+  photoUrl?: string | null;
 }
 
 export interface GroupMember {
