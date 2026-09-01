@@ -148,15 +148,15 @@ export const OBJETIVOS = [
 ];
 
 export const SUS_PREGUNTAS = [
-  { id: 1, tipo: 'positivo', texto: 'Podría usar este sistema frecuentemente como parte de mi rutina diaria.' },
-  { id: 2, tipo: 'negativo', texto: 'Creo que el sistema es muy complejo.' },
+  { id: 1, tipo: 'positivo', texto: 'Creo que me gustaría usar este sistema frecuentemente.' },
+  { id: 2, tipo: 'negativo', texto: 'Creo que el sistema es innecesariamente complejo.' },
   { id: 3, tipo: 'positivo', texto: 'El sistema es fácil de usar.' },
   { id: 4, tipo: 'negativo', texto: 'Creo que necesitaría el apoyo de una persona técnica para usar este sistema.' },
   { id: 5, tipo: 'positivo', texto: 'Encontré que las diversas funciones del sistema estaban bien integradas.' },
-  { id: 6, tipo: 'negativo', texto: 'Pensé que había demasiada inconsistencia en este sistema.' },
+  { id: 6, tipo: 'negativo', texto: 'Creo que hay demasiadas inconsistencias en este sistema.' },
   { id: 7, tipo: 'positivo', texto: 'Imagino que la mayoría de las personas aprenderían a usar este sistema muy rápidamente.' },
-  { id: 8, tipo: 'negativo', texto: 'Encontré el sistema muy difícil de usar.' },
-  { id: 9, tipo: 'positivo', texto: 'Me sentí muy seguro/a usando el sistema.' },
+  { id: 8, tipo: 'negativo', texto: 'Encontré el sistema muy incómodo o complicado de usar.' },
+  { id: 9, tipo: 'positivo', texto: 'Me sentí muy confiado/a usando el sistema.' },
   { id: 10, tipo: 'negativo', texto: 'Necesité aprender muchas cosas antes de poder comenzar a usar este sistema.' },
 ];
 
