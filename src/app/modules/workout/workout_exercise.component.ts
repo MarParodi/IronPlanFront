@@ -56,6 +56,7 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
   loading = false;
   saving = false;
   errorMessage: string | null = null;
+  saveError: string | null = null;
 
   // Video modal
   showVideoModal = false;
@@ -167,6 +168,7 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
 
     this.loading = true;
     this.errorMessage = null;
+    this.saveError = null;
     this.resetPairedState();
     this.reorderDirty = false;
     this.savingReorder = false;
@@ -984,6 +986,8 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
     if (this.isCombined && !this.pairedData) return;
 
     this.saving = true;
+    this.saveError = null;
+    this.errorMessage = null;
 
     const body: WorkoutSetRequest = {
       sets: this.currentSets,
@@ -1009,14 +1013,7 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
         }
 
         if (this.isLastExercise) {
-          this.workoutService.finishSession(this.sessionId).subscribe({
-            next: () => {
-              this.router.navigate(['/workouts', this.sessionId, 'summary']);
-            },
-            error: () => {
-              this.router.navigate(['/workouts', this.sessionId, 'summary']);
-            }
-          });
+          this.router.navigate(['/workouts', this.sessionId, 'summary']);
         } else {
           const nextOrder = this.isCombined
             ? this.data!.exerciseOrder + 2
@@ -1027,7 +1024,7 @@ export class WorkoutExercisePageComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error(err);
         this.saving = false;
-        this.errorMessage = 'No se pudieron guardar las series.';
+        this.saveError = 'No se pudieron guardar las series. Revisá tu conexión e intentá de nuevo.';
       }
     });
   }

@@ -19,4 +19,8 @@ export class FreeActivityService {
   getMine(): Observable<FreeActivityResponse[]> {
     return this.http.get<FreeActivityResponse[]>(`${this.baseUrl}/mine`);
   }
+
+  getById(id: number): Observable<FreeActivityResponse> {
+    return this.http.get<FreeActivityResponse>(`${this.baseUrl}/${id}`);
+  }
 }

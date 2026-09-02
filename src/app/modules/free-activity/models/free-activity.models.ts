@@ -34,3 +34,23 @@ export interface FreeActivityResponse {
   startedAt: string;
   completedAt: string;
 }
+
+export const FREE_ACTIVITY_TYPE_LABELS: Record<FreeActivityType, string> = {
+  CAMINADORA: 'Caminadora',
+  CAMINATA: 'Caminata',
+  RUNNING: 'Running',
+  BICICLETA_ESTATICA: 'Bicicleta estática',
+  ELIPTICA: 'Elíptica',
+  NATACION: 'Natación',
+  BAILE: 'Baile',
+  YOGA: 'Yoga',
+  FUTBOL: 'Fútbol',
+  BOX: 'Box',
+  CLASE_GRUPAL: 'Clase grupal',
+  OTRA: 'Otra',
+};
+
+export function getFreeActivityLabel(type: FreeActivityType, other?: string | null): string {
+  if (type === 'OTRA' && other?.trim()) return other.trim();
+  return FREE_ACTIVITY_TYPE_LABELS[type] ?? type;
+}

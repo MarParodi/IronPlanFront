@@ -3,8 +3,8 @@
   Cargando ejercicio...
 </div>
 
-<!-- Error -->
-<div *ngIf="!loading && errorMessage" class="min-h-screen bg-ip-page flex items-center justify-center text-red-400">
+<!-- Error de carga (sin datos para mostrar el formulario) -->
+<div *ngIf="!loading && errorMessage && !data" class="min-h-screen bg-ip-page flex items-center justify-center text-red-400">
   {{ errorMessage }}
 </div>
 
@@ -360,7 +360,10 @@
     </section>
 
     <!-- Botón registrar -->
-    <section class="px-4 mt-5">
+    <section class="px-4 mt-5 space-y-3">
+      <p *ngIf="saveError || errorMessage" class="text-sm text-red-300 bg-red-500/10 border border-red-500/25 rounded-xl px-3 py-2">
+        {{ saveError || errorMessage }}
+      </p>
       <button (click)="onRegisterAndContinue()" [disabled]="saving" class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl text-slate-950 font-semibold text-sm md:text-base hover:brightness-110 active:translate-y-[1px] transition disabled:opacity-50 disabled:cursor-not-allowed" [ngClass]="isLastExercise ? 'bg-gradient-to-b from-amber-300 to-amber-500 shadow-[0_16px_40px_rgba(245,158,11,0.5)]' : 'bg-gradient-to-b from-emerald-300 to-emerald-500 shadow-[0_16px_40px_rgba(16,185,129,0.5)]'">
         <span *ngIf="saving" class="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>
         {{ saving ? 'Guardando...' : submitButtonText }}
