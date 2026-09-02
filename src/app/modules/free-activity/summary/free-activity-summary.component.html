@@ -1,0 +1,152 @@
+<!-- Loading -->
+<div *ngIf="loading" class="min-h-screen bg-ip-page flex items-center justify-center text-ip-secondary">
+  <div class="text-center">
+    <div class="w-12 h-12 border-4 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+    <p>Cargando resumen...</p>
+  </div>
+</div>
+
+<!-- Error -->
+<div *ngIf="!loading && error" class="min-h-screen bg-ip-page flex items-center justify-center text-red-400 px-4">
+  <div class="text-center">
+    <p class="text-lg mb-4">{{ error }}</p>
+    <button
+      (click)="onGoHome()"
+      class="px-6 py-2 bg-ip-surface hover:bg-slate-600 rounded-xl text-ip-primary transition"
+    >
+      Volver al inicio
+    </button>
+  </div>
+</div>
+
+<!-- Contenido principal -->
+<div
+  *ngIf="!loading && activity as a"
+  class="min-h-screen bg-ip-page text-ip-primary flex justify-center relative overflow-hidden"
+>
+  <div *ngIf="showConfetti" class="absolute inset-0 pointer-events-none overflow-hidden">
+    <div class="confetti-container">
+      <div *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]"
+           class="confetti"
+           [style.left.%]="i * 6.5"
+           [style.animation-delay.s]="i * 0.1">
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full max-w-md md:max-w-lg flex flex-col px-4 py-8 relative z-10">
+
+    <header class="text-center mb-6">
+      <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600
+                  flex items-center justify-center text-4xl shadow-[0_0_40px_rgba(16,185,129,0.5)]"
+           [class.animate-bounce]="showConfetti">
+        🎉
+      </div>
+      <h1 class="text-2xl md:text-3xl font-bold text-emerald-400">
+        ¡Actividad Completada!
+      </h1>
+      <p class="text-ip-muted mt-2">{{ activityLabel }}</p>
+    </header>
+
+    <section class="bg-ip-surface rounded-3xl p-5 md:p-6 shadow-[0_18px_60px_rgba(0,0,0,0.7)] border border-ip-border">
+
+      <div class="text-center mb-6">
+        <p class="text-xs text-ip-muted uppercase tracking-wide mb-1">Tiempo total</p>
+        <p class="text-4xl md:text-5xl font-bold tabular-nums text-emerald-400">
+          {{ durationFormatted }}
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="bg-ip-input rounded-2xl p-4 text-center">
+          <p class="text-2xl md:text-3xl font-bold text-ip-primary">
+            <ng-container *ngIf="a.distanceKm; else noDistance">
+              {{ a.distanceKm | number:'1.1-1' }}
+            </ng-container>
+            <ng-template #noDistance>—</ng-template>
+          </p>
+          <p class="text-xs text-ip-muted mt-1">Distancia (km)</p>
+        </div>
+
+        <div class="bg-ip-input rounded-2xl p-4 text-center">
+          <p class="text-2xl md:text-3xl font-bold text-ip-primary">
+            {{ a.caloriesEstimated }}
+          </p>
+          <p class="text-xs text-ip-muted mt-1">Calorías</p>
+        </div>
+      </div>
+
+      <div *ngIf="a.photoUrl" class="rounded-2xl overflow-hidden border border-ip-border mb-4">
+        <img [src]="a.photoUrl" alt="Foto de la actividad" class="w-full max-h-64 object-cover" />
+      </div>
+
+      <p *ngIf="a.notes" class="text-sm text-ip-secondary whitespace-pre-line">{{ a.notes }}</p>
+    </section>
+
+    <section class="mt-8 space-y-3">
+      <button
+        (click)="onGoHome()"
+        class="w-full inline-flex items-center justify-center gap-2 px-6 py-4
+               rounded-2xl bg-gradient-to-b from-emerald-300 to-emerald-500
+               text-slate-950 font-semibold text-base
+               shadow-[0_16px_40px_rgba(16,185,129,0.5)]
+               hover:brightness-110 active:translate-y-[1px] transition"
+      >
+        🏠 Volver al inicio
+      </button>
+
+      <button
+        (click)="onRegisterAnother()"
+        class="w-full inline-flex items-center justify-center gap-2 px-6 py-3
+               rounded-2xl border border-ip-border bg-ip-surface
+               text-ip-primary font-medium text-sm
+               hover:border-teal-400/60 transition"
+      >
+        Registrar otra
+      </button>
+    </section>
+
+  </div>
+</div>
+
+<style>
+  .confetti-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+
+  .confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    animation: confetti-fall 3s ease-out forwards;
+  }
+
+  .confetti:nth-child(odd) {
+    background: linear-gradient(135deg, #10b981, #34d399);
+    border-radius: 50%;
+  }
+
+  .confetti:nth-child(even) {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    transform: rotate(45deg);
+  }
+
+  .confetti:nth-child(3n) {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    border-radius: 2px;
+  }
+
+  @keyframes confetti-fall {
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+</style>

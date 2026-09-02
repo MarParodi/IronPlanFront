@@ -130,8 +130,6 @@ onSkip(): void {
 }
 
   onStartSession() {
-    console.log('routineDetailId que mando:', this.routineDetailId);
-
     this.workoutService.startSession(this.routineDetailId)
       .subscribe({
         next: (resp) => {

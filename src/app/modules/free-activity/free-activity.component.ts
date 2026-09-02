@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FreeActivityService } from './services/free-activity.service';
 import { FreeActivityResponse, FreeActivityType } from './models/free-activity.models';
 import { CreateRoutineService } from '../create-routine/services/create-routine.service';
@@ -10,7 +10,7 @@ import { compressImageToJpeg, validateImageFile } from '../../core/utils/image-u
 @Component({
   selector: 'app-free-activity',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './free-activity.component.html',
 })
 export class FreeActivityComponent implements OnInit, OnDestroy {
@@ -56,7 +56,6 @@ export class FreeActivityComponent implements OnInit, OnDestroy {
   loadingMine = false;
   saving = false;
   error: string | null = null;
-  success = false;
 
   ngOnInit(): void {
     this.loadMine();
@@ -127,7 +126,6 @@ export class FreeActivityComponent implements OnInit, OnDestroy {
     if (!file) return;
 
     this.error = null;
-    this.success = false;
     const validationError = validateImageFile(file);
     if (validationError) {
       this.clearSelectedPhoto(input);
@@ -172,7 +170,6 @@ export class FreeActivityComponent implements OnInit, OnDestroy {
     if (this.saving) return;
 
     this.error = null;
-    this.success = false;
 
     if (this.form.activityType === 'OTRA' && !this.form.activityTypeOther.trim()) {
       this.error = 'Describe el tipo de actividad.';
@@ -197,14 +194,11 @@ export class FreeActivityComponent implements OnInit, OnDestroy {
         photoUrl,
         notes: this.form.notes.trim() || null,
       }).subscribe({
-        next: () => {
+        next: (created) => {
           this.saving = false;
-          this.success = true;
-          this.resetTimer();
-          this.form.distance = null;
-          this.form.notes = '';
-          this.clearSelectedPhoto();
-          this.loadMine();
+          this.router.navigate(['/actividad-libre', created.id, 'summary'], {
+            queryParams: { celebrate: '1' },
+          });
         },
         error: (err) => {
           this.saving = false;

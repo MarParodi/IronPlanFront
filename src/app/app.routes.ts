@@ -97,6 +97,12 @@ export const routes: Routes = [
 },
 
 {
+  path: 'actividad-libre/:id/summary',
+  loadComponent: () =>
+    import('./modules/free-activity/summary/free-activity-summary.component').then(m => m.FreeActivitySummaryComponent),
+  canActivate: [authGuard]
+},
+{
   path: 'actividad-libre',
   loadComponent: () =>
     import('./modules/free-activity/free-activity.component').then(m => m.FreeActivityComponent),

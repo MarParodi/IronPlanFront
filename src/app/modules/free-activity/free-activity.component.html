@@ -67,7 +67,6 @@
       </div>
 
       <p *ngIf="error" class="text-xs text-rose-400 bg-rose-900/20 border border-rose-500/30 rounded-lg px-3 py-2">{{ error }}</p>
-      <p *ngIf="success" class="text-xs text-teal-300 bg-emerald-900/20 border border-emerald-500/30 rounded-lg px-3 py-2">Actividad registrada correctamente.</p>
 
       <button (click)="submit()" [disabled]="saving" class="w-full py-3 rounded-xl bg-gradient-to-b from-teal-300 to-teal-500 text-slate-950 font-semibold disabled:opacity-60">
         {{ saving ? 'Guardando...' : 'Registrar actividad' }}
@@ -79,7 +78,11 @@
       <p *ngIf="loadingMine" class="text-sm text-ip-muted">Cargando...</p>
       <p *ngIf="!loadingMine && !mine.length" class="text-sm text-ip-muted">Aún no tienes actividades registradas.</p>
       <div class="space-y-3">
-        <article *ngFor="let item of mine" class="rounded-xl border border-ip-border/40 bg-ip-input/30 p-3 flex gap-3">
+        <article
+          *ngFor="let item of mine"
+          [routerLink]="['/actividad-libre', item.id, 'summary']"
+          class="rounded-xl border border-ip-border/40 bg-ip-input/30 p-3 flex gap-3 cursor-pointer hover:border-teal-400/50 transition"
+        >
           <img *ngIf="item.photoUrl" [src]="item.photoUrl" alt="" class="h-14 w-14 rounded-lg object-cover shrink-0" />
           <div class="min-w-0 flex-1">
             <p class="text-sm font-medium truncate">{{ getActivityLabel(item.activityType, item.activityTypeOther) }}</p>
