@@ -7,12 +7,16 @@ import {
   AdminRetoDashboard,
   AdminRetoKpis,
   AdminRetoTeam,
+  AdminRetoMember,
+  AdminPointHistory,
 } from '../home/services/admin.service';
+import { RetoAdminHistorialModalComponent } from './reto-admin-historial-modal.component';
+import { RetoAdminValidacionComponent } from './reto-admin-validacion.component';
 
 @Component({
   selector: 'app-reto-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, RetoAdminHistorialModalComponent, RetoAdminValidacionComponent],
   template: `
     <div class="space-y-6 max-w-6xl">
       <a routerLink="/grupos/administrar" [queryParams]="{ seccion: 'competencias' }"
@@ -196,8 +200,17 @@ import {
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-800">
-                  <tr *ngFor="let m of team.members" class="hover:bg-slate-800/30">
-                    <td class="px-4 py-3 text-ip-primary font-medium">{{ m.fullName }}</td>
+                  <tr *ngFor="let m of team.members"
+                    class="hover:bg-slate-800/30 cursor-pointer"
+                    (click)="openHistory(m)">
+                    <td class="px-4 py-3 text-ip-primary font-medium">
+                      <span class="inline-flex items-center gap-2">
+                        {{ m.fullName }}
+                        <svg class="w-3.5 h-3.5 text-ip-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                        </svg>
+                      </span>
+                    </td>
                     <td class="px-4 py-3 text-right tabular-nums text-teal-300">{{ m.points | number:'1.0-1' }}</td>
                     <td class="px-4 py-3 text-right tabular-nums">{{ m.fuerza | number:'1.0-1' }}</td>
                     <td class="px-4 py-3 text-right tabular-nums">{{ m.libre | number:'1.0-1' }}</td>
@@ -212,7 +225,21 @@ import {
             </div>
           </div>
         </section>
+
+        <app-reto-admin-validacion
+          [competitionId]="competitionId"
+          (openHistory)="openHistoryFromReview($event)">
+        </app-reto-admin-validacion>
       </ng-container>
+
+      <app-reto-admin-historial-modal
+        *ngIf="historyOpen"
+        [history]="history"
+        [loading]="historyLoading"
+        [error]="historyError"
+        [fallbackName]="historyName"
+        (close)="closeHistory()">
+      </app-reto-admin-historial-modal>
     </div>
   `,
   styles: [`
@@ -252,9 +279,17 @@ export class RetoAdminDashboardComponent implements OnInit {
   error = '';
   dashboard: AdminRetoDashboard | null = null;
   selectedGroupId: number | null = null;
+  competitionId = 0;
+
+  historyOpen = false;
+  historyLoading = false;
+  historyError = '';
+  history: AdminPointHistory | null = null;
+  historyName = '';
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.competitionId = id;
     if (!id) {
       this.loading = false;
       this.error = 'Competencia no encontrada';
@@ -337,6 +372,39 @@ export class RetoAdminDashboardComponent implements OnInit {
     if (diff <= 0) return 'Hoy';
     if (diff === 1) return 'Ayer';
     return `Hace ${diff} días`;
+  }
+
+  openHistory(member: AdminRetoMember): void {
+    this.openHistoryFor(member.userId, member.fullName);
+  }
+
+  openHistoryFromReview(event: { userId: number; fullName: string }): void {
+    this.openHistoryFor(event.userId, event.fullName);
+  }
+
+  closeHistory(): void {
+    this.historyOpen = false;
+    this.history = null;
+    this.historyError = '';
+  }
+
+  private openHistoryFor(userId: number, fullName: string): void {
+    if (!this.competitionId) return;
+    this.historyOpen = true;
+    this.historyLoading = true;
+    this.historyError = '';
+    this.history = null;
+    this.historyName = fullName;
+    this.adminService.getPointHistory(this.competitionId, userId).subscribe({
+      next: (data) => {
+        this.history = data;
+        this.historyLoading = false;
+      },
+      error: (err) => {
+        this.historyLoading = false;
+        this.historyError = err?.error?.message || 'No se pudo cargar el historial de puntos';
+      }
+    });
   }
 
   private kpisFromTeams(teams: AdminRetoTeam[]): AdminRetoKpis {
