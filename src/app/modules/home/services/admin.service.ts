@@ -169,6 +169,23 @@ getExercises() {
     return this.http.get<AdminRetoDashboard>(`${this.base}/admin/competitions/${id}/reto-dashboard`, { params });
   }
 
+  getPointHistory(competitionId: number, userId: number) {
+    return this.http.get<AdminPointHistory>(
+      `${this.base}/admin/competitions/${competitionId}/participants/${userId}/point-history`);
+  }
+
+  getActivityReviews(competitionId: number, flag?: AdminReviewFlag | null) {
+    let params = new HttpParams();
+    if (flag) params = params.set('flag', flag);
+    return this.http.get<AdminActivityReviewQueue>(
+      `${this.base}/admin/competitions/${competitionId}/activity-reviews`, { params });
+  }
+
+  upsertActivityReview(competitionId: number, body: AdminUpsertReviewRequest) {
+    return this.http.put<AdminActivityReviewItem>(
+      `${this.base}/admin/competitions/${competitionId}/activity-reviews`, body);
+  }
+
 }
 
 export interface AdminRetoDashboard {
@@ -229,3 +246,83 @@ export interface AdminRetoMember {
   activeDays: number;
   lastActivityAt: string | null;
 }
+
+export type AdminReviewFlag =
+  | 'SUSPICIOUS'
+  | 'DUPLICATE'
+  | 'EXCESSIVE_DURATION'
+  | 'OUTSIDE_RULES'
+  | 'MISSING_EVIDENCE'
+  | 'INCONSISTENT_DATA';
+
+export type AdminReviewStatus = 'PENDING_REVIEW' | 'REVIEWED';
+export type AdminActivitySource = 'WORKOUT' | 'FREE_ACTIVITY';
+export type AdminValidationStatus = 'PUNTUADA' | 'NO_PUNTUA' | 'EN_REVISION';
+
+export interface AdminPointHistory {
+  userId: number;
+  fullName: string;
+  totalPoints: number;
+  days: AdminPointDayGroup[];
+}
+
+export interface AdminPointDayGroup {
+  date: string;
+  label: string;
+  entries: AdminPointHistoryEntry[];
+}
+
+export interface AdminPointHistoryEntry {
+  kind: 'ACTIVITY' | 'CONSTANCIA' | 'PROGRESO' | string;
+  source: AdminActivitySource | null;
+  sourceId: number | null;
+  activityType: string;
+  activityLabel: string;
+  durationMinutes: number | null;
+  occurredAt: string | null;
+  points: number;
+  ruleApplied: string;
+  dataSource: string;
+  validationStatus: AdminValidationStatus | string;
+  evidenceUrl: string | null;
+  adminFlags: AdminReviewFlag[];
+  adminNote: string | null;
+  reviewStatus: AdminReviewStatus | null;
+}
+
+export interface AdminActivityReviewQueue {
+  items: AdminActivityReviewItem[];
+}
+
+export interface AdminActivityReviewItem {
+  userId: number;
+  fullName: string;
+  source: AdminActivitySource;
+  sourceId: number;
+  activityType: string;
+  activityLabel: string;
+  durationMinutes: number | null;
+  occurredAt: string | null;
+  evidenceUrl: string | null;
+  suggestedFlags: AdminReviewFlag[];
+  adminFlags: AdminReviewFlag[];
+  adminNote: string | null;
+  reviewStatus: AdminReviewStatus | null;
+}
+
+export interface AdminUpsertReviewRequest {
+  source: AdminActivitySource;
+  sourceId: number;
+  flags: AdminReviewFlag[];
+  note?: string | null;
+  status: AdminReviewStatus;
+}
+
+export const ADMIN_REVIEW_FLAG_LABELS: Record<AdminReviewFlag, string> = {
+  SUSPICIOUS: 'Sospechosa',
+  DUPLICATE: 'Duplicada',
+  EXCESSIVE_DURATION: 'Excesivamente larga',
+  OUTSIDE_RULES: 'Fuera de las reglas',
+  MISSING_EVIDENCE: 'Evidencia faltante',
+  INCONSISTENT_DATA: 'Datos poco consistentes',
+};
