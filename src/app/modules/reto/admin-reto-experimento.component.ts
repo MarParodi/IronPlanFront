@@ -178,6 +178,7 @@ interface ScopeNode { id: number; name: string; groupType: string; }
             <button type="button" class="action-btn" (click)="activarSus()" [disabled]="busy || estado.susActivo">Abrir encuesta SUS</button>
             <button type="button" class="action-btn" (click)="snapshots()" [disabled]="busy">Generar snapshots</button>
             <button type="button" class="action-btn export" (click)="exportar()" [disabled]="busy">Exportar CSV</button>
+            <button type="button" class="action-btn export" (click)="exportarSemanal()" [disabled]="busy">Exportar CSV semanal</button>
             <button type="button" class="action-btn danger" (click)="cerrar()" [disabled]="busy || estado.estado === 'CERRADO'">Cerrar reto</button>
             <button *ngIf="estado.estado !== 'ACTIVO'" type="button" class="action-btn danger-outline" (click)="eliminar()" [disabled]="busy">Eliminar experimento</button>
           </div>
@@ -185,6 +186,10 @@ interface ScopeNode { id: number; name: string; groupType: string; }
             Snapshots: genera semanas faltantes (1–{{ estado.semanasIntervencion }}).
             Al cerrar el reto se generan retroactivamente. Piloto de 1 semana → usa columnas
             <em>volumen_semana_inicio/fin</em> en el CSV (ambas = semana 1).
+          </p>
+          <p class="hint">
+            CSV semanal: una fila por participante y semana, disponible durante el reto. Incluye a todos
+            los inscritos (sin exigir pre/post-test); usa la columna <em>activo</em> para filtrar.
           </p>
           <p *ngIf="estado.estado === 'ACTIVO'" class="hint warn">Para eliminar, cierra el reto primero.</p>
 
@@ -497,8 +502,8 @@ export class AdminRetoExperimentoComponent implements OnInit {
       next: (r) => {
         this.busy = false;
         this.actionMsg = r.usuariosProcesados > 0
-          ? `${r.usuariosProcesados} snapshot(s) creados (hasta semana ${r.semanaGenerada}).`
-          : `No había snapshots pendientes (hasta semana ${r.semanaGenerada}).`;
+          ? `${r.usuariosProcesados} snapshot(s) recalculados (hasta semana ${r.semanaGenerada}).`
+          : `No hay semanas para calcular todavía.`;
         this.loadDetail();
       },
       error: () => { this.busy = false; this.detailError = 'Error al generar snapshots.'; },
@@ -520,6 +525,26 @@ export class AdminRetoExperimentoComponent implements OnInit {
         this.actionMsg = 'CSV descargado.';
       },
       error: () => { this.busy = false; this.detailError = 'Error al exportar CSV.'; },
+    });
+  }
+
+  exportarSemanal(): void {
+    if (!this.selectedRetoId) return;
+    this.busy = true;
+    this.actionMsg = '';
+    this.detailError = '';
+    this.retoService.exportarCsvSemanal(this.selectedRetoId).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ironplan_semanal_reto_${this.selectedRetoId}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        this.busy = false;
+        this.actionMsg = 'CSV semanal descargado.';
+      },
+      error: () => { this.busy = false; this.detailError = 'Error al exportar CSV semanal.'; },
     });
   }
 

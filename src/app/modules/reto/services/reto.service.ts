@@ -123,4 +123,10 @@ export class RetoService {
       responseType: 'blob',
     });
   }
+
+  exportarCsvSemanal(retoId: number): Observable<Blob> {
+    return this.http.get(`${this.base}/admin/retos/${retoId}/exportar/csv-semanal`, {
+      responseType: 'blob',
+    });
+  }
 }
