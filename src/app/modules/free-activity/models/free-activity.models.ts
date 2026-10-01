@@ -10,6 +10,7 @@ export type FreeActivityType =
   | 'FUTBOL'
   | 'BOX'
   | 'CLASE_GRUPAL'
+  | 'CARDIO_HIT'
   | 'OTRA';
 
 export interface CreateFreeActivityRequest {
@@ -47,6 +48,7 @@ export const FREE_ACTIVITY_TYPE_LABELS: Record<FreeActivityType, string> = {
   FUTBOL: 'Fútbol',
   BOX: 'Box',
   CLASE_GRUPAL: 'Clase grupal',
+  CARDIO_HIT: 'Cardio Hit',
   OTRA: 'Otra',
 };
 
