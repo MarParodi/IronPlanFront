@@ -30,6 +30,7 @@ export class FreeActivityComponent implements OnInit, OnDestroy {
     { label: 'Fútbol', value: 'FUTBOL' },
     { label: 'Box', value: 'BOX' },
     { label: 'Clase grupal', value: 'CLASE_GRUPAL' },
+    { label: 'Cardio Hit', value: 'CARDIO_HIT' },
     { label: 'Otra', value: 'OTRA' },
   ];
 
