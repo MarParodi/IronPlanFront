@@ -69,6 +69,10 @@ export class RetoService {
     });
   }
 
+  sincronizarFechas(retoId: number): Observable<RetoResumen> {
+    return this.http.post<RetoResumen>(`${this.base}/admin/retos/${retoId}/sincronizar-fechas`, {});
+  }
+
   listCompetenciasCandidatas(retoId: number): Observable<CompetitionCandidate[]> {
     return this.http.get<CompetitionCandidate[]>(`${this.base}/admin/retos/${retoId}/competencias-candidatas`);
   }
