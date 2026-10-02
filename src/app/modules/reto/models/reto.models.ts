@@ -33,6 +33,8 @@ export interface CompetitionCandidate {
   scopeReferenceId: number;
   scopeReferenceName: string;
   metricType: string;
+  startDate?: string | null;
+  endDate?: string | null;
   isMemberCompetition: boolean;
   participantMode?: string;
 }

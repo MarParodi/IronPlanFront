@@ -141,7 +141,19 @@ interface ScopeNode { id: number; name: string; groupType: string; }
           </p>
           <p *ngIf="selectedReto?.competitionId" class="hint ok">
             Vinculada: competencia #{{ selectedReto!.competitionId }}
+            <ng-container *ngIf="competenciaVinculada()?.startDate as inicio">
+              ({{ inicio }} — {{ competenciaVinculada()?.endDate || 'sin fin' }})
+            </ng-container>
           </p>
+          <div *ngIf="fechasDesincronizadas()" class="link-row">
+            <p class="hint warn flex-1">
+              Las fechas del reto ({{ selectedReto?.fechaInicio }} — {{ selectedReto?.fechaFin }}) no coinciden con las de la competencia.
+              Los snapshots y el CSV usan las fechas del reto.
+            </p>
+            <button type="button" class="btn-secondary" (click)="sincronizarFechas()" [disabled]="busy">
+              Usar fechas de la competencia
+            </button>
+          </div>
           <p *ngIf="!selectedReto?.competitionId && linkableCompetitions.length > 0" class="hint warn">
             Sin competencia vinculada — selecciona una del listado y guarda.
           </p>
@@ -462,6 +474,39 @@ export class AdminRetoExperimentoComponent implements OnInit {
       error: (err) => {
         this.busy = false;
         this.detailError = err?.error?.message || err?.error || 'No se pudo vincular la competencia.';
+      },
+    });
+  }
+
+  competenciaVinculada(): CompetitionCandidate | undefined {
+    const id = this.selectedReto?.competitionId;
+    return id ? this.linkableCompetitions.find(c => c.id === id) : undefined;
+  }
+
+  fechasDesincronizadas(): boolean {
+    const c = this.competenciaVinculada();
+    if (!c?.startDate || !this.selectedReto) return false;
+    return c.startDate !== this.selectedReto.fechaInicio
+      || (!!c.endDate && c.endDate !== this.selectedReto.fechaFin);
+  }
+
+  sincronizarFechas(): void {
+    if (!this.selectedRetoId) return;
+    if (!confirm('Se cambiarán las fechas del reto a las de la competencia y se recalcularán todos los snapshots. ¿Continuar?')) return;
+    this.busy = true;
+    this.detailError = '';
+    this.actionMsg = '';
+    this.retoService.sincronizarFechas(this.selectedRetoId).subscribe({
+      next: (reto) => {
+        this.busy = false;
+        const idx = this.retos.findIndex(r => r.id === reto.id);
+        if (idx >= 0) this.retos[idx] = reto;
+        this.actionMsg = `Fechas actualizadas: ${reto.fechaInicio} — ${reto.fechaFin}. Snapshots recalculados.`;
+        this.loadDetail();
+      },
+      error: (err) => {
+        this.busy = false;
+        this.detailError = err?.error?.message || err?.error || 'No se pudieron sincronizar las fechas.';
       },
     });
   }
