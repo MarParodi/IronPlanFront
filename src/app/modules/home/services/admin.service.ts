@@ -186,6 +186,41 @@ getExercises() {
       `${this.base}/admin/competitions/${competitionId}/activity-reviews`, body);
   }
 
+  getTeamBonuses(competitionId: number) {
+    return this.http.get<AdminTeamBonus[]>(`${this.base}/admin/competitions/${competitionId}/team-bonuses`);
+  }
+
+  createTeamBonus(competitionId: number, body: AdminCreateTeamBonusRequest) {
+    const form = new FormData();
+    form.append('groupId', String(body.groupId));
+    form.append('points', String(body.points));
+    form.append('title', body.title);
+    if (body.file) form.append('file', body.file);
+    return this.http.post<AdminTeamBonus>(`${this.base}/admin/competitions/${competitionId}/team-bonuses`, form);
+  }
+
+  deleteTeamBonus(competitionId: number, bonusId: number) {
+    return this.http.delete<void>(`${this.base}/admin/competitions/${competitionId}/team-bonuses/${bonusId}`);
+  }
+
+}
+
+export interface AdminTeamBonus {
+  id: number;
+  groupId: number;
+  groupName: string;
+  points: number;
+  title: string;
+  evidenceUrl: string | null;
+  createdByName: string | null;
+  createdAt: string;
+}
+
+export interface AdminCreateTeamBonusRequest {
+  groupId: number;
+  points: number;
+  title: string;
+  file?: File | null;
 }
 
 export interface AdminRetoDashboard {
@@ -227,6 +262,7 @@ export interface AdminRetoTeam {
   fuerzaPoints: number;
   librePoints: number;
   teamBonusPoints: number;
+  manualBonusPoints: number;
   rosterSize: number;
   activeThisWeek: number;
   participationPercent: number;

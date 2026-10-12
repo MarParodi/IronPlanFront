@@ -12,11 +12,15 @@ import {
 } from '../home/services/admin.service';
 import { RetoAdminHistorialModalComponent } from './reto-admin-historial-modal.component';
 import { RetoAdminValidacionComponent } from './reto-admin-validacion.component';
+import { RetoAdminBonosComponent } from './reto-admin-bonos.component';
 
 @Component({
   selector: 'app-reto-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, RetoAdminHistorialModalComponent, RetoAdminValidacionComponent],
+  imports: [
+    CommonModule, FormsModule, RouterModule,
+    RetoAdminHistorialModalComponent, RetoAdminValidacionComponent, RetoAdminBonosComponent,
+  ],
   template: `
     <div class="space-y-6 max-w-6xl">
       <a routerLink="/grupos/administrar" [queryParams]="{ seccion: 'competencias' }"
@@ -172,6 +176,15 @@ import { RetoAdminValidacionComponent } from './reto-admin-validacion.component'
                 <div class="h-2 rounded-full bg-slate-800 overflow-hidden">
                   <div class="h-full bg-amber-400/80 rounded-full" [style.width.%]="share(team.teamBonusPoints, team)"></div>
                 </div>
+                <ng-container *ngIf="!d.competition.isMemberCompetition">
+                  <div class="flex justify-between text-sm">
+                    <span class="text-ip-muted">Bonos manuales</span>
+                    <span class="tabular-nums text-rose-300">{{ (team.manualBonusPoints || 0) | number:'1.0-1' }} pts</span>
+                  </div>
+                  <div class="h-2 rounded-full bg-slate-800 overflow-hidden">
+                    <div class="h-full bg-rose-400/80 rounded-full" [style.width.%]="share(team.manualBonusPoints || 0, team)"></div>
+                  </div>
+                </ng-container>
               </div>
             </article>
           </div>
@@ -225,6 +238,13 @@ import { RetoAdminValidacionComponent } from './reto-admin-validacion.component'
             </div>
           </div>
         </section>
+
+        <app-reto-admin-bonos
+          *ngIf="!d.competition.isMemberCompetition"
+          [competitionId]="competitionId"
+          [teams]="d.teams"
+          (changed)="load()">
+        </app-reto-admin-bonos>
 
         <app-reto-admin-validacion
           [competitionId]="competitionId"
@@ -295,7 +315,13 @@ export class RetoAdminDashboardComponent implements OnInit {
       this.error = 'Competencia no encontrada';
       return;
     }
-    this.adminService.getRetoDashboard(id).subscribe({
+    this.load();
+  }
+
+  load(): void {
+    if (!this.competitionId) return;
+    this.error = '';
+    this.adminService.getRetoDashboard(this.competitionId).subscribe({
       next: (data) => {
         this.dashboard = data;
         this.loading = false;
@@ -357,7 +383,7 @@ export class RetoAdminDashboardComponent implements OnInit {
   }
 
   share(value: number, team: AdminRetoTeam): number {
-    const total = team.fuerzaPoints + team.librePoints + team.teamBonusPoints;
+    const total = team.fuerzaPoints + team.librePoints + team.teamBonusPoints + (team.manualBonusPoints || 0);
     if (total <= 0) return 0;
     return Math.max(0, Math.min(100, (value / total) * 100));
   }
