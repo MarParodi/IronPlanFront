@@ -130,6 +130,7 @@ export interface ExperimentoEstado {
   participantesActivos: number;
   posttestIpaqActivo: boolean;
   susActivo: boolean;
+  mostrarAporteEquipo: boolean;
 }
 
 export interface SusResumen {

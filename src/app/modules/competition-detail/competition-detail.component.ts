@@ -105,9 +105,10 @@ import { LeaderboardSimpleComponent } from '../../shared/reto/leaderboard-simple
     <ng-container *ngIf="!loading">
 
       <!-- MI APORTE Y MI EQUIPO -->
-      <div *ngIf="myScore" class="grid gap-4 md:grid-cols-2">
+      <div *ngIf="myScore" class="grid gap-4" [ngClass]="mostrarAporteEquipo ? 'md:grid-cols-2' : ''">
 
         <app-mi-aporte-card
+          *ngIf="mostrarAporteEquipo"
           [myScore]="myScore"
           [metricLabel]="getMetricLabel(competition?.metricType)"
           [isMemberCompetition]="myScore.isMemberCompetition">
@@ -315,6 +316,7 @@ export class CompetitionDetailComponent implements OnInit {
 
   competition: any = null;
   myScore: any = null;
+  mostrarAporteEquipo = true;
   leaderboard: any[] = [];
   loading = true;
   myParticipantGroupId: number | null = null;
@@ -358,6 +360,7 @@ export class CompetitionDetailComponent implements OnInit {
 
         this.competition = data?.competition ?? data;
         this.myScore = data?.myScore ?? null;
+        this.mostrarAporteEquipo = data?.mostrarAporteEquipo !== false;
         this.leaderboard = data?.groupLeaderboard ?? [];
 
         if (this.competition) this.competition.isMemberCompetition = isMember;
