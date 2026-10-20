@@ -114,8 +114,10 @@ import { LeaderboardSimpleComponent } from '../../shared/reto/leaderboard-simple
         </div>
       </section>
 
-      <div *ngIf="detail.myScore" class="grid gap-3 md:grid-cols-2">
+      <div *ngIf="detail.myScore" class="grid gap-3"
+        [ngClass]="detail.mostrarAporteEquipo !== false ? 'md:grid-cols-2' : ''">
         <app-mi-aporte-card
+          *ngIf="detail.mostrarAporteEquipo !== false"
           [myScore]="detail.myScore"
           [metricLabel]="detail.metricLabel || metricLabel(detail.competition.metricType)"
           [isMemberCompetition]="!!detail.myScore.isMemberCompetition">
