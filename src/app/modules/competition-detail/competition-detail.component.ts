@@ -105,25 +105,27 @@ import { LeaderboardSimpleComponent } from '../../shared/reto/leaderboard-simple
     <ng-container *ngIf="!loading">
 
       <!-- MI APORTE Y MI EQUIPO -->
-      <div *ngIf="myScore" class="grid gap-4" [ngClass]="mostrarAporteEquipo ? 'md:grid-cols-2' : ''">
+      <div *ngIf="myScore" class="grid gap-4" [ngClass]="mostrarEquipoCard ? 'md:grid-cols-2' : ''">
 
         <app-mi-aporte-card
-          *ngIf="mostrarAporteEquipo"
           [myScore]="myScore"
           [metricLabel]="getMetricLabel(competition?.metricType)"
-          [isMemberCompetition]="myScore.isMemberCompetition">
+          [isMemberCompetition]="myScore.isMemberCompetition"
+          [mostrarPosiciones]="mostrarPosiciones">
         </app-mi-aporte-card>
 
         <app-mi-equipo-card
+          *ngIf="mostrarEquipoCard"
           [myScore]="myScore"
           [groupLeaderboard]="leaderboard"
-          [isMemberCompetition]="myScore.isMemberCompetition">
+          [isMemberCompetition]="myScore.isMemberCompetition"
+          [mostrarPosiciones]="mostrarPosiciones">
         </app-mi-equipo-card>
       </div>
 
       <!-- Ganadores declarados (retos finalizados) -->
       <div
-        *ngIf="myScore?.isMemberCompetition && competition?.status === 'FINISHED' && declaredWinners.length"
+        *ngIf="mostrarPosiciones && myScore?.isMemberCompetition && competition?.status === 'FINISHED' && declaredWinners.length"
         class="space-y-2">
         <div
           *ngFor="let w of declaredWinners"
@@ -140,7 +142,7 @@ import { LeaderboardSimpleComponent } from '../../shared/reto/leaderboard-simple
 
       <!-- Podios compuestos (solo lectura) -->
       <section
-        *ngIf="podiums && myScore?.isMemberCompetition && competition?.status === 'FINISHED'"
+        *ngIf="mostrarPosiciones && podiums && myScore?.isMemberCompetition && competition?.status === 'FINISHED'"
         class="rounded-xl border border-ip-border bg-ip-surface overflow-hidden space-y-4 p-5">
         <h3 class="text-sm font-semibold text-ip-secondary">Podios</h3>
 
@@ -177,7 +179,7 @@ import { LeaderboardSimpleComponent } from '../../shared/reto/leaderboard-simple
 
       <!-- VERSUS -->
       <div
-        *ngIf="competition?.competitionType === 'VERSUS' && leaderboard.length === 2"
+        *ngIf="mostrarPosiciones && competition?.competitionType === 'VERSUS' && leaderboard.length === 2"
         class="rounded-xl border border-ip-border bg-ip-surface overflow-hidden">
 
         <div class="px-5 py-4 border-b border-slate-900">
@@ -263,7 +265,7 @@ import { LeaderboardSimpleComponent } from '../../shared/reto/leaderboard-simple
 
       <!-- POSICIONES POR EQUIPO (sin puntajes) -->
       <app-leaderboard-simple
-        *ngIf="competition?.competitionType !== 'VERSUS' && !myScore?.isMemberCompetition"
+        *ngIf="mostrarPosiciones && competition?.competitionType !== 'VERSUS' && !myScore?.isMemberCompetition"
         [entries]="leaderboard"
         [myParticipantGroupId]="myParticipantGroupId"
         title="Posiciones del reto">
@@ -316,7 +318,11 @@ export class CompetitionDetailComponent implements OnInit {
 
   competition: any = null;
   myScore: any = null;
-  mostrarAporteEquipo = true;
+  mostrarPosiciones = true;
+
+  get mostrarEquipoCard(): boolean {
+    return this.mostrarPosiciones || !this.myScore?.isMemberCompetition;
+  }
   leaderboard: any[] = [];
   loading = true;
   myParticipantGroupId: number | null = null;
@@ -360,7 +366,9 @@ export class CompetitionDetailComponent implements OnInit {
 
         this.competition = data?.competition ?? data;
         this.myScore = data?.myScore ?? null;
-        this.mostrarAporteEquipo = data?.mostrarAporteEquipo !== false;
+        this.mostrarPosiciones = data?.mostrarPosiciones !== false;
+        this.declaredWinners = [];
+        this.podiums = null;
         this.leaderboard = data?.groupLeaderboard ?? [];
 
         if (this.competition) this.competition.isMemberCompetition = isMember;
@@ -371,7 +379,7 @@ export class CompetitionDetailComponent implements OnInit {
         this.loading = false;
         this.cdr.markForCheck();
 
-        if (isMember && this.competition?.status === 'FINISHED') {
+        if (this.mostrarPosiciones && isMember && this.competition?.status === 'FINISHED') {
           this.loadRetoResults();
         }
       },

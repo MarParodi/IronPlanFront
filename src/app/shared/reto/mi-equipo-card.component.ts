@@ -52,6 +52,13 @@ export class MiEquipoCardComponent {
   private score: RetoMyScore | null = null;
   private entries: RetoLeaderboardEntry[] = [];
   private memberMode = false;
+  private positionsVisible = true;
+
+  @Input()
+  set mostrarPosiciones(value: boolean) {
+    this.positionsVisible = value !== false;
+    this.recompute();
+  }
 
   @Input()
   set isMemberCompetition(value: boolean) {
@@ -86,12 +93,12 @@ export class MiEquipoCardComponent {
   private recompute(): void {
     const rank = this.memberMode ? this.score?.memberRank : this.score?.groupRank;
 
-    this.positionLabel = ordinalPosition(rank);
+    this.positionLabel = this.positionsVisible ? ordinalPosition(rank) : '';
     this.memberCount = this.memberMode
       ? null
       : teamMemberCount(this.entries, this.score?.participantGroupId);
-    this.closenessMessage = this.memberMode
-      ? ''
-      : buildClosenessMessage(this.entries, this.score?.participantGroupId);
+    this.closenessMessage = this.positionsVisible && !this.memberMode
+      ? buildClosenessMessage(this.entries, this.score?.participantGroupId)
+      : '';
   }
 }

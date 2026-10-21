@@ -52,7 +52,7 @@ import { LeaderboardSimpleComponent } from '../../shared/reto/leaderboard-simple
           <span [class]="statusClass(detail.competition.status)">{{ statusLabel(detail.competition.status) }}</span>
         </div>
 
-        <div *ngIf="declaredWinners.length"
+        <div *ngIf="mostrarPosiciones && declaredWinners.length"
           class="space-y-2">
           <div *ngFor="let w of declaredWinners"
             class="rounded-xl bg-amber-500/10 border border-amber-500/30 px-4 py-3 flex items-center gap-3">
@@ -64,7 +64,7 @@ import { LeaderboardSimpleComponent } from '../../shared/reto/leaderboard-simple
           </div>
         </div>
 
-        <div *ngIf="!declaredWinners.length && detail.winner?.name && canShowLeader"
+        <div *ngIf="mostrarPosiciones && !declaredWinners.length && detail.winner?.name && canShowLeader"
           class="rounded-xl bg-teal-500/10 border border-teal-500/30 px-4 py-3 flex flex-wrap items-center gap-3">
           <span class="text-2xl">🏆</span>
           <div>
@@ -83,7 +83,7 @@ import { LeaderboardSimpleComponent } from '../../shared/reto/leaderboard-simple
       </header>
 
       <!-- Podios compuestos (solo lectura) -->
-      <section *ngIf="podiums && detail.competition.isMemberCompetition && detail.competition.status === 'FINISHED'"
+      <section *ngIf="mostrarPosiciones && podiums && detail.competition.isMemberCompetition && detail.competition.status === 'FINISHED'"
         class="rounded-2xl bg-ip-surface border border-ip-border overflow-hidden space-y-4 p-4">
         <h3 class="text-sm font-semibold text-ip-secondary">Podios</h3>
 
@@ -114,24 +114,25 @@ import { LeaderboardSimpleComponent } from '../../shared/reto/leaderboard-simple
         </div>
       </section>
 
-      <div *ngIf="detail.myScore" class="grid gap-3"
-        [ngClass]="detail.mostrarAporteEquipo !== false ? 'md:grid-cols-2' : ''">
+      <div *ngIf="detail.myScore" class="grid gap-3" [ngClass]="mostrarEquipoCard ? 'md:grid-cols-2' : ''">
         <app-mi-aporte-card
-          *ngIf="detail.mostrarAporteEquipo !== false"
           [myScore]="detail.myScore"
           [metricLabel]="detail.metricLabel || metricLabel(detail.competition.metricType)"
-          [isMemberCompetition]="!!detail.myScore.isMemberCompetition">
+          [isMemberCompetition]="!!detail.myScore.isMemberCompetition"
+          [mostrarPosiciones]="mostrarPosiciones">
         </app-mi-aporte-card>
 
         <app-mi-equipo-card
+          *ngIf="mostrarEquipoCard"
           [myScore]="detail.myScore"
           [groupLeaderboard]="detail.groupLeaderboard"
-          [isMemberCompetition]="!!detail.myScore.isMemberCompetition">
+          [isMemberCompetition]="!!detail.myScore.isMemberCompetition"
+          [mostrarPosiciones]="mostrarPosiciones">
         </app-mi-equipo-card>
       </div>
 
       <!-- VERSUS: enfrentamiento directo entre 2 grupos -->
-      <section *ngIf="isVersusGroup && detail.groupLeaderboard?.length === 2"
+      <section *ngIf="mostrarPosiciones && isVersusGroup && detail.groupLeaderboard?.length === 2"
         class="rounded-2xl bg-ip-surface border border-ip-border overflow-hidden">
         <h3 class="text-sm font-semibold text-ip-secondary px-4 py-3 border-b border-ip-border">Enfrentamiento</h3>
         <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 p-6" *ngIf="detail.groupLeaderboard as lb">
@@ -155,7 +156,7 @@ import { LeaderboardSimpleComponent } from '../../shared/reto/leaderboard-simple
 
       <!-- Posiciones por equipo (sin puntajes) -->
       <app-leaderboard-simple
-        *ngIf="!isVersusGroup && !detail.competition.isMemberCompetition"
+        *ngIf="mostrarPosiciones && !isVersusGroup && !detail.competition.isMemberCompetition"
         [entries]="detail.groupLeaderboard"
         [myParticipantGroupId]="detail.myScore?.participantGroupId"
         title="Posiciones del reto">
@@ -184,6 +185,15 @@ export class GrupoRetoDetailComponent implements OnInit {
   };
   loading = true;
   error = '';
+
+  get mostrarPosiciones(): boolean {
+    return this.detail?.mostrarPosiciones !== false;
+  }
+
+  /** En un reto individual la tarjeta solo muestra el lugar. Si las posiciones están ocultas, no aporta nada. */
+  get mostrarEquipoCard(): boolean {
+    return this.mostrarPosiciones || !this.detail?.myScore?.isMemberCompetition;
+  }
 
   get isVersusGroup(): boolean {
     return this.detail?.competition?.competitionType === 'VERSUS'
@@ -215,8 +225,10 @@ export class GrupoRetoDetailComponent implements OnInit {
         if (d.competition) d.competition.isMemberCompetition = isMember;
         if (d.myScore) d.myScore.isMemberCompetition = isMember;
         this.detail = d;
+        this.declaredWinners = [];
+        this.podiums = undefined;
         this.loading = false;
-        if (isMember && d.competition.status === 'FINISHED') {
+        if (this.mostrarPosiciones && isMember && d.competition.status === 'FINISHED') {
           this.gruposService.getRetoWinners(this.competitionId).subscribe({
             next: (w) => { this.declaredWinners = w || []; },
             error: () => { this.declaredWinners = []; },
