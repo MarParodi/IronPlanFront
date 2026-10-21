@@ -188,8 +188,8 @@ interface ScopeNode { id: number; name: string; groupType: string; }
             <button *ngIf="estado.estado === 'PLANEACION'" type="button" class="action-btn primary" (click)="activar()" [disabled]="busy">Activar reto</button>
             <button type="button" class="action-btn" (click)="activarPosttest()" [disabled]="busy || estado.posttestIpaqActivo">Abrir post-test IPAQ</button>
             <button type="button" class="action-btn" (click)="activarSus()" [disabled]="busy || estado.susActivo">Abrir encuesta SUS</button>
-            <button type="button" class="action-btn" (click)="toggleAporte()" [disabled]="busy">
-              {{ estado.mostrarAporteEquipo === false ? 'Mostrar puntos de aporte' : 'Ocultar puntos de aporte' }}
+            <button type="button" class="action-btn" (click)="togglePosiciones()" [disabled]="busy">
+              {{ estado.mostrarPosiciones === false ? 'Mostrar posiciones' : 'Ocultar posiciones' }}
             </button>
             <button type="button" class="action-btn" (click)="snapshots()" [disabled]="busy">Generar snapshots</button>
             <button type="button" class="action-btn export" (click)="exportar()" [disabled]="busy">Exportar CSV</button>
@@ -537,12 +537,14 @@ export class AdminRetoExperimentoComponent implements OnInit {
   activar(): void { this.run(() => this.retoService.activarReto(this.selectedRetoId!), 'Reto activado.'); }
   activarPosttest(): void { this.run(() => this.retoService.activarPosttest(this.selectedRetoId!), 'Post-test IPAQ activado.'); }
   activarSus(): void { this.run(() => this.retoService.activarSus(this.selectedRetoId!), 'Encuesta SUS activada.'); }
-  toggleAporte(): void {
+  togglePosiciones(): void {
     if (!this.selectedRetoId || !this.estado) return;
-    const visible = this.estado.mostrarAporteEquipo === false;
+    const visible = this.estado.mostrarPosiciones === false;
     this.run(
-      () => this.retoService.setMostrarAporteEquipo(this.selectedRetoId!, visible),
-      visible ? 'Los participantes vuelven a ver su aporte.' : 'Los participantes ya no ven los puntos que aportaron.'
+      () => this.retoService.setMostrarPosiciones(this.selectedRetoId!, visible),
+      visible
+        ? 'Los participantes vuelven a ver los lugares del reto.'
+        : 'Los participantes ya no ven el 1.er, 2.º ni 3.er lugar.'
     );
   }
   cerrar(): void {

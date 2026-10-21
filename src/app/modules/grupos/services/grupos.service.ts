@@ -197,7 +197,7 @@ export interface CompetitionDetailView {
   internalRanking?: InternalRankingEntry[];
   winner?: WinnerInfo;
   myScore?: MyCompetitionScore;
-  mostrarAporteEquipo?: boolean;
+  mostrarPosiciones?: boolean;
   metricLabel?: string;
   lastCalculatedAt?: string;
 }

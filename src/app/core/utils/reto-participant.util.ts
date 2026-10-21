@@ -77,7 +77,10 @@ export function buildClosenessMessage(
   return 'Cada actividad de esta semana puede hacer la diferencia.';
 }
 
-export function buildContributionMessages(myScore: RetoMyScore | null | undefined): string[] {
+export function buildContributionMessages(
+  myScore: RetoMyScore | null | undefined,
+  mostrarPosiciones = true
+): string[] {
   if (!myScore) return [];
 
   const contribution = myScore.individualScore ?? 0;
@@ -94,7 +97,7 @@ export function buildContributionMessages(myScore: RetoMyScore | null | undefine
   const points = Math.round(contribution);
   const messages: string[] = [];
 
-  if (!isMember && myScore.groupRank === 1) {
+  if (mostrarPosiciones && !isMember && myScore.groupRank === 1) {
     messages.push('Tu actividad ha ayudado al equipo a mantenerse en 1.er lugar.');
   }
 

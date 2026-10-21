@@ -107,8 +107,8 @@ export class RetoService {
     return this.http.post<void>(`${this.base}/admin/retos/${retoId}/activar-sus`, {});
   }
 
-  setMostrarAporteEquipo(retoId: number, visible: boolean): Observable<void> {
-    return this.http.post<void>(`${this.base}/admin/retos/${retoId}/aporte-equipo`, { visible });
+  setMostrarPosiciones(retoId: number, visible: boolean): Observable<void> {
+    return this.http.post<void>(`${this.base}/admin/retos/${retoId}/posiciones`, { visible });
   }
 
   cerrarReto(retoId: number): Observable<void> {

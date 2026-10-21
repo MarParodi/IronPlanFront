@@ -45,11 +45,18 @@ export class MiAporteCardComponent {
   messages: string[] = [];
 
   private currentScore: RetoMyScore | null = null;
+  private positionsVisible = true;
+
+  @Input()
+  set mostrarPosiciones(value: boolean) {
+    this.positionsVisible = value !== false;
+    this.messages = buildContributionMessages(this.currentScore, this.positionsVisible);
+  }
 
   @Input()
   set myScore(value: RetoMyScore | null | undefined) {
     this.currentScore = value ?? null;
-    this.messages = buildContributionMessages(this.currentScore);
+    this.messages = buildContributionMessages(this.currentScore, this.positionsVisible);
   }
 
   get myScore(): RetoMyScore | null {
