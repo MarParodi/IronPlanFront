@@ -52,7 +52,7 @@ import { CategoriaIpaq, IpaqFormData } from '../models/reto.models';
 
       <!-- Caminata -->
       <section class="rounded-xl border border-ip-border p-4 space-y-3">
-        <h3 class="font-semibold text-ip-primary">Caminata</h3>
+        <h3 class="font-semibold text-ip-primary">Caminata o ejercicio suave</h3>
         <label class="flex items-center gap-2">
           <input type="checkbox" [(ngModel)]="form.caminataRealizo" (ngModelChange)="emitChange()" [disabled]="readonly" />
           Realicé caminata
