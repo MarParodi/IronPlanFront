@@ -186,6 +186,12 @@ getExercises() {
       `${this.base}/admin/competitions/${competitionId}/activity-reviews`, body);
   }
 
+  /** Anula (voided=true) o restaura (voided=false) los puntos de una actividad. Devuelve el historial recalculado. */
+  setActivityVoided(competitionId: number, body: AdminVoidPointsRequest) {
+    return this.http.put<AdminPointHistory>(
+      `${this.base}/admin/competitions/${competitionId}/activity-reviews/voided`, body);
+  }
+
   getTeamBonuses(competitionId: number) {
     return this.http.get<AdminTeamBonus[]>(`${this.base}/admin/competitions/${competitionId}/team-bonuses`);
   }
@@ -293,7 +299,7 @@ export type AdminReviewFlag =
 
 export type AdminReviewStatus = 'PENDING_REVIEW' | 'REVIEWED';
 export type AdminActivitySource = 'WORKOUT' | 'FREE_ACTIVITY';
-export type AdminValidationStatus = 'PUNTUADA' | 'NO_PUNTUA' | 'EN_REVISION';
+export type AdminValidationStatus = 'PUNTUADA' | 'NO_PUNTUA' | 'EN_REVISION' | 'ANULADA';
 
 export interface AdminPointHistory {
   userId: number;
@@ -324,6 +330,9 @@ export interface AdminPointHistoryEntry {
   adminFlags: AdminReviewFlag[];
   adminNote: string | null;
   reviewStatus: AdminReviewStatus | null;
+  pointsVoided: boolean;
+  voidedAt: string | null;
+  voidedByName: string | null;
 }
 
 export interface AdminActivityReviewQueue {
@@ -344,6 +353,9 @@ export interface AdminActivityReviewItem {
   adminFlags: AdminReviewFlag[];
   adminNote: string | null;
   reviewStatus: AdminReviewStatus | null;
+  pointsVoided: boolean;
+  voidedAt: string | null;
+  voidedByName: string | null;
 }
 
 export interface AdminUpsertReviewRequest {
@@ -352,6 +364,12 @@ export interface AdminUpsertReviewRequest {
   flags: AdminReviewFlag[];
   note?: string | null;
   status: AdminReviewStatus;
+}
+
+export interface AdminVoidPointsRequest {
+  source: AdminActivitySource;
+  sourceId: number;
+  voided: boolean;
 }
 
 export const ADMIN_REVIEW_FLAG_LABELS: Record<AdminReviewFlag, string> = {
