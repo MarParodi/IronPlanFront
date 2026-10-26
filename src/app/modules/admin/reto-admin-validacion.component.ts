@@ -71,11 +71,15 @@ import {
                   <span *ngIf="!item.suggestedFlags.length" class="text-ip-muted">—</span>
                 </td>
                 <td class="px-4 py-3">
+                  <span *ngIf="item.pointsVoided"
+                    class="inline-block text-[10px] mr-1 mb-1 px-1.5 py-0.5 rounded border border-red-500/40 bg-red-500/10 text-red-200 font-semibold">
+                    Anulada
+                  </span>
                   <span *ngFor="let f of item.adminFlags"
                     class="inline-block text-[10px] mr-1 mb-1 px-1.5 py-0.5 rounded border border-teal-500/30 text-teal-200">
                     {{ labelOf(f) }}
                   </span>
-                  <span *ngIf="!item.adminFlags.length" class="text-xs text-ip-muted">{{ item.reviewStatus === 'REVIEWED' ? 'Revisada' : '—' }}</span>
+                  <span *ngIf="!item.adminFlags.length && !item.pointsVoided" class="text-xs text-ip-muted">{{ item.reviewStatus === 'REVIEWED' ? 'Revisada' : '—' }}</span>
                 </td>
                 <td class="px-4 py-3">
                   <a *ngIf="item.evidenceUrl" [href]="item.evidenceUrl" target="_blank" rel="noopener" class="text-xs text-teal-400 hover:underline">Ver</a>

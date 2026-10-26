@@ -258,6 +258,8 @@ import { RetoAdminBonosComponent } from './reto-admin-bonos.component';
         [loading]="historyLoading"
         [error]="historyError"
         [fallbackName]="historyName"
+        [competitionId]="competitionId"
+        (changed)="load()"
         (close)="closeHistory()">
       </app-reto-admin-historial-modal>
     </div>

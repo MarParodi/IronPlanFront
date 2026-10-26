@@ -5,6 +5,7 @@ import {
   AdminPointHistory,
   AdminPointHistoryEntry,
   AdminReviewFlag,
+  AdminService,
 } from '../home/services/admin.service';
 
 @Component({
@@ -32,6 +33,7 @@ import {
         </div>
 
         <p *ngIf="error" class="mx-5 mt-3 text-sm text-red-300 bg-red-500/10 border border-red-500/25 rounded-lg px-3 py-2">{{ error }}</p>
+        <p *ngIf="actionError" class="mx-5 mt-3 text-sm text-red-300 bg-red-500/10 border border-red-500/25 rounded-lg px-3 py-2">{{ actionError }}</p>
 
         <div *ngIf="!loading && history as h" class="modal-body">
           <div *ngIf="!h.days.length" class="py-10 text-center text-sm text-ip-muted">
@@ -40,24 +42,49 @@ import {
 
           <section *ngFor="let day of h.days" class="space-y-2">
             <h3 class="text-xs font-semibold uppercase tracking-wide text-ip-muted">{{ day.label }}</h3>
-            <button type="button" *ngFor="let entry of day.entries"
-              class="w-full text-left rounded-xl border border-ip-border bg-ip-page/60 px-3 py-2.5 hover:border-teal-500/30 transition"
-              (click)="toggle(entry)">
-              <div class="flex items-start justify-between gap-3">
-                <div class="min-w-0">
-                  <p class="text-sm text-ip-primary font-medium truncate">
+            <div *ngFor="let entry of day.entries" role="button" tabindex="0"
+              class="entry-row w-full text-left rounded-xl border border-ip-border bg-ip-page/60 px-3 py-2.5 hover:border-teal-500/30 transition cursor-pointer"
+              [class.entry-voided]="entry.pointsVoided"
+              (click)="toggle(entry)"
+              (keydown.enter)="toggle(entry)">
+              <div class="flex items-center justify-between gap-3">
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium truncate"
+                    [class.text-ip-primary]="!entry.pointsVoided"
+                    [class.text-ip-muted]="entry.pointsVoided"
+                    [class.line-through]="entry.pointsVoided">
                     {{ lineLabel(entry) }}
                   </p>
-                  <p class="text-xs text-ip-muted mt-0.5">{{ statusLabel(entry.validationStatus) }}</p>
+                  <p class="text-xs mt-0.5"
+                    [class.text-ip-muted]="!entry.pointsVoided"
+                    [class.text-amber-300]="entry.pointsVoided">
+                    {{ statusLabel(entry.validationStatus) }}
+                  </p>
                 </div>
                 <p class="text-sm font-semibold tabular-nums shrink-0"
                   [class.text-teal-300]="entry.points > 0"
-                  [class.text-ip-muted]="entry.points <= 0">
+                  [class.text-ip-muted]="entry.points <= 0"
+                  [class.line-through]="entry.pointsVoided">
                   {{ entry.points > 0 ? '+' : '' }}{{ entry.points | number:'1.0-1' }} pts
                 </p>
+                <button *ngIf="canVoid(entry)" type="button"
+                  class="void-btn shrink-0"
+                  [class.void-btn--undo]="entry.pointsVoided"
+                  [disabled]="isBusy(entry)"
+                  [attr.aria-label]="entry.pointsVoided ? 'Deshacer anulación' : 'Anular puntos'"
+                  (click)="toggleVoid(entry, $event)">
+                  <span *ngIf="isBusy(entry)" class="btn-spinner"></span>
+                  <ng-container *ngIf="!isBusy(entry)">{{ entry.pointsVoided ? 'Deshacer' : 'Anular' }}</ng-container>
+                </button>
               </div>
 
               <div *ngIf="isOpen(entry)" class="mt-3 pt-3 border-t border-ip-border space-y-1.5 text-xs text-ip-muted">
+                <p *ngIf="entry.pointsVoided" class="text-amber-300">
+                  Anulada
+                  <ng-container *ngIf="entry.voidedAt"> el {{ entry.voidedAt | date:'dd/MM/yyyy HH:mm' }}</ng-container>
+                  <ng-container *ngIf="entry.voidedByName"> por {{ entry.voidedByName }}</ng-container>.
+                  Esta actividad no suma al reto.
+                </p>
                 <p><span class="text-ip-secondary">Tipo:</span> {{ entry.activityLabel }}</p>
                 <p *ngIf="entry.durationMinutes != null"><span class="text-ip-secondary">Duración:</span> {{ entry.durationMinutes }} min</p>
                 <p *ngIf="entry.occurredAt"><span class="text-ip-secondary">Fecha y hora:</span> {{ entry.occurredAt | date:'dd/MM/yyyy HH:mm' }}</p>
@@ -77,7 +104,7 @@ import {
                 <img *ngIf="entry.evidenceUrl" [src]="entry.evidenceUrl" alt="Evidencia"
                   class="mt-2 max-h-40 rounded-lg object-cover border border-ip-border">
               </div>
-            </button>
+            </div>
           </section>
         </div>
 
@@ -137,6 +164,28 @@ import {
       border-radius: 10px; padding: 8px 14px; font-size: 13px; cursor: pointer;
     }
     .btn-secondary:hover { border-color: #64748b; color: #e2e8f0; }
+    .entry-row.entry-voided {
+      border-color: rgba(251,191,36,0.35);
+      background: rgba(251,191,36,0.05);
+    }
+    .void-btn {
+      min-width: 72px; height: 28px; padding: 0 10px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;
+      background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.35); color: #fca5a5;
+      transition: background .15s, border-color .15s;
+    }
+    .void-btn:hover:not(:disabled) { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.6); }
+    .void-btn--undo {
+      background: rgba(45,212,191,0.08); border-color: rgba(45,212,191,0.35); color: #5eead4;
+    }
+    .void-btn--undo:hover:not(:disabled) { background: rgba(45,212,191,0.18); border-color: rgba(45,212,191,0.6); }
+    .void-btn:disabled { opacity: .6; cursor: progress; }
+    .btn-spinner {
+      width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.25);
+      border-top-color: currentColor; border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
   `]
 })
 export class RetoAdminHistorialModalComponent {
@@ -144,9 +193,17 @@ export class RetoAdminHistorialModalComponent {
   @Input() loading = false;
   @Input() error = '';
   @Input() fallbackName = '';
+  @Input() competitionId: number | null = null;
   @Output() close = new EventEmitter<void>();
+  /** Se emite cuando se anula/restaura una actividad y el ranking cambió. */
+  @Output() changed = new EventEmitter<void>();
+
+  actionError = '';
 
   private openKey: string | null = null;
+  private busyKey: string | null = null;
+
+  constructor(private adminService: AdminService) {}
 
   toggle(entry: AdminPointHistoryEntry): void {
     const key = this.keyOf(entry);
@@ -155,6 +212,48 @@ export class RetoAdminHistorialModalComponent {
 
   isOpen(entry: AdminPointHistoryEntry): boolean {
     return this.openKey === this.keyOf(entry);
+  }
+
+  canVoid(entry: AdminPointHistoryEntry): boolean {
+    return entry.kind === 'ACTIVITY'
+      && entry.source != null
+      && entry.sourceId != null
+      && this.competitionId != null;
+  }
+
+  isBusy(entry: AdminPointHistoryEntry): boolean {
+    return this.busyKey === this.keyOf(entry);
+  }
+
+  toggleVoid(entry: AdminPointHistoryEntry, event: Event): void {
+    event.stopPropagation();
+    if (!this.canVoid(entry) || this.busyKey) return;
+
+    const voided = !entry.pointsVoided;
+    const msg = voided
+      ? `¿Anular los puntos de "${this.lineLabel(entry)}"?\nLa actividad dejará de sumar al reto y el ranking se recalculará.`
+      : `¿Deshacer la anulación de "${this.lineLabel(entry)}"?\nLa actividad volverá a sumar al reto.`;
+    if (!confirm(msg)) return;
+
+    const key = this.keyOf(entry);
+    this.busyKey = key;
+    this.actionError = '';
+    this.adminService.setActivityVoided(this.competitionId!, {
+      source: entry.source!,
+      sourceId: entry.sourceId!,
+      voided,
+    }).subscribe({
+      next: (updated) => {
+        this.history = updated;
+        this.busyKey = null;
+        this.changed.emit();
+      },
+      error: (err) => {
+        this.busyKey = null;
+        this.actionError = err?.error?.message
+          || (voided ? 'No se pudieron anular los puntos' : 'No se pudo deshacer la anulación');
+      }
+    });
   }
 
   lineLabel(entry: AdminPointHistoryEntry): string {
@@ -168,6 +267,7 @@ export class RetoAdminHistorialModalComponent {
     if (status === 'PUNTUADA') return 'Puntuada';
     if (status === 'NO_PUNTUA') return 'No puntúa';
     if (status === 'EN_REVISION') return 'En revisión';
+    if (status === 'ANULADA') return 'Anulada';
     return status || 'Sin estado';
   }
 
