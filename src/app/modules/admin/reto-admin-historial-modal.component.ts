@@ -87,6 +87,7 @@ import {
                 </p>
                 <p><span class="text-ip-secondary">Tipo:</span> {{ entry.activityLabel }}</p>
                 <p *ngIf="entry.durationMinutes != null"><span class="text-ip-secondary">Duración:</span> {{ entry.durationMinutes }} min</p>
+                <p *ngIf="entry.distanceKm != null"><span class="text-ip-secondary">Distancia:</span> {{ entry.distanceKm | number:'1.0-2' }} km</p>
                 <p *ngIf="entry.occurredAt"><span class="text-ip-secondary">Fecha y hora:</span> {{ entry.occurredAt | date:'dd/MM/yyyy HH:mm' }}</p>
                 <p><span class="text-ip-secondary">Puntos otorgados:</span> {{ entry.points | number:'1.0-1' }}</p>
                 <p><span class="text-ip-secondary">Regla aplicada:</span> {{ entry.ruleApplied }}</p>
