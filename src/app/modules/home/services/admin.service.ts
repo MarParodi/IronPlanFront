@@ -321,6 +321,7 @@ export interface AdminPointHistoryEntry {
   activityType: string;
   activityLabel: string;
   durationMinutes: number | null;
+  distanceKm: number | null;
   occurredAt: string | null;
   points: number;
   ruleApplied: string;
