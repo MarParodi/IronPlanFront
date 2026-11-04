@@ -198,13 +198,13 @@ interface ScopeNode { id: number; name: string; groupType: string; }
             <button *ngIf="estado.estado !== 'ACTIVO'" type="button" class="action-btn danger-outline" (click)="eliminar()" [disabled]="busy">Eliminar experimento</button>
           </div>
           <p class="hint">
-            Snapshots: genera semanas faltantes (1–{{ estado.semanasIntervencion }}).
-            Al cerrar el reto se generan retroactivamente. Piloto de 1 semana → usa columnas
-            <em>volumen_semana_inicio/fin</em> en el CSV (ambas = semana 1).
+            Exportar CSV incluye a todos los inscritos y recalcula las semanas ya transcurridas,
+            sin cerrar el experimento. Cerrar el reto congela el estado.
+            Piloto de 1 semana → usa columnas <em>volumen_semana_inicio/fin</em> (ambas = semana 1).
           </p>
           <p class="hint">
-            CSV semanal: una fila por participante y semana, disponible durante el reto. Incluye a todos
-            los inscritos (sin exigir pre/post-test); usa la columna <em>activo</em> para filtrar.
+            CSV semanal: una fila por participante y semana. Incluye a todos los inscritos;
+            usa la columna <em>activo</em> para filtrar.
           </p>
           <p *ngIf="estado.estado === 'ACTIVO'" class="hint warn">Para eliminar, cierra el reto primero.</p>
 
@@ -571,7 +571,11 @@ export class AdminRetoExperimentoComponent implements OnInit {
   exportar(): void {
     if (!this.selectedRetoId) return;
     this.busy = true;
-    this.retoService.exportarCsv(this.selectedRetoId).subscribe({
+    this.retoService.exportarCsv(this.selectedRetoId, {
+      incluirOutliers: true,
+      soloCompletos: false,
+      incluirInactivos: true,
+    }).subscribe({
       next: (blob) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');

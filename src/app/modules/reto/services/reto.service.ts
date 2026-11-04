@@ -122,10 +122,14 @@ export class RetoService {
     );
   }
 
-  exportarCsv(retoId: number, opts: { incluirOutliers?: boolean; soloCompletos?: boolean } = {}): Observable<Blob> {
+  exportarCsv(
+    retoId: number,
+    opts: { incluirOutliers?: boolean; soloCompletos?: boolean; incluirInactivos?: boolean } = {}
+  ): Observable<Blob> {
     let params = new HttpParams();
     if (opts.incluirOutliers) params = params.set('incluirOutliers', 'true');
     if (opts.soloCompletos === false) params = params.set('soloCompletos', 'false');
+    if (opts.incluirInactivos) params = params.set('incluirInactivos', 'true');
     return this.http.get(`${this.base}/admin/retos/${retoId}/exportar/csv`, {
       params,
       responseType: 'blob',
